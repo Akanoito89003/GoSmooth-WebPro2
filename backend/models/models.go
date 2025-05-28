@@ -1,0 +1,124 @@
+package models
+
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+// User represents a user in the system
+type User struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Email     string             `bson:"email" json:"email" validate:"required,email"`
+	Password  string             `bson:"password" json:"-"`
+	Name      string             `bson:"name" json:"name" validate:"required"`
+	Role      string             `bson:"role" json:"role"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
+}
+
+// RegisterInput represents the input for user registration
+type RegisterInput struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=6"`
+	Name     string `json:"name" validate:"required"`
+}
+
+// LoginCredentials represents the input for user login
+type LoginCredentials struct {
+	Email      string `json:"email" validate:"required,email"`
+	Password   string `json:"password" validate:"required"`
+	RememberMe bool   `json:"remember_me"`
+}
+
+// UpdateProfileInput represents the input for updating user profile
+type UpdateProfileInput struct {
+	Name string `json:"name" validate:"required"`
+}
+
+// UpdateUserInput represents the input for updating user (admin only)
+type UpdateUserInput struct {
+	Name string `json:"name" validate:"required"`
+	Role string `json:"role" validate:"required,oneof=user admin"`
+}
+
+// Review represents a user review
+type Review struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	UserID    string             `bson:"user_id" json:"user_id"`
+	Rating    int                `bson:"rating" json:"rating" validate:"required,min=1,max=5"`
+	Comment   string             `bson:"comment" json:"comment" validate:"required"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
+}
+
+// RouteSuggestion represents a route suggestion
+type RouteSuggestion struct {
+	ID            primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	UserID        string             `bson:"user_id" json:"user_id"`
+	StartLocation string             `bson:"start_location" json:"start_location" validate:"required"`
+	EndLocation   string             `bson:"end_location" json:"end_location" validate:"required"`
+	Description   string             `bson:"description" json:"description"`
+	CreatedAt     time.Time          `bson:"created_at" json:"created_at"`
+	UpdatedAt     time.Time          `bson:"updated_at" json:"updated_at"`
+}
+
+// RouteInput represents the input for route cost estimation
+type RouteInput struct {
+	StartLocation string  `json:"start_location" validate:"required"`
+	EndLocation   string  `json:"end_location" validate:"required"`
+	Distance      float64 `json:"distance" validate:"required"`
+	Duration      int     `json:"duration" validate:"required"` // in minutes
+}
+
+// Location represents a geographical location with details
+// (เพิ่มฟิลด์ตามตัวอย่าง JSON)
+type Location struct {
+	ID          string   `bson:"location_id" json:"LocationID"`
+	Name        string   `bson:"name" json:"Name"`
+	Description string   `bson:"description" json:"Description"`
+	Category    string   `bson:"category" json:"Category"`
+	Latitude    float64  `bson:"latitude" json:"Latitude"`
+	Longitude   float64  `bson:"longitude" json:"Longitude"`
+	Address     string   `bson:"address" json:"Address"`
+	Phone       string   `bson:"phone" json:"Phone"`
+	Website     string   `bson:"website" json:"Website"`
+	ImageURL    []string `bson:"image_url" json:"ImageURL"`
+}
+
+// Route represents a route between two locations
+type Route struct {
+	ID            primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	StartLocID    string             `bson:"start_loc_id" json:"StartLocID"`
+	EndLocID      string             `bson:"end_loc_id" json:"EndLocID"`
+	Distance      float64            `bson:"distance" json:"Distance"`
+	Duration      int                `bson:"duration" json:"Duration"`
+	Cost          float64            `bson:"cost" json:"Cost"`
+	TransportMode string             `bson:"transport_mode" json:"TransportMode"`
+	CreatedAt     time.Time          `bson:"created_at" json:"CreatedAt"`
+	UpdatedAt     time.Time          `bson:"updated_at" json:"UpdatedAt"`
+}
+
+// Place represents a place in the system (ปรับให้ตรงกับ JSON)
+type Place struct {
+	ID          string   `bson:"place_id" json:"PlaceID"`
+	Name        string   `bson:"name" json:"Name"`
+	Location    string   `bson:"location" json:"Location"`
+	Description string   `bson:"description" json:"Description"`
+	Category    string   `bson:"category" json:"Category"`
+	ImageURL    []string `bson:"image_url" json:"ImageURL"`
+	Rating      float64  `bson:"rating" json:"Rating"`
+	Coordinates struct {
+		Lat float64 `bson:"lat" json:"lat"`
+		Lng float64 `bson:"lng" json:"lng"`
+	} `bson:"coordinates" json:"Coordinates"`
+	CreatedAt time.Time `bson:"created_at" json:"CreatedAt"`
+	UpdatedAt time.Time `bson:"updated_at" json:"UpdatedAt"`
+}
+
+// UpdatePlaceInput represents the input for updating a place
+type UpdatePlaceInput struct {
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description"`
+	Location    string `json:"location" validate:"required"`
+}

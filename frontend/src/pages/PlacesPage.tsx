@@ -5,20 +5,13 @@ import { FaStar, FaMapMarkerAlt, FaSearch, FaFilter, FaTimes, FaEdit, FaTrash } 
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 
-const categories = [
-  { id: 'all', name: 'All' },
-  { id: 'attractions', name: 'Attractions' },
-  { id: 'restaurants', name: 'Restaurants' },
-  { id: 'hotels', name: 'Hotels' },
-  { id: 'shopping', name: 'Shopping' },
-  { id: 'nature', name: 'Nature' },
-];
-
 type Place = {
   id: string;
   name: string;
-  location: string;
+  locationId: string;
+  locationName?: string;
   description: string;
+  coverImage: string;
   imageUrl: string[];
   rating: number;
   category: string;
@@ -47,7 +40,7 @@ const PlaceCard: React.FC<PlaceCardProps & { apiUrl: string }> = ({ place, curre
     >
       <Link to={`/places/${place.id}`}>
         <img
-          src={getImageUrl(place.imageUrl[0], apiUrl)}
+          src={getImageUrl(place.coverImage, apiUrl)}
           alt={place.name}
           className="w-full h-48 object-cover"
         />
@@ -59,7 +52,7 @@ const PlaceCard: React.FC<PlaceCardProps & { apiUrl: string }> = ({ place, curre
           <h3 className="text-base font-bold mb-1 truncate">{place.name}</h3>
           <div className="flex items-center text-xs text-neutral-500 mb-1">
             <FaMapMarkerAlt className="mr-1" />
-            <span className="truncate">{place.location}</span>
+            <span className="truncate">{place.locationName}</span>
           </div>
           <p className="text-xs text-neutral-600 mb-2 line-clamp-2">{place.description}</p>
           <div className="mt-auto">
@@ -82,37 +75,59 @@ const PlacesPage: React.FC = () => {
     rating: 0,
     priceRange: [0, 5],
   });
+  const [locations, setLocations] = useState<{[key: string]: string}>({});
   const API_URL = import.meta.env.VITE_API_URL;
   const auth = useAuth();
   const user = auth?.user;
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([ { id: 'all', name: 'All' } ]);
 
   useEffect(() => {
-    fetchPlaces();
+    fetchLocations();
   }, []);
 
-  useEffect(() => {
-    filterPlaces();
-  }, [searchTerm, activeCategory, filters, places]);
+  const fetchLocations = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/locations`);
+      const locationsData = response.data.locations || [];
+      const locationMap: {[key: string]: string} = {};
+      locationsData.forEach((loc: any) => {
+        locationMap[loc.LocationID] = loc.Name;
+      });
+      setLocations(locationMap);
+      fetchPlaces(locationMap);
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      fetchPlaces({});
+    }
+  };
 
-  const fetchPlaces = async () => {
+  const fetchPlaces = async (locationMap: {[key: string]: string}) => {
     try {
       const response = await axios.get(`${API_URL}/api/places`);
       const data = Array.isArray(response.data)
         ? response.data
         : response.data.places || response.data.data || [];
-      console.log('data from API', data);
-      const placesData: Place[] = data.map((p: any) => ({
-        id: p.place_id ?? p.PlaceID ?? '',
-        name: p.Name ?? '-',
-        location: p.Location ?? '-',
-        description: p.Description ?? '-',
-        imageUrl: Array.isArray(p.ImageURL) ? p.ImageURL : [],
-        rating: typeof p.Rating === 'number' ? p.Rating : 0,
-        category: p.Category ?? '-',
-        priceLevel: typeof p.PriceLevel === 'number' ? p.PriceLevel : 3,
-        tags: Array.isArray(p.Tags) ? p.Tags : (p.Category ? [p.Category] : []),
-      }));
-      console.log('placesData', placesData);
+      const placesData: Place[] = data.map((p: any) => {
+        const locId = p.LocationID ?? p.location_id ?? p.locationId ?? '';
+        return {
+          id: p.place_id ?? p.PlaceID ?? '',
+          name: p.Name ?? '-',
+          locationId: locId,
+          locationName: p.LocationName ?? locationMap[locId] ?? '-',
+          description: p.Description ?? '-',
+          coverImage: p.CoverImage ?? '',
+          imageUrl: Array.isArray(p.HighlightImages) ? p.HighlightImages : [],
+          rating: typeof p.Rating === 'number' ? p.Rating : 0,
+          category: p.Category ?? '-',
+          priceLevel: typeof p.PriceLevel === 'number' ? p.PriceLevel : 3,
+          tags: Array.isArray(p.Tags) ? p.Tags : (p.Category ? [p.Category] : []),
+        };
+      });
+      const uniqueCategories = Array.from(new Set(placesData.map(p => p.category).filter(Boolean)));
+      setCategories([
+        { id: 'all', name: 'All' },
+        ...uniqueCategories.map(cat => ({ id: cat, name: cat.charAt(0).toUpperCase() + cat.slice(1) }))
+      ]);
       setPlaces(placesData);
       setFilteredPlaces(placesData);
       setLoading(false);
@@ -122,12 +137,12 @@ const PlacesPage: React.FC = () => {
     }
   };
 
-  const filterPlaces = () => {
+  useEffect(() => {
     let filtered = [...places];
     if (searchTerm) {
       filtered = filtered.filter(place => 
         place.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        place.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        place.locationName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         place.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (place.tags && place.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
       );
@@ -143,7 +158,7 @@ const PlacesPage: React.FC = () => {
       place.priceLevel <= filters.priceRange[1]
     );
     setFilteredPlaces(filtered);
-  };
+  }, [places, searchTerm, activeCategory, filters]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
   const handleCategoryChange = (categoryId: string) => setActiveCategory(categoryId);
@@ -210,7 +225,8 @@ const PlacesPage: React.FC = () => {
                       <button
                         key={rating}
                         onClick={() => handleRatingChange(rating)}
-                        className={`px-3 py-1 rounded-md text-sm ${filters.rating === rating
+                        className={`px-3 py-1 rounded-md text-sm ${
+                          filters.rating === rating
                             ? 'bg-primary-600 text-white'
                             : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
                         }`}
@@ -230,9 +246,10 @@ const PlacesPage: React.FC = () => {
               <button
                 key={category.id}
                 onClick={() => handleCategoryChange(category.id)}
-                className={`px-4 py-2 rounded-full whitespace-nowrap ${activeCategory === category.id
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                className={`px-4 py-2 rounded-full whitespace-nowrap ${
+                  activeCategory === category.id
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-white text-neutral-700 hover:bg-neutral-100'
                 }`}
               >
                 {category.name}
@@ -284,4 +301,4 @@ const PlacesPage: React.FC = () => {
   );
 };
 
-export default PlacesPage; 
+export default PlacesPage;

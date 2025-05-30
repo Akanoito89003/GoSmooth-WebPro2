@@ -72,18 +72,10 @@ type RouteInput struct {
 }
 
 // Location represents a geographical location with details
-// (เพิ่มฟิลด์ตามตัวอย่าง JSON)
 type Location struct {
-	ID          string   `bson:"location_id" json:"LocationID"`
-	Name        string   `bson:"name" json:"Name"`
-	Description string   `bson:"description" json:"Description"`
-	Category    string   `bson:"category" json:"Category"`
-	Latitude    float64  `bson:"latitude" json:"Latitude"`
-	Longitude   float64  `bson:"longitude" json:"Longitude"`
-	Address     string   `bson:"address" json:"Address"`
-	Phone       string   `bson:"phone" json:"Phone"`
-	Website     string   `bson:"website" json:"Website"`
-	ImageURL    []string `bson:"image_url" json:"ImageURL"`
+	ID          string `bson:"location_id" json:"LocationID"`
+	Name        string `bson:"name" json:"Name"`
+	Description string `bson:"description" json:"Description"`
 }
 
 // Route represents a route between two locations
@@ -99,19 +91,25 @@ type Route struct {
 	UpdatedAt     time.Time          `bson:"updated_at" json:"UpdatedAt"`
 }
 
-// Place represents a place in the system (ปรับให้ตรงกับ JSON)
+// Place represents a place in the system
 type Place struct {
-	ID          string   `bson:"place_id" json:"PlaceID"`
-	Name        string   `bson:"name" json:"Name"`
-	Location    string   `bson:"location" json:"Location"`
-	Description string   `bson:"description" json:"Description"`
-	Category    string   `bson:"category" json:"Category"`
-	ImageURL    []string `bson:"image_url" json:"ImageURL"`
-	Rating      float64  `bson:"rating" json:"Rating"`
-	Coordinates struct {
+	ID              string   `bson:"place_id" json:"PlaceID"`
+	Name            string   `bson:"name" json:"Name"`
+	LocationID      string   `bson:"location_id" json:"LocationID"`
+	LocationName    string   `bson:"location_name,omitempty" json:"LocationName,omitempty"`
+	Description     string   `bson:"description" json:"Description"`
+	Category        string   `bson:"category" json:"Category"`
+	CoverImage      string   `bson:"cover_image" json:"CoverImage"`
+	HighlightImages []string `bson:"highlight_images" json:"HighlightImages"`
+	Rating          float64  `bson:"rating" json:"Rating"`
+	Coordinates     struct {
 		Lat float64 `bson:"lat" json:"lat"`
 		Lng float64 `bson:"lng" json:"lng"`
 	} `bson:"coordinates" json:"Coordinates"`
+	Address   string    `bson:"address" json:"Address"`
+	Phone     string    `bson:"phone" json:"Phone"`
+	Website   string    `bson:"website" json:"Website"`
+	Hours     string    `bson:"hours" json:"Hours"`
 	CreatedAt time.Time `bson:"created_at" json:"CreatedAt"`
 	UpdatedAt time.Time `bson:"updated_at" json:"UpdatedAt"`
 }
@@ -120,5 +118,5 @@ type Place struct {
 type UpdatePlaceInput struct {
 	Name        string `json:"name" validate:"required"`
 	Description string `json:"description"`
-	Location    string `json:"location" validate:"required"`
+	LocationID  string `json:"location_id" validate:"required"`
 }

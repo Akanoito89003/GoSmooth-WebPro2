@@ -5,6 +5,7 @@ export interface Place {
   location: string;
   description: string;
   longDescription?: string;
+  coverImage: string;
   imageUrl: string[];
   gallery?: string[];
   rating: number;
@@ -24,6 +25,10 @@ export interface Place {
   highlights: string[];
   reviews: Review[];
   nearbyPlaces: NearbyPlace[];
+  hours?: string;
+  address?: string;
+  phone?: string;
+  website?: string;
 }
 
 export interface Review {

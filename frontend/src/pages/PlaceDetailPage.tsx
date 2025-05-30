@@ -28,36 +28,56 @@ const PlaceDetailPage: React.FC = () => {
 
   useEffect(() => { fetchPlaceDetails(); }, [id]);
 
+  // Debug API_URL
+  console.log('[DEBUG] API_URL:', API_URL);
+
+  useEffect(() => {
+    if (place) {
+      console.log('[DEBUG] Render Hero backgroundImage:', place.coverImage ? `${API_URL}/uploads/${place.coverImage}` : place.imageUrl[0]);
+    }
+  }, [place]);
+
   const fetchPlaceDetails = async () => {
     try {
+      console.log('[DEBUG] PlaceDetailPage id:', id);
       const response = await axios.get(`${API_URL}/api/places/${id}`);
+      console.log('[DEBUG] API response:', response.data);
       const p = response.data.place || response.data;
       const placeData: Place = {
         id: p.id || p._id || p.ID || p.PlaceID || p.name,
         name: p.name || p.Name,
-        location: p.location || p.Location || p.address || '',
+        location: p.location || p.Location || p.address || p.Address || '',
         description: p.description || p.Description || '',
         longDescription: p.longDescription || p.LongDescription || p.description || p.Description || '',
-        imageUrl: Array.isArray(p.imageUrl || p.ImageURL) ? (p.imageUrl || p.ImageURL) : [(p.imageUrl || p.ImageURL || 'https://images.pexels.com/photos/1287145/pexels-photo-1287145.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')],
-        gallery: Array.isArray(p.gallery || p.Gallery) ? (p.gallery || p.Gallery) : (Array.isArray(p.images) ? p.images : []),
+        coverImage: p.CoverImage || '',
+        imageUrl: Array.isArray(p.HighlightImages) ? p.HighlightImages : [],
+        gallery: Array.isArray(p.HighlightImages) ? p.HighlightImages.map((img: string) => `${API_URL}/uploads/${img}`) : [],
         rating: p.rating || p.Rating || 4.5,
         priceLevel: p.priceLevel || p.PriceLevel || 3,
         category: p.category || p.Category || 'attractions',
         coordinates: p.coordinates || p.Coordinates || { lat: 0, lng: 0 },
         tags: p.tags || (p.category ? [p.category] : []) || [],
-        contact: p.contact || {
-          phone: '',
-          website: '',
-          hours: '',
-          address: p.address || '',
+        contact: {
+          phone: p.phone || p.Phone || '',
+          website: p.website || p.Website || '',
+          hours: p.hours || p.Hours || '',
+          address: p.address || p.Address || '',
         },
+        phone: p.phone || p.Phone || '',
+        website: p.website || p.Website || '',
+        hours: p.hours || p.Hours || '',
+        address: p.address || p.Address || '',
         highlights: p.highlights || [],
         reviews: p.reviews || [],
         nearbyPlaces: p.nearbyPlaces || [],
       };
+      // Debug coverImage and url
+      console.log('[DEBUG] coverImage:', placeData.coverImage);
+      console.log('[DEBUG] coverImage url:', `${API_URL}/uploads/${placeData.coverImage}`);
       setPlace(placeData);
       setLoading(false);
     } catch (error) {
+      console.error('[DEBUG] Error loading place details:', error);
       setError('Failed to load place details. Please try again later.');
       setLoading(false);
     }
@@ -123,23 +143,20 @@ const PlaceDetailPage: React.FC = () => {
   return (
     <div className="page-container">
       {/* Hero Section */}
-      <div className="place-detail-hero" style={{ backgroundImage: `url(${place.imageUrl[0]})` }}>
-        <div className="place-detail-hero-overlay"></div>
-        <div className="container-custom">
+      <div className="place-detail-hero" style={{ backgroundImage: `url(${place.coverImage ? `${API_URL}/uploads/${place.coverImage}` : place.imageUrl[0]})`, minHeight: '400px', height: '40vh', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
+        <div className="place-detail-hero-overlay" style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 1 }}></div>
+        <div className="container-custom px-6 pt-6" style={{ position: 'relative', zIndex: 2 }}>
           <div className="pb-8 md:pb-16 text-white max-w-3xl">
-            <h1 className="place-detail-title">{place.name}</h1>
+            <h1 className="place-detail-title text-white">{place.name}</h1>
             <div className="flex items-center mb-4">
               <div className="flex items-center mr-4">
-                <FaStar className="star-icon mr-1" />
-                <span className="font-medium">{place.rating.toFixed(1)}</span>
+                <FaStar className="star-icon mr-1 text-white" />
+                <span className="font-medium text-white">{place.rating.toFixed(1)}</span>
                 <span className="text-white text-opacity-80 ml-1">({place.reviews.length} reviews)</span>
               </div>
               <div className="flex items-center mr-4">
                 <FaMapMarkerAlt className="location-icon mr-1 text-white text-opacity-80" />
-                <span>{place.location}</span>
-              </div>
-              <div className="hidden md:flex items-center">
-                <span className="text-white text-opacity-80">{Array(place.priceLevel).fill('$').join('')}</span>
+                <span className="text-white">{place.location}</span>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -155,20 +172,20 @@ const PlaceDetailPage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:w-2/3">
             {/* Action Buttons */}
-            <div className="card p-4 mb-6 flex justify-between">
-              <Link to={`/routes?destination=${encodeURIComponent(place.name)}`} className="btn btn-primary flex-1 mr-2 flex items-center justify-center">
+            <div className="card p-4 mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-center">
+              <Link to={`/routes?destination=${encodeURIComponent(place.name)}`} className="btn btn-primary flex-1 sm:mr-2 flex items-center justify-center">
                 <FaRoute className="mr-2" />
                 Get Directions
               </Link>
-              <button onClick={toggleFavorite} className="btn btn-outline flex-1 ml-2 flex items-center justify-center">
+              <button onClick={toggleFavorite} className="btn btn-outline flex-1 sm:ml-2 flex items-center justify-center">
                 {isFavorite ? (<><FaHeart className="mr-2 text-primary-600" />Saved</>) : (<><FaRegHeart className="mr-2" />Save</>)}
               </button>
-              <button className="btn btn-outline ml-2 p-3 flex items-center justify-center"><FaShareAlt /></button>
+              <button className="btn btn-outline sm:ml-2 p-3 flex items-center justify-center"><FaShareAlt /></button>
             </div>
-            {/* Tabs */}
+            {/* Tabs Navigation */}
             <div className="card overflow-hidden mb-6">
               <div className="border-b border-neutral-200">
-                <nav className="flex">
+                <nav className="flex gap-6">
                   <button onClick={() => setActiveTab('overview')} className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}>Overview</button>
                   <button onClick={() => setActiveTab('photos')} className={`tab-button ${activeTab === 'photos' ? 'active' : ''}`}>Photos</button>
                   <button onClick={() => setActiveTab('reviews')} className={`tab-button ${activeTab === 'reviews' ? 'active' : ''}`}>Reviews ({place.reviews.length})</button>
@@ -181,11 +198,22 @@ const PlaceDetailPage: React.FC = () => {
                     <h2 className="text-2xl font-bold mb-4">About {place.name}</h2>
                     <p className="text-neutral-700 mb-6 whitespace-pre-line">{place.longDescription}</p>
                     <h3 className="text-xl font-bold mb-3">Highlights</h3>
-                    <ul className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {place.highlights.map((highlight, index) => (
-                        <li key={index} className="flex items-start"><span className="text-primary-600 mr-2">•</span><span>{highlight}</span></li>
-                      ))}
-                    </ul>
+                    <div className="mb-6">
+                      {place.imageUrl && place.imageUrl.length > 0 ? (
+                        <div className="flex gap-3 flex-wrap">
+                          {place.imageUrl.slice(0, 5).map((img, idx) => (
+                            <img
+                              key={idx}
+                              src={`${API_URL}/uploads/${img}`}
+                              alt={`Highlight ${idx + 1}`}
+                              className="w-20 h-20 object-cover rounded shadow border"
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-neutral-400 text-sm">No highlights</span>
+                      )}
+                    </div>
                     {/* Map Preview */}
                     <h3 className="text-xl font-bold mb-3">Location</h3>
                     <div className="map-preview-container">
@@ -203,7 +231,7 @@ const PlaceDetailPage: React.FC = () => {
                 {activeTab === 'photos' && (
                   <div>
                     <h2 className="text-2xl font-bold mb-4">Photos</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       {(place.gallery ?? []).map((photo, index) => (
                         <div key={index} className="rounded-lg overflow-hidden h-64">
                           <img
@@ -349,50 +377,50 @@ const PlaceDetailPage: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:w-1/3">
             {/* Contact Information */}
-            <div className="card p-6 mb-6">
-              <h2 className="text-xl font-bold mb-4">Contact Information</h2>
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <div className="w-8 flex-shrink-0 flex justify-center mt-1">
-                    <FaMapMarkerAlt className="text-primary-600" />
+            <div className="card p-8 rounded-xl shadow-lg bg-white mb-6">
+              <h2 className="text-2xl font-bold mb-8">Contact Information</h2>
+              <div className="space-y-7">
+                <div className="flex items-start gap-4">
+                  <div className="mt-1">
+                    <FaMapMarkerAlt className="text-primary-600 text-2xl" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Address</h3>
-                    <p className="text-neutral-600">{place.contact.address}</p>
+                    <h3 className="font-semibold text-lg mb-1">Address</h3>
+                    <p className="text-neutral-600">{place.address || place.contact.address}</p>
                   </div>
                 </div>
-                <div className="flex items-start">
-                  <div className="w-8 flex-shrink-0 flex justify-center mt-1">
-                    <FaPhone className="text-primary-600" />
+                <div className="flex items-start gap-4">
+                  <div className="mt-1">
+                    <FaPhone className="text-primary-600 text-2xl" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Phone</h3>
-                    <p className="text-neutral-600">{place.contact.phone}</p>
+                    <h3 className="font-semibold text-lg mb-1">Phone</h3>
+                    <p className="text-neutral-600">{place.phone || place.contact.phone}</p>
                   </div>
                 </div>
-                <div className="flex items-start">
-                  <div className="w-8 flex-shrink-0 flex justify-center mt-1">
-                    <FaGlobe className="text-primary-600" />
+                <div className="flex items-start gap-4">
+                  <div className="mt-1">
+                    <FaGlobe className="text-primary-600 text-2xl" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Website</h3>
+                    <h3 className="font-semibold text-lg mb-1">Website</h3>
                     <a 
-                      href={place.contact.website} 
+                      href={place.website || place.contact.website} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="text-primary-600 hover:underline"
+                      className="text-primary-600 hover:underline break-all"
                     >
-                      {place.contact.website.replace(/^https?:\/\//, '')}
+                      {place.website || place.contact.website.replace(/^https?:\/\//, '')}
                     </a>
                   </div>
                 </div>
-                <div className="flex items-start">
-                  <div className="w-8 flex-shrink-0 flex justify-center mt-1">
-                    <FaClock className="text-primary-600" />
+                <div className="flex items-start gap-4">
+                  <div className="mt-1">
+                    <FaClock className="text-primary-600 text-2xl" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Hours</h3>
-                    <p className="text-neutral-600">{place.contact.hours}</p>
+                    <h3 className="font-semibold text-lg mb-1">Hours</h3>
+                    <p className="text-neutral-600">{place.hours || place.contact.hours}</p>
                   </div>
                 </div>
               </div>

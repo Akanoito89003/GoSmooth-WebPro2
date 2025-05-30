@@ -72,7 +72,7 @@ func UpdatePlace(c *gin.Context) {
 		"$set": bson.M{
 			"name":        input.Name,
 			"description": input.Description,
-			"location":    input.Location,
+			"location_id": input.LocationID,
 			"updated_at":  time.Now(),
 		},
 	}

@@ -155,21 +155,10 @@ const Footer = () => {
             GoSmooth
           </FooterLogo>
           <FooterDescription>
-            Making travel planning seamless and efficient. 
-            Find the best routes, estimate costs, and read reviews
-            to make your journey smooth.
+            ทำให้การวางแผนการเดินทางราบรื่นและมีประสิทธิภาพ
+            ค้นหาเส้นทางที่ดีที่สุด ประเมินค่าใช้จ่าย และอ่านบทวิจารณ์
+            เพื่อให้การเดินทางของคุณราบรื่น
           </FooterDescription>
-          <SocialIcons>
-            <SocialIcon href="#" aria-label="Facebook">
-              <Facebook size={18} />
-            </SocialIcon>
-            <SocialIcon href="#" aria-label="Twitter">
-              <Twitter size={18} />
-            </SocialIcon>
-            <SocialIcon href="#" aria-label="Instagram">
-              <Instagram size={18} />
-            </SocialIcon>
-          </SocialIcons>
         </FooterColumn>
         
         <FooterColumn>

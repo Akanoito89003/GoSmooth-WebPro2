@@ -173,13 +173,21 @@ const fetchRoute = async (
     // วาดเส้นตรง (great-circle) สำหรับโหมดที่ไม่มี routing จริง
     return [start, end];
   }
-  // สำหรับ car (หรือ foot, bike สามารถเพิ่มได้)
   const profile = mode === 'car' ? 'driving-car' : 'driving-car';
   const url = `https://api.openrouteservice.org/v2/directions/${profile}?api_key=${ORS_API_KEY}&start=${start[1]},${start[0]}&end=${end[1]},${end[0]}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (!data.features || !data.features[0]) return [start, end];
-  return data.features[0].geometry.coordinates.map(([lng, lat]: [number, number]) => [lat, lng]);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      console.error('ORS API error:', res.status, res.statusText, url);
+      throw new Error(`ORS API error: ${res.status} ${res.statusText}`);
+    }
+    const data = await res.json();
+    if (!data.features || !data.features[0]) return [start, end];
+    return data.features[0].geometry.coordinates.map(([lng, lat]: [number, number]) => [lat, lng]);
+  } catch (err) {
+    console.error('fetchRoute error:', err);
+    throw err;
+  }
 };
 
 const haversine = (
@@ -284,8 +292,8 @@ const RoutePlanner = () => {
           setDuration(dist * (mode === 'car' ? 2 : mode === 'bus' ? 3 : mode === 'train' ? 2.5 : 1));
           setCost(calculateCost(mode, originCoord, destCoord));
           setIsRouteCalculated(true);
-        } catch (error) {
-          setErrorMsg('Error fetching route.');
+        } catch (error: any) {
+          setErrorMsg('ไม่สามารถดึงเส้นทางถนนจริงจาก ORS API ได้ กรุณาตรวจสอบ API Key หรืออินเทอร์เน็ต');
           setRouteCoords([]);
           setIsRouteCalculated(false);
         } finally {

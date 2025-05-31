@@ -982,6 +982,7 @@ func setupRoutes(router *gin.Engine) {
 		api.GET("/places", func(c *gin.Context) {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
+
 			cursor, err := db.Collection("places").Find(ctx, bson.M{})
 			if err != nil {
 				c.JSON(500, gin.H{"error": "Failed to fetch places"})
@@ -994,6 +995,13 @@ func setupRoutes(router *gin.Engine) {
 				c.JSON(500, gin.H{"error": "Failed to decode places"})
 				return
 			}
+
+			// Debug log
+			log.Printf("[DEBUG] Found %d places", len(places))
+			for _, p := range places {
+				log.Printf("[DEBUG] Place: %s, Coordinates: %+v", p.Name, p.Coordinates)
+			}
+
 			c.JSON(200, gin.H{"places": places})
 		})
 

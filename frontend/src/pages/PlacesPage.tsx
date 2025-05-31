@@ -115,7 +115,7 @@ const PlacesPage: React.FC = () => {
           locationId: locId,
           locationName: p.LocationName ?? locationMap[locId] ?? '-',
           description: p.Description ?? '-',
-          coverImage: p.CoverImage ?? '',
+          coverImage: p.CoverImage ?? p.coverImage ?? p.cover_image ?? '',
           imageUrl: Array.isArray(p.HighlightImages) ? p.HighlightImages : [],
           rating: typeof p.Rating === 'number' ? p.Rating : 0,
           category: p.Category ?? '-',

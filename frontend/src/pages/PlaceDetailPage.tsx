@@ -6,6 +6,8 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import ReactStars from 'react-stars';
 import { Place, Review } from '../types/place';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -216,14 +218,30 @@ const PlaceDetailPage: React.FC = () => {
                     </div>
                     {/* Map Preview */}
                     <h3 className="text-xl font-bold mb-3">Location</h3>
-                    <div className="map-preview-container">
-                      <iframe
-                        width="100%"
-                        height="100%"
-                        frameBorder="0"
-                        src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(place.name)}`}
-                        allowFullScreen
-                      ></iframe>
+                    <div className="map-preview-container" style={{ height: 200, borderRadius: 12, overflow: 'hidden' }}>
+                      {place.coordinates && place.coordinates.lat && place.coordinates.lng ? (
+                        <MapContainer
+                          center={[place.coordinates.lat, place.coordinates.lng]}
+                          zoom={15}
+                          style={{ height: '100%', width: '100%' }}
+                          scrollWheelZoom={false}
+                          dragging={false}
+                          doubleClickZoom={false}
+                          zoomControl={false}
+                        >
+                          <TileLayer
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          />
+                          <Marker position={[place.coordinates.lat, place.coordinates.lng]}>
+                            <Popup>
+                              {place.name}
+                            </Popup>
+                          </Marker>
+                        </MapContainer>
+                      ) : (
+                        <div style={{ color: '#888', padding: 16 }}>No coordinates available</div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -339,38 +357,6 @@ const PlaceDetailPage: React.FC = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
-            {/* Nearby Places */}
-            <div className="card p-6 mb-6">
-              <h2 className="text-xl font-bold mb-4">Nearby Places</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {place.nearbyPlaces.map((nearbyPlace) => (
-                  <Link
-                    key={nearbyPlace.id}
-                    to={`/places/${nearbyPlace.id}`}
-                    className="group"
-                  >
-                    <div className="rounded-lg overflow-hidden">
-                      <div className="h-40 overflow-hidden">
-                        <img
-                          src={nearbyPlace.imageUrl}
-                          alt={nearbyPlace.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                      <div className="p-3">
-                        <div className="flex justify-between items-center">
-                          <h3 className="font-medium group-hover:text-primary-600 transition-colors">{nearbyPlace.name}</h3>
-                          <div className="flex items-center text-accent-500">
-                            <FaStar size={12} />
-                            <span className="ml-1 text-sm">{nearbyPlace.rating}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
               </div>
             </div>
           </div>

@@ -7,6 +7,9 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
 import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
+import L from 'leaflet';
+import React from 'react';
 
 // Type Place รองรับทั้ง id, place_id, name, coordinates (และ fallback สำหรับ id)
 interface Place {
@@ -17,6 +20,7 @@ interface Place {
   Name?: string;
   coordinates?: { lat: number; lng: number };
   Coordinates?: { lat: number; lng: number };
+  address?: string;
   [key: string]: any;
 }
 
@@ -236,7 +240,23 @@ const getPlaceId = (p: Place) => p.place_id || p.PlaceID || p.id || '';
 const getPlaceName = (p: Place) => p.name || p.Name || '';
 const getPlaceCoordinates = (p: Place) => p.coordinates || p.Coordinates;
 
+// สร้าง green icon สำหรับบ้านของฉัน
+const homeIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
 const RoutePlanner = () => {
+  const { user } = useAuth();
+  // DEBUG: log user address
+  console.log('DEBUG: user.address', user?.address);
+  if (user?.address) {
+    console.log('DEBUG: user.address.lat', user.address.lat, 'user.address.lng', user.address.lng);
+  }
   const [places, setPlaces] = useState<Place[]>([]);
   const [origin, setOrigin] = useState('');
   const [originId, setOriginId] = useState('');
@@ -261,6 +281,34 @@ const RoutePlanner = () => {
   const [showOriginDropdown, setShowOriginDropdown] = useState(false);
   const [showDestDropdown, setShowDestDropdown] = useState(false);
 
+  // เพิ่ม myHomeOption ถ้ามี user.address
+  const myHomeOption = user && user.address && typeof user.address.lat === 'number' && typeof user.address.lng === 'number'
+    ? [{
+        id: 'my-home',
+        name: 'บ้านของฉัน',
+        coordinates: { lat: user.address.lat, lng: user.address.lng },
+        address: `${user.address.addressLine || ''}${user.address.city ? ', ' + user.address.city : ''}${user.address.province ? ', ' + user.address.province : ''}${user.address.zipcode ? ', ' + user.address.zipcode : ''}${user.address.country ? ', ' + user.address.country : ''}`
+      }]
+    : [];
+
+  const [showModeWarning, setShowModeWarning] = useState(false);
+  const [pendingMode, setPendingMode] = useState<string | null>(null);
+
+  // ฟังก์ชันสำหรับ handle mode change
+  const handleModeChange = (modeKey: string) => {
+    if (["bus", "train", "plane"].includes(modeKey)) {
+      setPendingMode(modeKey);
+      setShowModeWarning(true);
+    } else {
+      setMode(modeKey);
+    }
+  };
+  const handleAcceptWarning = () => {
+    if (pendingMode) setMode(pendingMode);
+    setShowModeWarning(false);
+    setPendingMode(null);
+  };
+
   useEffect(() => {
     axios.get('/api/places')
       .then(res => {
@@ -270,18 +318,40 @@ const RoutePlanner = () => {
   }, []);
 
   useEffect(() => {
-    const o = places.find(p => getPlaceId(p) === originId);
-    const d = places.find(p => getPlaceId(p) === destinationId);
-    const oCoord = o ? getPlaceCoordinates(o) : null;
-    const dCoord = d ? getPlaceCoordinates(d) : null;
-    setOriginCoord(oCoord && typeof oCoord.lat === 'number' && typeof oCoord.lng === 'number' ? [oCoord.lat, oCoord.lng] : null);
-    setDestCoord(dCoord && typeof dCoord.lat === 'number' && typeof dCoord.lng === 'number' ? [dCoord.lat, dCoord.lng] : null);
-    if (oCoord && typeof oCoord.lat === 'number' && typeof oCoord.lng === 'number') setMapCenter([oCoord.lat, oCoord.lng]);
-  }, [originId, destinationId, places]);
+    let oCoord: [number, number] | null = null;
+    let dCoord: [number, number] | null = null;
+    if (originId === 'my-home' && user?.address) {
+      oCoord = [user.address.lat, user.address.lng];
+    } else {
+      const o = places.find(p => getPlaceId(p) === originId);
+      const coord = o ? getPlaceCoordinates(o) : null;
+      if (coord && typeof coord.lat === 'number' && typeof coord.lng === 'number') {
+        oCoord = [coord.lat, coord.lng];
+      } else {
+        oCoord = null;
+      }
+    }
+    if (destinationId === 'my-home' && user?.address) {
+      dCoord = [user.address.lat, user.address.lng];
+    } else {
+      const d = places.find(p => getPlaceId(p) === destinationId);
+      const coord = d ? getPlaceCoordinates(d) : null;
+      if (coord && typeof coord.lat === 'number' && typeof coord.lng === 'number') {
+        dCoord = [coord.lat, coord.lng];
+      } else {
+        dCoord = null;
+      }
+    }
+    setOriginCoord(oCoord);
+    setDestCoord(dCoord);
+    if (oCoord) setMapCenter(oCoord);
+  }, [originId, destinationId, places, user]);
 
   useEffect(() => {
     const getRoute = async () => {
       setErrorMsg('');
+      // DEBUG: log origin/dest coords
+      console.log('DEBUG: originCoord', originCoord, 'destCoord', destCoord);
       if (originCoord && destCoord) {
         setLoadingRoute(true);
         try {
@@ -293,9 +363,11 @@ const RoutePlanner = () => {
           setCost(calculateCost(mode, originCoord, destCoord));
           setIsRouteCalculated(true);
         } catch (error: any) {
-          setErrorMsg('ไม่สามารถดึงเส้นทางถนนจริงจาก ORS API ได้ กรุณาตรวจสอบ API Key หรืออินเทอร์เน็ต');
+          setErrorMsg('ไม่สามารถดึงเส้นทางถนนจริงจาก ORS API ได้ กรุณาตรวจสอบ API Key, พิกัด, หรืออินเทอร์เน็ต\n' + (error?.message || ''));
           setRouteCoords([]);
           setIsRouteCalculated(false);
+          // DEBUG: log error
+          console.error('DEBUG: ORS API error', error);
         } finally {
           setLoadingRoute(false);
         }
@@ -305,7 +377,10 @@ const RoutePlanner = () => {
         setDistance(0);
         setDuration(0);
         setIsRouteCalculated(false);
-        if (origin && destination) setErrorMsg('ไม่พบข้อมูลพิกัดของสถานที่ที่เลือก');
+        if (origin && destination) setErrorMsg('ไม่พบข้อมูลพิกัดของสถานที่ที่เลือก (origin/destination)');
+        // DEBUG: log missing coords
+        if (!originCoord) console.warn('DEBUG: originCoord is missing or invalid', originCoord);
+        if (!destCoord) console.warn('DEBUG: destCoord is missing or invalid', destCoord);
       }
     };
     getRoute();
@@ -316,33 +391,29 @@ const RoutePlanner = () => {
     const value = e.target.value;
     setOrigin(value);
     setOriginId('');
+    let filtered = [
+      ...myHomeOption,
+      ...places.filter(p => typeof getPlaceName(p) === 'string' && getPlaceName(p).trim() !== '')
+    ];
     if (value.length > 0) {
-      const filtered = places
-        .filter(p => typeof getPlaceName(p) === 'string' && getPlaceName(p).trim() !== '')
-        .filter(p => getPlaceName(p).toLowerCase().includes(value.toLowerCase()));
-      setOriginSuggestions(filtered);
-      setShowOriginDropdown(true);
-      console.log('originSuggestions:', filtered.map(f => getPlaceName(f)));
-    } else {
-      setShowOriginDropdown(false);
-      setOriginSuggestions([]);
+      filtered = filtered.filter(p => getPlaceName(p).toLowerCase().includes(value.toLowerCase()) || (p.name === 'บ้านของฉัน' && 'บ้านของฉัน'.includes(value)));
     }
+    setOriginSuggestions(filtered);
+    setShowOriginDropdown(true);
   };
   const handleDestInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setDestination(value);
     setDestinationId('');
+    let filtered = [
+      ...myHomeOption,
+      ...places.filter(p => typeof getPlaceName(p) === 'string' && getPlaceName(p).trim() !== '')
+    ];
     if (value.length > 0) {
-      const filtered = places
-        .filter(p => typeof getPlaceName(p) === 'string' && getPlaceName(p).trim() !== '')
-        .filter(p => getPlaceName(p).toLowerCase().includes(value.toLowerCase()));
-      setDestSuggestions(filtered);
-      setShowDestDropdown(true);
-      console.log('destSuggestions:', filtered.map(f => getPlaceName(f)));
-    } else {
-      setShowDestDropdown(false);
-      setDestSuggestions([]);
+      filtered = filtered.filter(p => getPlaceName(p).toLowerCase().includes(value.toLowerCase()) || (p.name === 'บ้านของฉัน' && 'บ้านของฉัน'.includes(value)));
     }
+    setDestSuggestions(filtered);
+    setShowDestDropdown(true);
   };
   const selectOrigin = (place: Place) => {
     setOrigin(getPlaceName(place));
@@ -353,6 +424,11 @@ const RoutePlanner = () => {
     if (coord && typeof coord.lat === 'number' && typeof coord.lng === 'number') {
       setMapCenter([coord.lat, coord.lng]);
     }
+    if (getPlaceId(place) === 'my-home' && user?.address) {
+      setOrigin('บ้านของฉัน');
+      setOriginId('my-home');
+      setOriginCoord([user.address.lat, user.address.lng]);
+    }
   };
   const selectDestination = (place: Place) => {
     setDestination(getPlaceName(place));
@@ -362,6 +438,11 @@ const RoutePlanner = () => {
     const coord = getPlaceCoordinates(place);
     if (coord && typeof coord.lat === 'number' && typeof coord.lng === 'number') {
       setMapCenter([coord.lat, coord.lng]);
+    }
+    if (getPlaceId(place) === 'my-home' && user?.address) {
+      setDestination('บ้านของฉัน');
+      setDestinationId('my-home');
+      setDestCoord([user.address.lat, user.address.lng]);
     }
   };
 
@@ -401,7 +482,7 @@ const RoutePlanner = () => {
                   type="text"
                   value={origin}
                   onChange={handleOriginInput}
-                  onFocus={() => setShowOriginDropdown(true)}
+                  onFocus={() => handleOriginInput({ target: { value: origin } } as any)}
                   onBlur={() => setTimeout(() => setShowOriginDropdown(false), 150)}
                   placeholder="Enter starting point"
                   style={{
@@ -441,6 +522,7 @@ const RoutePlanner = () => {
                         ) && (
                           <span style={{ color: 'red', fontSize: 12, marginLeft: 8 }}>(ไม่มีพิกัด)</span>
                         )}
+                        {s.id === 'my-home' && <span style={{color:'#888',fontSize:12}}>({s.address})</span>}
                       </div>
                     )) : (
                       <div style={{ padding: 10, color: '#888' }}>ไม่พบสถานที่</div>
@@ -456,7 +538,7 @@ const RoutePlanner = () => {
                   type="text"
                   value={destination}
                   onChange={handleDestInput}
-                  onFocus={() => setShowDestDropdown(true)}
+                  onFocus={() => handleDestInput({ target: { value: destination } } as any)}
                   onBlur={() => setTimeout(() => setShowDestDropdown(false), 150)}
                   placeholder="Enter destination"
                   style={{
@@ -496,6 +578,7 @@ const RoutePlanner = () => {
                         ) && (
                           <span style={{ color: 'red', fontSize: 12, marginLeft: 8 }}>(ไม่มีพิกัด)</span>
                         )}
+                        {s.id === 'my-home' && <span style={{color:'#888',fontSize:12}}>({s.address})</span>}
                       </div>
                     )) : (
                       <div style={{ padding: 10, color: '#888' }}>ไม่พบสถานที่</div>
@@ -510,7 +593,7 @@ const RoutePlanner = () => {
                 {TRANSPORT_MODES.map(m => (
                   <button
                     key={m.key}
-                    onClick={() => setMode(m.key)}
+                    onClick={() => handleModeChange(m.key)}
                     style={{
                       padding: '8px 16px',
                       borderRadius: 8,
@@ -564,13 +647,71 @@ const RoutePlanner = () => {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <SetViewOnChange center={mapCenter} />
+            {/* บ้านของฉัน (มุดสีเขียว) */}
+            {user?.address && typeof user.address.lat === 'number' && typeof user.address.lng === 'number' && (
+              <Marker position={[user.address.lat, user.address.lng]} icon={homeIcon}>
+                <Popup>บ้านของฉัน</Popup>
+              </Marker>
+            )}
+            {/* Origin (มุดปกติ) */}
             {originCoord && <Marker position={originCoord}><Popup>Origin: {origin}</Popup></Marker>}
+            {/* Destination (มุดปกติ) */}
             {destCoord && <Marker position={destCoord}><Popup>Destination: {destination}</Popup></Marker>}
+            {/* เส้นทาง */}
             {routeCoords.length > 1 && <Polyline positions={routeCoords} color="#2563eb" weight={5} />}
           </MapContainer>
           {loadingRoute && <div style={{ textAlign: 'center', marginTop: 8 }}>กำลังคำนวณเส้นทาง...</div>}
         </MapWrapper>
       </RouteContainer>
+      {/* Popup แจ้งเตือนโหมด Bus/Train/Plane */}
+      {showModeWarning && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.3)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: 12,
+            padding: 32,
+            maxWidth: 420,
+            boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
+            textAlign: 'center',
+          }}>
+            <h3 style={{ marginBottom: 16, color: '#eab308' }}>หมายเหตุสำหรับโหมด {pendingMode === 'bus' ? 'รถโดยสาร' : pendingMode === 'train' ? 'รถไฟ' : 'เครื่องบิน'}</h3>
+            <div style={{ color: '#444', fontSize: 16, marginBottom: 20, textAlign: 'left' }}>
+              เส้นทางที่แสดงสำหรับโหมดรถโดยสาร, รถไฟ, หรือเครื่องบิน เป็นเพียงเส้นตรงโดยประมาณเท่านั้น<br />
+              ผลลัพธ์อาจไม่ตรงกับเส้นทางจริง กรุณาตรวจสอบข้อมูลเส้นทาง ตารางเวลา และราคากับผู้ให้บริการโดยตรง<br /><br />
+              <b>ตัวอย่างแหล่งข้อมูล:</b><br />
+              - รถเมล์: <a href="https://viabus.co" target="_blank" rel="noopener noreferrer">ViaBus</a>, <a href="https://www.bmta.co.th" target="_blank" rel="noopener noreferrer">ขสมก.</a><br />
+              - รถไฟ: <a href="https://www.railway.co.th" target="_blank" rel="noopener noreferrer">การรถไฟแห่งประเทศไทย</a><br />
+              - เครื่องบิน: <a href="https://www.skyscanner.co.th" target="_blank" rel="noopener noreferrer">Skyscanner</a>, <a href="https://www.traveloka.com" target="_blank" rel="noopener noreferrer">Traveloka</a>
+            </div>
+            <button
+              onClick={handleAcceptWarning}
+              style={{
+                background: '#2563eb',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '10px 28px',
+                fontSize: 16,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              ยอมรับ
+            </button>
+          </div>
+        </div>
+      )}
     </PageContainer>
   );
 };

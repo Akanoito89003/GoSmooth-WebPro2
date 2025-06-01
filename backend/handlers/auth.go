@@ -28,12 +28,15 @@ func SetDB(database *mongo.Database) {
 func Register(c *gin.Context) {
 	var input models.RegisterInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := validate.Struct(input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// Check if email already exists
+	var existingUser models.User
+	err := db.Collection("users").FindOne(context.Background(), bson.M{"email": input.Email}).Decode(&existingUser)
+	if err == nil {
+		c.JSON(400, gin.H{"error": "Email already exists"})
 		return
 	}
 
@@ -45,39 +48,29 @@ func Register(c *gin.Context) {
 	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
+		c.JSON(500, gin.H{"error": "Error hashing password"})
 		return
 	}
 
+	// Create user
 	user := models.User{
+		ID:        primitive.NewObjectID(),
 		Email:     input.Email,
 		Password:  string(hashedPassword),
 		Name:      input.Name,
 		Role:      "user",
+		Address:   input.Address,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
-	result, err := db.Collection("users").InsertOne(context.Background(), user)
+	_, err = db.Collection("users").InsertOne(context.Background(), user)
 	if err != nil {
-		if mongo.IsDuplicateKeyError(err) {
-			c.JSON(http.StatusConflict, gin.H{"error": "email already exists"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user"})
+		c.JSON(500, gin.H{"error": "Error creating user"})
 		return
 	}
 
-	user.ID = result.InsertedID.(primitive.ObjectID)
-
-	// Generate token for the new user
-	token, err := middleware.GenerateToken(user.ID.Hex(), true)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{"token": token, "user": user})
+	c.JSON(201, gin.H{"message": "User registered successfully"})
 }
 
 func Login(c *gin.Context) {
@@ -109,4 +102,64 @@ func Login(c *gin.Context) {
 		"token": token,
 		"user":  user,
 	})
+}
+
+// ChangePassword handles changing user password
+func ChangePassword(c *gin.Context) {
+	userID := c.GetString("userID")
+	objectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID"})
+		return
+	}
+
+	var input struct {
+		CurrentPassword string `json:"currentPassword" binding:"required"`
+		NewPassword     string `json:"newPassword" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// ดึง user
+	var user models.User
+	err = db.Collection("users").FindOne(context.Background(), bson.M{"_id": objectID}).Decode(&user)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	// ตรวจสอบรหัสผ่านเดิม
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.CurrentPassword)); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "current password is incorrect"})
+		return
+	}
+
+	// Validate รหัสผ่านใหม่
+	if !utils.IsValidPassword(input.NewPassword) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must be at least 7 characters and contain at least one letter"})
+		return
+	}
+
+	// Hash รหัสผ่านใหม่
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash new password"})
+		return
+	}
+
+	// อัปเดตรหัสผ่าน
+	_, err = db.Collection("users").UpdateOne(context.Background(), bson.M{"_id": objectID}, bson.M{
+		"$set": bson.M{
+			"password":   string(hashedPassword),
+			"updated_at": time.Now(),
+		},
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update password"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password changed successfully"})
 }

@@ -13,15 +13,17 @@ type User struct {
 	Password  string             `bson:"password" json:"-"`
 	Name      string             `bson:"name" json:"name" validate:"required"`
 	Role      string             `bson:"role" json:"role"`
+	Address   Address            `bson:"address,omitempty" json:"address,omitempty"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
 
 // RegisterInput represents the input for user registration
 type RegisterInput struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=6"`
-	Name     string `json:"name" validate:"required"`
+	Email    string  `json:"email" validate:"required,email"`
+	Password string  `json:"password" validate:"required,min=6"`
+	Name     string  `json:"name" validate:"required"`
+	Address  Address `json:"address" validate:"required"`
 }
 
 // LoginCredentials represents the input for user login
@@ -119,4 +121,15 @@ type UpdatePlaceInput struct {
 	Name        string `json:"name" validate:"required"`
 	Description string `json:"description"`
 	LocationID  string `json:"location_id" validate:"required"`
+}
+
+// Address represents the address of a user
+type Address struct {
+	AddressLine string  `bson:"addressLine,omitempty" json:"addressLine,omitempty"`
+	City        string  `bson:"city,omitempty" json:"city,omitempty"`
+	Province    string  `bson:"province,omitempty" json:"province,omitempty"`
+	Zipcode     string  `bson:"zipcode,omitempty" json:"zipcode,omitempty"`
+	Country     string  `bson:"country,omitempty" json:"country,omitempty"`
+	Lat         float64 `bson:"lat,omitempty" json:"lat,omitempty"`
+	Lng         float64 `bson:"lng,omitempty" json:"lng,omitempty"`
 }

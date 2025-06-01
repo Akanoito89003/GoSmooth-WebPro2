@@ -1069,6 +1069,7 @@ func setupRoutes(router *gin.Engine) {
 			auth.POST("/login", handlers.Login)
 			auth.POST("/refresh", handlers.RefreshToken)
 			auth.POST("/logout", middleware.RequireAuth(), handlers.Logout)
+			auth.POST("/change-password", middleware.RequireAuth(), handlers.ChangePassword)
 		}
 
 		// Protected routes

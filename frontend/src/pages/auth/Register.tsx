@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, User } from 'lucide-react';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 
 interface RegisterFormValues {
@@ -14,6 +14,11 @@ interface RegisterFormValues {
   email: string;
   password: string;
   confirmPassword: string;
+  addressLine: string;
+  city: string;
+  province: string;
+  zipcode: string;
+  country: string;
 }
 
 const Form = styled.form`
@@ -77,7 +82,7 @@ const LoginLink = styled.div`
 `;
 
 const Register = () => {
-  const { register: registerUser, error, clearError } = useAuth();
+  const { registerUser, error, clearError } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   
@@ -91,11 +96,37 @@ const Register = () => {
   const onSubmit = async (data: RegisterFormValues) => {
     try {
       setIsSubmitting(true);
-      await registerUser(data.name, data.email, data.password);
+      // Geocode address
+      const address = `${data.addressLine}, ${data.city}, ${data.province}, ${data.zipcode}, ${data.country}`;
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+      const res = await fetch(url);
+      const geo = await res.json();
+      if (!geo || geo.length === 0) {
+        toast.error('ไม่พบพิกัดที่อยู่ กรุณาตรวจสอบที่อยู่ให้ถูกต้อง');
+        setIsSubmitting(false);
+        return;
+      }
+      const lat = parseFloat(geo[0].lat);
+      const lng = parseFloat(geo[0].lon);
+      
+      await registerUser(
+        data.name,
+        data.email,
+        data.password,
+        {
+          addressLine: data.addressLine,
+          city: data.city,
+          province: data.province,
+          zipcode: data.zipcode,
+          country: data.country,
+          lat,
+          lng,
+        }
+      );
       toast.success('Registration successful! Please log in.');
       navigate('/login');
-    } catch (error) {
-      // Error is handled in AuthContext
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -182,6 +213,62 @@ const Register = () => {
           })}
           onChange={() => error && clearError()}
         />
+
+        <Input
+          label="บ้านเลขที่/ถนน"
+          placeholder="123/45 ถนนพหลโยธิน"
+          fullWidth
+          error={errors.addressLine?.message}
+          {...register('addressLine', { required: 'กรุณากรอกบ้านเลขที่/ถนน' })}
+          onChange={() => error && clearError()}
+        />
+
+        <Input
+          label="เขต/อำเภอ"
+          placeholder="เขตจตุจักร"
+          fullWidth
+          error={errors.city?.message}
+          {...register('city', { required: 'กรุณากรอกเขต/อำเภอ' })}
+          onChange={() => error && clearError()}
+        />
+
+        <Input
+          label="จังหวัด"
+          placeholder="กรุงเทพมหานคร"
+          fullWidth
+          error={errors.province?.message}
+          {...register('province', { required: 'กรุณากรอกจังหวัด' })}
+          onChange={() => error && clearError()}
+        />
+
+        <Input
+          label="รหัสไปรษณีย์"
+          placeholder="10900"
+          fullWidth
+          error={errors.zipcode?.message}
+          {...register('zipcode', {
+            required: 'กรุณากรอกรหัสไปรษณีย์',
+            pattern: {
+              value: /^[0-9]{5}$/,
+              message: 'รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก',
+            },
+          })}
+          onChange={() => error && clearError()}
+        />
+
+        <select
+          {...register('country', { required: 'กรุณาเลือกประเทศ' })}
+          style={{ width: '100%', padding: '0.75rem', borderRadius: 8, border: '1px solid #ccc', marginBottom: 8 }}
+          defaultValue=""
+        >
+          <option value="">เลือกประเทศ</option>
+          <option value="Thailand">Thailand</option>
+          {/* เพิ่มประเทศอื่น ๆ ได้ */}
+        </select>
+        {errors.country && <div style={{ color: 'red', marginBottom: 8 }}>{errors.country.message}</div>}
+        <div style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>
+          ตัวอย่างที่อยู่: 123/45 ถนนพหลโยธิน แขวงลาดยาว เขตจตุจักร กรุงเทพฯ 10900 ประเทศไทย
+        </div>
 
         <FormActions>
           <Button

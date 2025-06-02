@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Settings, User, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Settings, User, Loader2, Eye, EyeOff, Mail, User as UserIcon, MapPin, Calendar, Edit, KeyRound, Map as MapIcon, Landmark, Globe2, Hash } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvent } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -221,7 +221,6 @@ const ChangePasswordModal = ({ open, onClose, onSave }: { open: boolean, onClose
 
 const Profile = () => {
   const { user, updateProfile, changePassword } = useAuth();
-  // green icon for home
   const homeIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -233,61 +232,77 @@ const Profile = () => {
   const address = user?.address;
   const [editOpen, setEditOpen] = useState(false);
   const [changePwOpen, setChangePwOpen] = useState(false);
+  const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="container mx-auto px-2 py-8"
-    >
-      <h1 className="text-3xl font-bold mb-8">Profile</h1>
-      <div className="w-full max-w-3xl mx-auto">
-        <Card padding="lg">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="bg-primary/10 p-3 rounded-full">
-              <User className="w-6 h-6 text-primary" />
+    <div className="container mx-auto px-2 py-8">
+      {/* Profile Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl p-6 flex items-center gap-6 mb-6">
+        <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center text-3xl font-bold text-blue-600 shadow-lg">
+          {user?.name?.[0] || 'A'}
             </div>
-            <h2 className="text-xl font-semibold">Account Information</h2>
+        <div className="flex-1">
+          <h2 className="text-white text-2xl font-bold mb-1">Profile</h2>
+          <div className="text-white text-lg font-semibold">{user?.name}</div>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <span className="bg-green-500 w-3 h-3 rounded-full"></span>
+            <span className="text-white text-sm flex items-center gap-1"><Calendar className="w-4 h-4 inline" /> Member since {memberSince}</span>
+            {address?.country && <span className="text-white text-sm flex items-center gap-1"><Globe2 className="w-4 h-4 inline" /> {address.country}</span>}
+            <span className="bg-white/20 text-xs px-2 py-1 rounded text-white border border-white/30">Active User</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        </div>
+      </div>
+      {/* Main Content */}
+      <div className="grid md:grid-cols-3 gap-6">
+        {/* Account Info */}
+        <div className="md:col-span-2 bg-white rounded-xl shadow p-6">
+          <h3 className="text-blue-700 text-lg font-semibold flex items-center gap-2 mb-4"><UserIcon className="w-5 h-5" /> Account Information</h3>
           <div className="space-y-4">
-              <div>
-                <label className="text-sm text-gray-500">Full Name</label>
-                <p className="font-medium">{user?.name || '-'}</p>
-              </div>
             <div>
-              <label className="text-sm text-gray-500">Email</label>
-              <p className="font-medium">{user?.email}</p>
+              <label className="text-sm text-gray-500 flex items-center gap-1"><UserIcon className="w-4 h-4" /> Full Name</label>
+              <div className="font-medium text-lg">{user?.name || '-'}</div>
+              <div className="text-xs text-gray-400">Display name</div>
             </div>
             <div>
-                <label className="text-sm text-gray-500">Address</label>
-              <p className="font-medium">
-                  {address ? (
-                    <>
-                      {address.addressLine || ''}{address.city ? ', ' + address.city : ''}{address.province ? ', ' + address.province : ''}{address.zipcode ? ', ' + address.zipcode : ''}{address.country ? ', ' + address.country : ''}
-                    </>
-                  ) : 'N/A'}
-              </p>
+              <label className="text-sm text-gray-500 flex items-center gap-1"><Mail className="w-4 h-4" /> Email</label>
+              <div className="font-medium text-lg">{user?.email}</div>
+              <div className="text-xs text-gray-400">Primary contact</div>
             </div>
-              <div>
-                <label className="text-sm text-gray-500">Member Since</label>
-                <p className="font-medium">{user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</p>
+            <div>
+              <label className="text-sm text-gray-500 flex items-center gap-1"><MapPin className="w-4 h-4" /> Address</label>
+              <div className="font-medium text-lg">
+                {address ? (
+                  <>
+                    {address.addressLine || ''}{address.city ? ', ' + address.city : ''}{address.province ? ', ' + address.province : ''}{address.zipcode ? ', ' + address.zipcode : ''}{address.country ? ', ' + address.country : ''}
+                  </>
+                ) : 'N/A'}
               </div>
-              <div className="flex gap-3 mt-4">
-                <Button variant="outline" className="" onClick={() => setEditOpen(true)}>
-                  Edit Profile
-                </Button>
-                <Button variant="outline" className="" onClick={() => setChangePwOpen(true)}>
-                  Change Password
-                </Button>
+              <div className="text-xs text-gray-400">Current location</div>
+            </div>
+            <div>
+              <label className="text-sm text-gray-500 flex items-center gap-1"><Calendar className="w-4 h-4" /> Member Since</label>
+              <div className="font-medium text-lg">{memberSince}</div>
+              <div className="text-xs text-gray-400">Account created</div>
+            </div>
           </div>
-            </div>
-            <div>
-              {address && typeof address.lat === 'number' && typeof address.lng === 'number' && (
+          <div className="flex flex-wrap gap-3 mt-6">
+            <button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white px-4 py-2 rounded shadow transition" onClick={() => setEditOpen(true)}>
+              <Edit className="w-4 h-4" /> Edit Profile
+            </button>
+            <button className="flex items-center gap-2 bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white px-4 py-2 rounded shadow transition" onClick={() => setChangePwOpen(true)}>
+              <KeyRound className="w-4 h-4" /> Change Password
+            </button>
+          </div>
+        </div>
+        {/* Location Card */}
+        <div className="bg-green-50 rounded-xl shadow p-6 flex flex-col items-center">
+          <h3 className="text-green-700 text-lg font-semibold flex items-center gap-2 mb-4"><MapIcon className="w-5 h-5" /> Location</h3>
+          <div className="w-full flex flex-col items-center mb-4">
+            <div className="w-full rounded-xl overflow-hidden mb-2" style={{height: 140, minHeight: 140}}>
+              {address && typeof address.lat === 'number' && typeof address.lng === 'number' ? (
                 <MapContainer
                   center={[address.lat, address.lng]}
                   zoom={15}
-                  style={{ height: 180, width: '100%', borderRadius: 12 }}
+                  style={{ height: '100%', width: '100%' }}
                   scrollWheelZoom={false}
                   dragging={false}
                   doubleClickZoom={false}
@@ -301,10 +316,34 @@ const Profile = () => {
                     <Popup>บ้านของฉัน</Popup>
                   </Marker>
                 </MapContainer>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400 bg-green-100">No location</div>
               )}
+            </div>
+            <div className="bg-white rounded-lg shadow px-4 py-2 flex items-center gap-2 mt-2">
+              <MapPin className="w-4 h-4 text-green-600" />
+              <span className="font-medium">Current Location</span>
+              <span className="text-gray-700">{address ? `${address.addressLine || ''}${address.city ? ', ' + address.city : ''}${address.province ? ', ' + address.province : ''}` : '-'}</span>
+            </div>
           </div>
+          <div className="w-full grid grid-cols-1 gap-2">
+            <div className="flex items-center justify-between bg-green-100 rounded px-3 py-2">
+              <Landmark className="w-4 h-4 text-green-700 mr-2" />
+              <span className="text-gray-600">Province</span>
+              <span className="font-bold text-green-900 ml-auto">{address?.province || '-'}</span>
+            </div>
+            <div className="flex items-center justify-between bg-green-100 rounded px-3 py-2">
+              <Hash className="w-4 h-4 text-green-700 mr-2" />
+              <span className="text-gray-600">Postal Code</span>
+              <span className="font-bold text-green-900 ml-auto">{address?.zipcode || '-'}</span>
+            </div>
+            <div className="flex items-center justify-between bg-green-100 rounded px-3 py-2">
+              <Globe2 className="w-4 h-4 text-green-700 mr-2" />
+              <span className="text-gray-600">Country</span>
+              <span className="font-bold text-green-900 ml-auto">{address?.country || '-'}</span>
+            </div>
           </div>
-        </Card>
+        </div>
       </div>
       <EditProfileModal open={editOpen} onClose={() => setEditOpen(false)} user={user} onSave={async (data) => {
         try {
@@ -324,7 +363,7 @@ const Profile = () => {
           toast.error(err.message || 'Change password failed');
         }
       }} />
-    </motion.div>
+    </div>
   );
 };
 

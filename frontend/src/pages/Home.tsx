@@ -232,152 +232,152 @@ const Home = () => {
   }, [user]);
 
   if (!user) {
-    return (
-      <>
-        <HeroSection>
-          <HeroBg />
-          <HeroContent>
-            <HeroTitle
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+  return (
+    <>
+      <HeroSection>
+        <HeroBg />
+        <HeroContent>
+          <HeroTitle
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            Travel Smarter, Journey Smoother
+          </HeroTitle>
+          <HeroSubtitle
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Plan your trips with ease, estimate costs accurately, 
+            and make informed decisions with GoSmooth Travel.
+          </HeroSubtitle>
+          <HeroButtons
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Button
+              as={Link}
+              to="/route-planner"
+              size="lg"
             >
-              Travel Smarter, Journey Smoother
-            </HeroTitle>
-            <HeroSubtitle
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              Plan your trips with ease, estimate costs accurately, 
-              and make informed decisions with GoSmooth Travel.
-            </HeroSubtitle>
-            <HeroButtons
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <Button
-                as={Link}
-                to="/route-planner"
-                size="lg"
-              >
-                Plan Your Route
-              </Button>
-              <Button
-                as={Link}
-                to="/register"
-                variant="outline"
-                size="lg"
-                style={{ borderColor: 'white', color: 'white' }}
-              >
-                Sign Up Free
-              </Button>
-            </HeroButtons>
-          </HeroContent>
-        </HeroSection>
-
-        <FeaturesSection>
-          <SectionTitle>Why Choose GoSmooth?</SectionTitle>
-          <SectionSubtitle>
-            Our platform offers comprehensive tools to make your travel planning experience smooth and efficient.
-          </SectionSubtitle>
-
-          <FeaturesGrid>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true, margin: "-100px" }}
-            >
-              <FeatureCard variant="elevated">
-                <FeatureIconWrapper>
-                  <Route size={28} />
-                </FeatureIconWrapper>
-                <FeatureTitle>Smart Route Planning</FeatureTitle>
-                <FeatureDescription>
-                  Find the most efficient routes with real-time traffic updates and multiple alternatives.
-                </FeatureDescription>
-                <Button
-                  as={Link}
-                  to="/route-planner"
-                  variant="ghost"
-                  style={{ marginTop: 'auto' }}
-                >
-                  Plan Now
-                </Button>
-              </FeatureCard>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              viewport={{ once: true, margin: "-100px" }}
-            >
-              <FeatureCard variant="elevated">
-                <FeatureIconWrapper>
-                  <DollarSign size={28} />
-                </FeatureIconWrapper>
-                <FeatureTitle>Accurate Cost Estimation</FeatureTitle>
-                <FeatureDescription>
-                  Get precise cost breakdowns for different transportation modes to budget effectively.
-                </FeatureDescription>
-                <Button
-                  as={Link}
-                  to="/cost-estimator"
-                  variant="ghost"
-                  style={{ marginTop: 'auto' }}
-                >
-                  Estimate Costs
-                </Button>
-              </FeatureCard>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              viewport={{ once: true, margin: "-100px" }}
-            >
-              <FeatureCard variant="elevated">
-                <FeatureIconWrapper>
-                  <Star size={28} />
-                </FeatureIconWrapper>
-                <FeatureTitle>Trusted Reviews</FeatureTitle>
-                <FeatureDescription>
-                  Read authentic reviews from fellow travelers to make informed decisions about routes and services.
-                </FeatureDescription>
-                <Button
-                  as={Link}
-                  to="/reviews"
-                  variant="ghost"
-                  style={{ marginTop: 'auto' }}
-                >
-                  Read Reviews
-                </Button>
-              </FeatureCard>
-            </motion.div>
-          </FeaturesGrid>
-        </FeaturesSection>
-
-        <CtaSection>
-          <CtaContainer>
-            <CtaTitle>Ready to Travel Smarter?</CtaTitle>
-            <CtaText>
-              Join thousands of satisfied travelers who use GoSmooth to plan their journeys.
-              Sign up today and experience the difference.
-            </CtaText>
+              Plan Your Route
+            </Button>
             <Button
               as={Link}
               to="/register"
+              variant="outline"
               size="lg"
-              variant="secondary"
+              style={{ borderColor: 'white', color: 'white' }}
             >
-              Get Started for Free
+              Sign Up Free
             </Button>
-          </CtaContainer>
-        </CtaSection>
+          </HeroButtons>
+        </HeroContent>
+      </HeroSection>
+
+      <FeaturesSection>
+        <SectionTitle>Why Choose GoSmooth?</SectionTitle>
+        <SectionSubtitle>
+          Our platform offers comprehensive tools to make your travel planning experience smooth and efficient.
+        </SectionSubtitle>
+
+        <FeaturesGrid>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <FeatureCard variant="elevated">
+              <FeatureIconWrapper>
+                <Route size={28} />
+              </FeatureIconWrapper>
+              <FeatureTitle>Smart Route Planning</FeatureTitle>
+              <FeatureDescription>
+                Find the most efficient routes with real-time traffic updates and multiple alternatives.
+              </FeatureDescription>
+              <Button
+                as={Link}
+                to="/route-planner"
+                variant="ghost"
+                style={{ marginTop: 'auto' }}
+              >
+                Plan Now
+              </Button>
+            </FeatureCard>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <FeatureCard variant="elevated">
+              <FeatureIconWrapper>
+                <DollarSign size={28} />
+              </FeatureIconWrapper>
+              <FeatureTitle>Accurate Cost Estimation</FeatureTitle>
+              <FeatureDescription>
+                Get precise cost breakdowns for different transportation modes to budget effectively.
+              </FeatureDescription>
+              <Button
+                as={Link}
+                to="/cost-estimator"
+                variant="ghost"
+                style={{ marginTop: 'auto' }}
+              >
+                Estimate Costs
+              </Button>
+            </FeatureCard>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <FeatureCard variant="elevated">
+              <FeatureIconWrapper>
+                <Star size={28} />
+              </FeatureIconWrapper>
+              <FeatureTitle>Trusted Reviews</FeatureTitle>
+              <FeatureDescription>
+                Read authentic reviews from fellow travelers to make informed decisions about routes and services.
+              </FeatureDescription>
+              <Button
+                as={Link}
+                to="/reviews"
+                variant="ghost"
+                style={{ marginTop: 'auto' }}
+              >
+                Read Reviews
+              </Button>
+            </FeatureCard>
+          </motion.div>
+        </FeaturesGrid>
+      </FeaturesSection>
+
+      <CtaSection>
+        <CtaContainer>
+          <CtaTitle>Ready to Travel Smarter?</CtaTitle>
+          <CtaText>
+            Join thousands of satisfied travelers who use GoSmooth to plan their journeys.
+            Sign up today and experience the difference.
+          </CtaText>
+          <Button
+            as={Link}
+            to="/register"
+            size="lg"
+            variant="secondary"
+          >
+            Get Started for Free
+          </Button>
+        </CtaContainer>
+      </CtaSection>
       </>
     );
   }

@@ -44,12 +44,29 @@ type UpdateUserInput struct {
 	Role string `json:"role" validate:"required,oneof=user admin"`
 }
 
+// Comment represents a comment on a review
+type Comment struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	UserID    string             `bson:"user_id" json:"user_id"`
+	Username  string             `bson:"username" json:"username"`
+	Text      string             `bson:"text" json:"text"`
+	Likes     int                `bson:"likes" json:"likes"`
+	LikedBy   []string           `bson:"liked_by" json:"liked_by"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+}
+
 // Review represents a user review
 type Review struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	UserID    string             `bson:"user_id" json:"user_id"`
+	Username  string             `bson:"username" json:"username"`
+	PlaceID   string             `bson:"place_id" json:"placeId"`
+	PlaceName string             `bson:"place_name" json:"placeName"`
 	Rating    int                `bson:"rating" json:"rating" validate:"required,min=1,max=5"`
 	Comment   string             `bson:"comment" json:"comment" validate:"required"`
+	Likes     int                `bson:"likes" json:"likes"`
+	LikedBy   []string           `bson:"liked_by" json:"liked_by"`
+	Comments  []Comment          `bson:"comments" json:"comments"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
@@ -95,15 +112,16 @@ type Route struct {
 
 // Place represents a place in the system
 type Place struct {
-	ID              string   `bson:"place_id" json:"PlaceID"`
-	Name            string   `bson:"name" json:"Name"`
-	LocationID      string   `bson:"location_id" json:"LocationID"`
-	LocationName    string   `bson:"location_name,omitempty" json:"LocationName,omitempty"`
-	Description     string   `bson:"description" json:"Description"`
-	Category        string   `bson:"category" json:"Category"`
-	CoverImage      string   `bson:"cover_image" json:"CoverImage"`
-	HighlightImages []string `bson:"highlight_images" json:"HighlightImages"`
-	Rating          float64  `bson:"rating" json:"Rating"`
+	ObjectID        primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	ID              string             `bson:"place_id" json:"PlaceID"`
+	Name            string             `bson:"name" json:"Name"`
+	LocationID      string             `bson:"location_id" json:"LocationID"`
+	LocationName    string             `bson:"location_name,omitempty" json:"LocationName,omitempty"`
+	Description     string             `bson:"description" json:"Description"`
+	Category        string             `bson:"category" json:"Category"`
+	CoverImage      string             `bson:"cover_image" json:"CoverImage"`
+	HighlightImages []string           `bson:"highlight_images" json:"HighlightImages"`
+	Rating          float64            `bson:"rating" json:"Rating"`
 	Coordinates     struct {
 		Lat float64 `bson:"lat" json:"lat"`
 		Lng float64 `bson:"lng" json:"lng"`

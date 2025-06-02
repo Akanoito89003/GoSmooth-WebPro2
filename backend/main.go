@@ -3,7 +3,11 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 	"os"
+	"os/signal"
+	"strings"
+	"syscall"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -22,20 +26,78 @@ import (
 
 var db *mongo.Database
 
+// Custom error response structure
+type ErrorResponse struct {
+	Error   string `json:"error"`
+	Message string `json:"message"`
+	Code    int    `json:"code"`
+}
+
+// Error logging middleware
+func ErrorLogger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+
+		// Check if there are any errors
+		if len(c.Errors) > 0 {
+			// Log the error
+			for _, e := range c.Errors {
+				log.Printf("[ERROR] %v", e.Error())
+			}
+
+			// Get the last error
+			err := c.Errors.Last()
+
+			// Create error response
+			errorResponse := ErrorResponse{
+				Error:   err.Error(),
+				Message: "An error occurred while processing your request",
+				Code:    c.Writer.Status(),
+			}
+
+			// Send error response
+			c.JSON(c.Writer.Status(), errorResponse)
+		}
+	}
+}
+
 func main() {
+	// Load environment variables
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal("Error loading .env file:", err)
 	}
 
-	// Connect to MongoDB
+	// Set up logging
+	logFile, err := os.OpenFile("app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal("Error opening log file:", err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile)
+
+	// Connect to MongoDB with retry logic
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URI")))
+	var client *mongo.Client
+	maxRetries := 3
+	for i := 0; i < maxRetries; i++ {
+		client, err = mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URI")))
+		if err == nil {
+			break
+		}
+		log.Printf("MongoDB connection attempt %d failed: %v", i+1, err)
+		time.Sleep(time.Second * time.Duration(i+1))
+	}
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to connect to MongoDB after", maxRetries, "attempts:", err)
 	}
 	defer client.Disconnect(ctx)
+
+	// Ping MongoDB to verify connection
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Fatal("Failed to ping MongoDB:", err)
+	}
 
 	db = client.Database(os.Getenv("DB_NAME"))
 
@@ -48,15 +110,24 @@ func main() {
 	handlers.SetDB(db)
 	middleware.SetDB(db)
 
-	// Initialize router
-	router := gin.Default()
+	// Initialize router with custom error handling
+	router := gin.New() // Use gin.New() instead of gin.Default() to customize middleware
+	router.Use(gin.Recovery())
+	router.Use(ErrorLogger())
 
-	// Configure CORS
+	// Configure CORS with more specific settings
+	frontendURL := os.Getenv("FRONTEND_URL")
+	allowOrigins := []string{}
+	if frontendURL != "" && (strings.HasPrefix(frontendURL, "http://") || strings.HasPrefix(frontendURL, "https://")) {
+		allowOrigins = []string{frontendURL}
+	} else {
+		allowOrigins = []string{"*"}
+	}
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // Vite's default port
+		AllowOrigins:     allowOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
+		ExposeHeaders:    []string{"Content-Length", "Content-Range"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
@@ -64,16 +135,47 @@ func main() {
 	// Routes
 	setupRoutes(router)
 
-	// Serve static files for uploads
+	// Serve static files for uploads with security headers
 	router.Static("/uploads", "./uploads")
 
-	// Start server
+	// Start server with graceful shutdown
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
-	log.Printf("Server starting on port %s...", port)
-	router.Run(":" + port)
+
+	// Create a server with custom timeouts
+	srv := &http.Server{
+		Addr:         ":" + port,
+		Handler:      router,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	// Start server in a goroutine
+	go func() {
+		log.Printf("Server starting on port %s...", port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal("Failed to start server:", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutting down server...")
+
+	// Create shutdown context with timeout
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown:", err)
+	}
+
+	log.Println("Server exiting")
 }
 
 func initializeDatabase(ctx context.Context) error {
@@ -988,6 +1090,38 @@ func initializeDatabase(ctx context.Context) error {
 	}
 	log.Println("Initial places created")
 
+	// --- MIGRATE: เปลี่ยน id ของแต่ละ place ให้เป็น ObjectID จริง ---
+	ctx2, cancel2 := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel2()
+	cursor, err := db.Collection("places").Find(ctx2, bson.M{})
+	if err != nil {
+		return err
+	}
+	defer cursor.Close(ctx2)
+	for cursor.Next(ctx2) {
+		var place bson.M
+		if err := cursor.Decode(&place); err != nil {
+			return err
+		}
+		// ถ้ายังไม่มี _id เป็น ObjectID
+		if _, ok := place["_id"].(primitive.ObjectID); !ok {
+			idStr, _ := place["id"].(string)
+			if idStr == "" {
+				continue
+			}
+			// สร้าง ObjectID ใหม่
+			newObjID := primitive.NewObjectID()
+			// อัพเดต document: เพิ่ม _id, เก็บ id เดิมใน place_id
+			filter := bson.M{"id": idStr}
+			update := bson.M{"$set": bson.M{"_id": newObjID, "place_id": idStr}}
+			_, err := db.Collection("places").UpdateOne(ctx2, filter, update)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	log.Println("Migrate places id to ObjectID completed")
+
 	// --- เพิ่มข้อมูล Route ---
 	initialRoutes := []models.Route{
 		{
@@ -1090,6 +1224,9 @@ func setupRoutes(router *gin.Engine) {
 			protected.GET("/reviews/:id", handlers.GetReview)
 			protected.PUT("/reviews/:id", handlers.UpdateReview)
 			protected.DELETE("/reviews/:id", handlers.DeleteReview)
+			protected.POST("/reviews/:id/like", handlers.LikeReview)
+			protected.POST("/reviews/:id/comments", handlers.AddComment)
+			protected.POST("/reviews/:id/comments/:commentId/like", handlers.LikeComment)
 
 			// Admin routes
 			admin := protected.Group("/admin")

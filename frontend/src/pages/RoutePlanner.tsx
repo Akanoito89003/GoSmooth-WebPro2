@@ -236,7 +236,7 @@ const SetViewOnChange = ({ center }: { center: [number, number] }) => {
   return null;
 };
 
-const getPlaceId = (p: Place) => p.place_id || p.PlaceID || p.id || '';
+const getPlaceId = (p: Place) => p._id?.$oid || p._id || p.place_id || p.PlaceID || p.id || '';
 const getPlaceName = (p: Place) => p.name || p.Name || '';
 const getPlaceCoordinates = (p: Place) => p.coordinates || p.Coordinates;
 
@@ -323,7 +323,7 @@ const RoutePlanner = () => {
     if (originId === 'my-home' && user?.address) {
       oCoord = [user.address.lat, user.address.lng];
     } else {
-      const o = places.find(p => getPlaceId(p) === originId);
+    const o = places.find(p => getPlaceId(p) === originId);
       const coord = o ? getPlaceCoordinates(o) : null;
       if (coord && typeof coord.lat === 'number' && typeof coord.lng === 'number') {
         oCoord = [coord.lat, coord.lng];
@@ -334,7 +334,7 @@ const RoutePlanner = () => {
     if (destinationId === 'my-home' && user?.address) {
       dCoord = [user.address.lat, user.address.lng];
     } else {
-      const d = places.find(p => getPlaceId(p) === destinationId);
+    const d = places.find(p => getPlaceId(p) === destinationId);
       const coord = d ? getPlaceCoordinates(d) : null;
       if (coord && typeof coord.lat === 'number' && typeof coord.lng === 'number') {
         dCoord = [coord.lat, coord.lng];
@@ -398,8 +398,8 @@ const RoutePlanner = () => {
     if (value.length > 0) {
       filtered = filtered.filter(p => getPlaceName(p).toLowerCase().includes(value.toLowerCase()) || (p.name === 'บ้านของฉัน' && 'บ้านของฉัน'.includes(value)));
     }
-    setOriginSuggestions(filtered);
-    setShowOriginDropdown(true);
+      setOriginSuggestions(filtered);
+      setShowOriginDropdown(true);
   };
   const handleDestInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -412,8 +412,8 @@ const RoutePlanner = () => {
     if (value.length > 0) {
       filtered = filtered.filter(p => getPlaceName(p).toLowerCase().includes(value.toLowerCase()) || (p.name === 'บ้านของฉัน' && 'บ้านของฉัน'.includes(value)));
     }
-    setDestSuggestions(filtered);
-    setShowDestDropdown(true);
+      setDestSuggestions(filtered);
+      setShowDestDropdown(true);
   };
   const selectOrigin = (place: Place) => {
     setOrigin(getPlaceName(place));

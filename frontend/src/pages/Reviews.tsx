@@ -1,10 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { Star, Filter, ChevronDown, ChevronUp, Image } from 'lucide-react';
+import { Star, Filter, ChevronDown, ChevronUp, Image, UserCircle, Heart, Share2, MoreHorizontal, X } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import { reviewsAPI } from '../services/api';
+import { placesAPI } from '../services/api';
+import toast from 'react-hot-toast';
+import Modal from '../components/ui/Modal';
+
+// Types
+interface User {
+  id: string;
+  name: string;
+  username?: string;
+  image?: string;
+}
+
+interface Place {
+  id: string;
+  name: string;
+}
+
+interface Comment {
+  id: string;
+  user_id: string;
+  username: string;
+  text: string;
+  likes: number;
+  liked_by?: string[];
+  createdAt: string;
+}
+
+interface Review {
+  id: string;
+  user_id: string;
+  username: string;
+  place_id: string;
+  place_name?: string;
+  rating: number;
+  comment: string;
+  likes: number;
+  comments: Comment[];
+  createdAt: string;
+  images?: ReviewImage[];
+  liked_by?: string[];
+}
+
+interface ReviewImage {
+  id: string;
+  filename: string;
+  path: string;
+  createdAt: string;
+}
 
 const PageContainer = styled.div`
   display: flex;
@@ -354,110 +403,208 @@ const FormActions = styled.div`
   margin-top: 1.5rem;
 `;
 
-// Mock data for reviews
-const mockReviews = [
-  {
-    id: 1,
-    author: 'John Doe',
-    date: '2023-05-15',
-    rating: 5,
-    text: 'This route was amazing! Beautiful scenery and well-maintained roads. The cost estimation was spot on, and I had no surprises during my journey. Highly recommended for anyone traveling from Boston to New York.',
-    route: 'Boston to New York',
-    images: [
-      'https://images.pexels.com/photos/1563256/pexels-photo-1563256.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/1268855/pexels-photo-1268855.jpeg?auto=compress&cs=tinysrgb&w=800',
-    ],
-  },
-  {
-    id: 2,
-    author: 'Jane Smith',
-    date: '2023-05-10',
-    rating: 4,
-    text: 'Great route overall, but there were a few unexpected delays due to construction. The cost estimation was accurate, and the alternative routes provided were helpful. Would use this service again for future trips.',
-    route: 'Chicago to Detroit',
-    images: [],
-  },
-  {
-    id: 3,
-    author: 'Robert Johnson',
-    date: '2023-05-08',
-    rating: 3,
-    text: 'Decent route, but I encountered more traffic than expected. The cost estimation was a bit off, and I ended up spending more on tolls than anticipated. The scenery was nice though, and the overall experience was positive.',
-    route: 'San Francisco to Los Angeles',
-    images: [
-      'https://images.pexels.com/photos/1470405/pexels-photo-1470405.jpeg?auto=compress&cs=tinysrgb&w=800',
-    ],
-  },
-  {
-    id: 4,
-    author: 'Emily Davis',
-    date: '2023-05-05',
-    rating: 5,
-    text: 'Fantastic route! The directions were clear, and the alternative routes provided were very helpful when I encountered traffic. The cost estimation was accurate, and I saved money by following the eco-friendly route. Highly recommended!',
-    route: 'Seattle to Portland',
-    images: [
-      'https://images.pexels.com/photos/2526025/pexels-photo-2526025.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/1252426/pexels-photo-1252426.jpeg?auto=compress&cs=tinysrgb&w=800',
-    ],
-  },
-];
+const LIMIT = 10;
+
+// เพิ่มฟังก์ชัน map id แบบ RoutePlanner
+const getPlaceId = (p: any) => p._id || p.place_id || p.PlaceID || p.id || '';
+
+// เพิ่ม helper function ตรวจสอบว่า user กด like review นี้หรือยัง
+const getCurrentUserId = () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return user.id || user._id || '';
+  } catch {
+    return '';
+  }
+};
 
 const Reviews = () => {
   const [starFilter, setStarFilter] = useState<number | null>(null);
   const [sortOption, setSortOption] = useState('newest');
   const [showSortMenu, setShowSortMenu] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [rating, setRating] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState('');
+  const loaderRef = useRef<HTMLDivElement>(null);
+  const [showWrite, setShowWrite] = useState(false);
+  const [places, setPlaces] = useState<{id: string, name: string}[]>([]);
+  const [selectedPlace, setSelectedPlace] = useState('');
+  const [reviewText, setReviewText] = useState('');
+  const [reviewRating, setReviewRating] = useState(0);
+  const [posting, setPosting] = useState(false);
+  const [placeInput, setPlaceInput] = useState('');
+  const [placeSuggestions, setPlaceSuggestions] = useState<{id: string, name: string}[]>([]);
+  const [showPlaceDropdown, setShowPlaceDropdown] = useState(false);
+  const [userId, setUserId] = useState<string>('');
 
-  const handleStarFilter = (stars: number) => {
-    if (starFilter === stars) {
-      setStarFilter(null);
+  // Fetch reviews (infinite scroll)
+  useEffect(() => {
+    fetchReviews(1, true);
+    // eslint-disable-next-line
+  }, [starFilter, sortOption, searchTerm]);
+
+  useEffect(() => {
+    if (!loaderRef.current || !hasMore) return;
+    const observer = new window.IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && !loading) {
+          fetchReviews(page + 1);
+        }
+      },
+      { threshold: 1 }
+    );
+    observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [loaderRef.current, page, loading, hasMore]);
+
+  useEffect(() => {
+    // ดึงสถานที่ทั้งหมดสำหรับ dropdown
+    async function fetchPlaces() {
+      try {
+        const res = await placesAPI.getPlaces();
+        console.log('DEBUG: PLACES API RESPONSE', res.data);
+        setPlaces(
+          (res.data.places || []).map((p: any) => ({
+            id: p._id?.$oid || p._id || p.place_id || p.id || '',
+            name: p.name || p.Name
+          }))
+        );
+      } catch (e) {
+        setPlaces([]);
+      }
+    }
+    fetchPlaces();
+  }, []);
+
+  useEffect(() => {
+    if (!placeInput) {
+      setPlaceSuggestions(places);
     } else {
-      setStarFilter(stars);
+      setPlaceSuggestions(
+        places.filter(p => p.name.toLowerCase().includes(placeInput.toLowerCase()))
+      );
+    }
+  }, [placeInput, places]);
+
+  useEffect(() => {
+    if (places.length > 0) {
+      fetchReviews(1, true);
+    }
+    // eslint-disable-next-line
+  }, [places]);
+
+  useEffect(() => {
+    setUserId(getCurrentUserId());
+  }, []);
+
+  const fetchReviews = async (pageToFetch = 1, reset = false) => {
+    setLoading(true);
+    setError('');
+    try {
+      // Optionally pass filter/sort/search to backend
+      const params: any = { page: pageToFetch, limit: LIMIT };
+      if (starFilter) params.rating = starFilter;
+      if (sortOption) params.sort = sortOption;
+      if (searchTerm) params.q = searchTerm;
+      const res = await reviewsAPI.getReviews(params.page, params.limit, params.sort, 'desc');
+      let newReviews = (res.data.reviews || []) as Review[];
+      setReviews(prev => reset ? newReviews : [...prev, ...newReviews]);
+      setPage(pageToFetch);
+      setHasMore(newReviews.length === LIMIT);
+      console.log('DEBUG: Reviews mapped', newReviews);
+    } catch (e: any) {
+      setError(e.message || 'Failed to load reviews');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSortChange = (option: string) => {
-    setSortOption(option);
-    setShowSortMenu(false);
+  // (Optional) filter/sort/search client-side if backend doesn't support
+  let filteredReviews = reviews;
+  // ... (สามารถเพิ่ม filter/sort client-side ได้ถ้าต้องการ)
+
+  // Modified handlePostReview to include image upload
+  const handlePostReview = async () => {
+    console.log('DEBUG: handlePostReview called');
+    console.log('selectedPlace:', selectedPlace);
+    console.log('places:', places);
+    const selectedPlaceObj = places.find(p => p.id === selectedPlace);
+    if (!selectedPlace || !selectedPlaceObj) {
+      toast.error('กรุณาเลือกสถานที่จากรายการ');
+      console.log('DEBUG: Invalid selectedPlace:', selectedPlace);
+      return;
+    }
+    if (!reviewRating) {
+      toast.error('กรุณาให้คะแนน');
+      return;
+    }
+    if (!reviewText.trim()) {
+      toast.error('กรุณากรอกข้อความรีวิว');
+      return;
+    }
+
+    setPosting(true);
+    try {
+      // 1. สร้างรีวิว
+      console.log('DEBUG: Creating review', {
+        placeId: selectedPlace,
+        placeName: selectedPlaceObj.name,
+        rating: reviewRating,
+        comment: reviewText,
+      });
+      const response = await reviewsAPI.createReview({
+        placeId: selectedPlace,
+        placeName: selectedPlaceObj.name,
+        rating: reviewRating,
+        comment: reviewText,
+      });
+      console.log('DEBUG: createReview response', response);
+
+      if (!response.data || !response.data.id) {
+        console.log('DEBUG: Invalid response from createReview', response.data);
+        throw new Error('ไม่สามารถสร้างรีวิวได้');
+      }
+
+      // 3. ดึงรีวิวใหม่ทั้งหมด (refresh)
+      await fetchReviews(1, true);
+
+      // 4. Reset & ปิด popup
+      setShowWrite(false);
+      setSelectedPlace('');
+      setPlaceInput('');
+      setReviewText('');
+      setReviewRating(0);
+      toast.success('โพสต์รีวิวสำเร็จ!');
+      console.log('DEBUG: Review post success, form reset');
+    } catch (e: any) {
+      console.error('Error posting review:', e);
+      toast.error(e.response?.data?.error || e.message || 'เกิดข้อผิดพลาด');
+    } finally {
+      setPosting(false);
+      console.log('DEBUG: setPosting(false)');
+    }
   };
 
-  const handleRatingChange = (value: number) => {
-    setRating(value);
+  // Like review (toggle)
+  const handleLikeReview = async (reviewId: string) => {
+    setReviews(prev => prev.map(r => {
+      if (r.id !== reviewId) return r;
+      const likedBy = r.liked_by || [];
+      const liked = likedBy.includes(userId);
+      return {
+        ...r,
+        likes: liked ? r.likes - 1 : r.likes + 1,
+        liked_by: liked ? likedBy.filter((id: string) => id !== userId) : [...likedBy, userId],
+      };
+    }));
+    try {
+      await reviewsAPI.toggleLike(reviewId);
+    } catch {}
   };
-
-  const handleSubmitReview = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, this would submit the review to the API
-    alert('Review submitted successfully!');
-  };
-
-  // Filter and sort reviews
-  let filteredReviews = [...mockReviews];
-  
-  if (starFilter) {
-    filteredReviews = filteredReviews.filter(review => review.rating === starFilter);
-  }
-  
-  if (searchTerm) {
-    filteredReviews = filteredReviews.filter(review => 
-      review.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      review.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      review.route.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
-  
-  // Sort reviews
-  if (sortOption === 'newest') {
-    filteredReviews.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  } else if (sortOption === 'oldest') {
-    filteredReviews.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  } else if (sortOption === 'highest') {
-    filteredReviews.sort((a, b) => b.rating - a.rating);
-  } else if (sortOption === 'lowest') {
-    filteredReviews.sort((a, b) => a.rating - b.rating);
-  }
 
   return (
     <PageContainer>
@@ -468,7 +615,6 @@ const Reviews = () => {
           about routes and services. Share your own experiences to help others.
         </PageDescription>
       </PageHeader>
-
       <ReviewsContainer>
         <FilterSection>
           <FilterGroup>
@@ -478,7 +624,7 @@ const Reviews = () => {
                 <StarButton
                   key={stars}
                   isActive={starFilter === stars}
-                  onClick={() => handleStarFilter(stars)}
+                  onClick={() => setStarFilter(stars)}
                 >
                   <Star size={16} fill={starFilter === stars ? 'currentColor' : 'none'} />
                   {stars}
@@ -486,7 +632,6 @@ const Reviews = () => {
               ))}
             </StarFilter>
           </FilterGroup>
-          
           <SearchBox>
             <Input
               placeholder="Search reviews..."
@@ -495,7 +640,6 @@ const Reviews = () => {
               fullWidth
             />
           </SearchBox>
-          
           <SortDropdown>
             <SortButton onClick={() => setShowSortMenu(!showSortMenu)}>
               <Filter size={16} />
@@ -504,7 +648,6 @@ const Reviews = () => {
                      sortOption === 'highest' ? 'Highest Rated' : 'Lowest Rated'}
               {showSortMenu ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </SortButton>
-            
             {showSortMenu && (
               <SortMenu
                 initial={{ opacity: 0, y: -10 }}
@@ -512,147 +655,187 @@ const Reviews = () => {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <SortMenuItem
-                  isActive={sortOption === 'newest'}
-                  onClick={() => handleSortChange('newest')}
-                >
-                  Newest First
-                </SortMenuItem>
-                <SortMenuItem
-                  isActive={sortOption === 'oldest'}
-                  onClick={() => handleSortChange('oldest')}
-                >
-                  Oldest First
-                </SortMenuItem>
-                <SortMenuItem
-                  isActive={sortOption === 'highest'}
-                  onClick={() => handleSortChange('highest')}
-                >
-                  Highest Rated
-                </SortMenuItem>
-                <SortMenuItem
-                  isActive={sortOption === 'lowest'}
-                  onClick={() => handleSortChange('lowest')}
-                >
-                  Lowest Rated
-                </SortMenuItem>
+                <SortMenuItem isActive={sortOption === 'newest'} onClick={() => setSortOption('newest')}>Newest First</SortMenuItem>
+                <SortMenuItem isActive={sortOption === 'oldest'} onClick={() => setSortOption('oldest')}>Oldest First</SortMenuItem>
+                <SortMenuItem isActive={sortOption === 'highest'} onClick={() => setSortOption('highest')}>Highest Rated</SortMenuItem>
+                <SortMenuItem isActive={sortOption === 'lowest'} onClick={() => setSortOption('lowest')}>Lowest Rated</SortMenuItem>
               </SortMenu>
             )}
           </SortDropdown>
         </FilterSection>
-
-        <ReviewsList>
-          {filteredReviews.map(review => (
-            <ReviewCard key={review.id} variant="elevated">
-              <ReviewHeader>
-                <ReviewAuthor>
-                  <AuthorName>{review.author}</AuthorName>
-                  <ReviewDate>{new Date(review.date).toLocaleDateString()}</ReviewDate>
-                </ReviewAuthor>
-                <ReviewRating>
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={18}
-                      fill={i < review.rating ? 'currentColor' : 'none'}
-                    />
-                  ))}
-                </ReviewRating>
-              </ReviewHeader>
-              
-              <ReviewContent>
-                <ReviewText>{review.text}</ReviewText>
-                
-                {review.images.length > 0 && (
-                  <ReviewImages>
-                    {review.images.map((image, index) => (
-                      <ReviewImage key={index} src={image} alt={`Review image ${index + 1}`} />
-                    ))}
-                  </ReviewImages>
-                )}
-                
-                <ReviewRoute>Route: {review.route}</ReviewRoute>
-              </ReviewContent>
-            </ReviewCard>
-          ))}
-        </ReviewsList>
-
-        <Pagination>
-          <PageButton
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-          >
-            &lt;
-          </PageButton>
-          {[1, 2, 3].map(page => (
-            <PageButton
-              key={page}
-              isActive={currentPage === page}
-              onClick={() => setCurrentPage(page)}
+        {/* Write Review Box (moved here) */}
+        <div style={{ maxWidth: 600, minWidth: 400, width: '100%', margin: '0 auto', marginBottom: 32 }}>
+          {!showWrite ? (
+            <div
+              style={{ background: '#fff', borderRadius: 18, boxShadow: '0 2px 16px 0 rgba(0,0,0,0.06)', padding: 28, display: 'flex', alignItems: 'center', gap: 18, cursor: 'pointer' }}
+              onClick={() => setShowWrite(true)}
             >
-              {page}
-            </PageButton>
-          ))}
-          <PageButton
-            disabled={currentPage === 3}
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, 3))}
-          >
-            &gt;
-          </PageButton>
-        </Pagination>
-
-        <WriteReviewSection>
-          <SectionTitle>Share Your Experience</SectionTitle>
-          <ReviewForm onSubmit={handleSubmitReview}>
-            <FormGroup>
-              <label htmlFor="rating">Rating</label>
-              <RatingSelector>
-                {[1, 2, 3, 4, 5].map(value => (
-                  <RatingStar
-                    key={value}
-                    type="button"
-                    isActive={value <= rating}
-                    onClick={() => handleRatingChange(value)}
-                  >
-                    <Star fill={value <= rating ? 'currentColor' : 'none'} />
-                  </RatingStar>
-                ))}
-              </RatingSelector>
-            </FormGroup>
-            
-            <FormGroup>
-              <Input
-                label="Route"
-                placeholder="e.g., Boston to New York"
-                fullWidth
-              />
-            </FormGroup>
-            
-            <FormGroup>
-              <label htmlFor="review">Your Review</label>
-              <TextArea
-                id="review"
-                placeholder="Share your experience with this route..."
-              />
-            </FormGroup>
-            
-            <FormGroup>
-              <label>Add Photos (Optional)</label>
-              <UploadButton>
-                <Image size={18} />
-                Upload Images
-                <input type="file" multiple accept="image/*" />
-              </UploadButton>
-              <p style={{ fontSize: '0.75rem', marginTop: '0.5rem', color: '#6b7280' }}>
-                Max 5 images, 5MB each
-              </p>
-            </FormGroup>
-            
-            <FormActions>
-              <Button type="submit">Submit Review</Button>
-            </FormActions>
-          </ReviewForm>
-        </WriteReviewSection>
+              <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 24, color: '#6366f1' }}>
+                <UserCircle size={38} />
+              </div>
+              <div style={{ flex: 1, color: '#888', fontSize: 20 }}>แชร์ประสบการณ์การเดินทางของคุณ...</div>
+              <Button variant="primary" style={{ background: '#a5b4fc', color: '#fff', fontWeight: 600, fontSize: 18, padding: '10px 24px' }}>เขียนรีวิว</Button>
+            </div>
+          ) : (
+            <div style={{
+              background: '#fff',
+              borderRadius: 18,
+              boxShadow: '0 2px 16px 0 rgba(0,0,0,0.06)',
+              padding: 32,
+              position: 'relative',
+              maxWidth: 600,
+              minWidth: 400,
+              width: '100%',
+              margin: '0 auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 18
+            }}>
+              <button onClick={() => setShowWrite(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', cursor: 'pointer' }}><X size={24} /></button>
+              <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 10 }}>แชร์เรื่องราวการเดินทาง</div>
+              <div style={{ color: '#888', fontSize: 16, marginBottom: 18 }}>บอกเล่าประสบการณ์ให้เพื่อนๆ ฟัง</div>
+              <div style={{ marginBottom: 18 }}>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    value={placeInput}
+                    onChange={e => {
+                      setPlaceInput(e.target.value);
+                      setShowPlaceDropdown(true);
+                      setSelectedPlace('');
+                    }}
+                    onFocus={() => setShowPlaceDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowPlaceDropdown(false), 150)}
+                    placeholder="คุณไปเที่ยวที่ไหนมา?"
+                    style={{ width: '100%', padding: 12, borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 17 }}
+                  />
+                  {showPlaceDropdown && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      background: '#fff',
+                      border: '1px solid #eee',
+                      borderRadius: 8,
+                      zIndex: 10,
+                      maxHeight: 220,
+                      overflowY: 'auto',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                    }}>
+                      {placeSuggestions.length > 0 ? placeSuggestions.map(p => (
+                        <div
+                          key={p.id}
+                          style={{ padding: 12, cursor: 'pointer', fontSize: 16 }}
+                          onMouseDown={() => {
+                            setSelectedPlace(p.id);
+                            setPlaceInput(p.name);
+                            setShowPlaceDropdown(false);
+                            console.log('DEBUG: Select place', p);
+                          }}
+                        >
+                          {p.name}
+                        </div>
+                      )) : (
+                        <div style={{ padding: 12, color: '#888' }}>ไม่พบสถานที่</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div style={{ marginBottom: 18 }}>
+                <div style={{ marginBottom: 8, color: '#666', fontSize: 16 }}>ให้คะแนนสถานที่นี้</div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {[1,2,3,4,5].map(i => (
+                    <button key={i} type="button" onClick={() => setReviewRating(i)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                      <Star size={32} fill={reviewRating >= i ? '#facc15' : 'none'} color="#facc15" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ marginBottom: 18 }}>
+                <textarea
+                  value={reviewText}
+                  onChange={e => setReviewText(e.target.value)}
+                  placeholder="เล่าให้ฟังหน่อยว่าที่นี่เป็นยังไงบ้าง? อาหารอร่อยไหม? ที่พักดีไหม? มีอะไรน่าสนใจบ้าง..."
+                  style={{ width: '100%', minHeight: 90, borderRadius: 8, border: '1px solid #e5e7eb', padding: 12, fontSize: 17, resize: 'vertical' }}
+                />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button variant="primary" style={{ background: '#a5b4fc', color: '#fff', fontWeight: 600, minWidth: 130, fontSize: 17, padding: '10px 0', width: 160 }} onClick={handlePostReview} disabled={posting}>
+                  {posting ? 'กำลังโพสต์...' : 'โพสต์รีวิว'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Feed Reviews */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', margin: '0 auto', maxWidth: 600 }}>
+          {filteredReviews.map((review, idx) => {
+            const isLiked = Array.isArray(review.liked_by) && review.liked_by.includes(userId);
+            // ฟังก์ชัน normalize id เพื่อเปรียบเทียบ id ที่อาจมีรูปแบบต่างกัน
+            const normalizeId = (id: string) => id?.toString()?.toLowerCase()?.replace(/[^a-z0-9]/gi, '');
+            // ฟังก์ชันตรวจสอบว่า string เป็น id (24 ตัวอักษร hex) หรือไม่
+            const isIdString = (str: string) => /^[a-f0-9]{24}$/i.test(str);
+            // logic แสดงชื่อสถานที่
+            let placeName = '';
+            if (review.place_name && !isIdString(review.place_name)) {
+              placeName = review.place_name;
+            } else if (places.length > 0) {
+              const found = places.find(p => normalizeId(p.id) === normalizeId(review.place_id));
+              if (found) placeName = found.name;
+            }
+            return (
+              <div key={review.id} style={{ background: '#fff', borderRadius: 18, boxShadow: '0 2px 16px 0 rgba(0,0,0,0.06)', padding: 24, position: 'relative' }}>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                  {/* Avatar */}
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 22, color: '#6366f1' }}>
+                    <UserCircle size={36} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600 }}>{review.username || 'Unknown'}</div>
+                    <div style={{ fontSize: 13, color: '#6b7280' }}>@{review.username?.toLowerCase().replace(/\s/g, '_') || 'user'}</div>
+                  </div>
+                  <div style={{ color: '#6b7280', fontSize: 13 }}>{review.createdAt ? new Date(review.createdAt).toLocaleString() : ''}</div>
+                  <MoreHorizontal size={20} style={{ color: '#9ca3af', marginLeft: 8 }} />
+                </div>
+                {/* Location/Place */}
+                <div style={{ marginBottom: 8 }}>
+                  {placeName ? (
+                    <span style={{ background: '#eef2ff', color: '#6366f1', fontSize: 13, borderRadius: 8, padding: '2px 10px', fontWeight: 500 }}>
+                      {placeName}
+                    </span>
+                  ) : (
+                    <span style={{ background: '#fef2f2', color: '#ef4444', fontSize: 13, borderRadius: 8, padding: '2px 10px', fontWeight: 500 }}>
+                      ไม่พบชื่อสถานที่
+                    </span>
+                  )}
+                </div>
+                {/* Review text */}
+                <div style={{ fontSize: 16, marginBottom: 10 }}>{review.comment}</div>
+                {/* Rating & Actions */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={18} fill={i < (review.rating || 0) ? '#facc15' : 'none'} color="#facc15" />
+                    ))}
+                    <span style={{ fontWeight: 600, color: '#f59e42', marginLeft: 4 }}>{review.rating}/5</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: isLiked ? '#ef4444' : '#aaa', cursor: 'pointer' }} onClick={() => handleLikeReview(review.id)}>
+                      <Heart size={18} fill={isLiked ? '#ef4444' : 'none'} />{review.likes}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {loading && <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>Loading...</div>}
+          {error && <div style={{ textAlign: 'center', color: 'red', margin: 24 }}>{error}</div>}
+          <div ref={loaderRef} style={{ height: 1 }} />
+          {!hasMore && !loading && <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>No more reviews</div>}
+        </div>
       </ReviewsContainer>
     </PageContainer>
   );

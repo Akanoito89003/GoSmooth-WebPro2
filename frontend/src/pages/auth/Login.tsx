@@ -100,14 +100,23 @@ const Login = () => {
     } catch (error: any) {
       // Show specific error messages based on backend response
       if (error?.response?.data?.error) {
-        if (error.response.data.error.includes('email')) {
+        const backendError = error.response.data.error;
+        if (backendError === 'account is banned') {
+          setFormError('บัญชีของคุณถูกแบน กรุณาติดต่อผู้ดูแลระบบ' +
+            (error.response.data.ban_reason ? `\nเหตุผล: ${error.response.data.ban_reason}` : '')
+          );
+        } else if (backendError === 'account is hidden') {
+          setFormError('บัญชีของคุณถูกซ่อน กรุณาติดต่อผู้ดูแลระบบ');
+        } else if (backendError === 'account is not active') {
+          setFormError('บัญชีของคุณไม่สามารถใช้งานได้ กรุณาติดต่อผู้ดูแลระบบ');
+        } else if (backendError.includes('email')) {
           clearError();
           setFormError('Email not found');
-        } else if (error.response.data.error.includes('password') || error.response.data.error.includes('credentials')) {
+        } else if (backendError.includes('password') || backendError.includes('credentials')) {
           clearError();
           setFormError('Incorrect password');
         } else {
-          setFormError(error.response.data.error);
+          setFormError(backendError);
         }
       } else {
         setFormError('Login failed');

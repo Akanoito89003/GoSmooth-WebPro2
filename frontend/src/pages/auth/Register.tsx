@@ -22,7 +22,12 @@ interface RegisterFormValues {
 }
 
 const Form = styled.form`
-  width: 100%;
+  width: 700px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 0 auto;
 `;
 
 const FormTitle = styled.h2`
@@ -81,9 +86,27 @@ const LoginLink = styled.div`
   }
 `;
 
+const AddressGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+`;
+
+const FieldError = styled.div`
+  color: ${({ theme }) => theme.colors.error[700] || '#d32f2f'};
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+`;
+
 const Register = () => {
   const { registerUser, error, clearError } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
   
   const {
@@ -94,6 +117,8 @@ const Register = () => {
   } = useForm<RegisterFormValues>();
 
   const onSubmit = async (data: RegisterFormValues) => {
+    setEmailError('');
+    setPasswordError('');
     try {
       setIsSubmitting(true);
       // Geocode address
@@ -108,23 +133,31 @@ const Register = () => {
       }
       const lat = parseFloat(geo[0].lat);
       const lng = parseFloat(geo[0].lon);
-      
-      await registerUser(
-        data.name,
-        data.email,
-        data.password,
-        {
-          addressLine: data.addressLine,
-          city: data.city,
-          province: data.province,
-          zipcode: data.zipcode,
-          country: data.country,
-          lat,
-          lng,
+      try {
+        await registerUser(
+          data.name,
+          data.email,
+          data.password,
+          {
+            addressLine: data.addressLine,
+            city: data.city,
+            province: data.province,
+            zipcode: data.zipcode,
+            country: data.country,
+            lat,
+            lng,
+          }
+        );
+        toast.success('Registration successful! Please log in.');
+        navigate('/login');
+      } catch (err: any) {
+        // ตรวจสอบ error email ซ้ำ
+        if (err?.message?.toLowerCase().includes('email')) {
+          setEmailError('อีเมลนี้ถูกใช้ไปแล้ว กรุณาใช้อีเมลอื่น');
+        } else {
+          toast.error(err.message);
         }
-      );
-      toast.success('Registration successful! Please log in.');
-      navigate('/login');
+      }
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -136,7 +169,6 @@ const Register = () => {
     <>
       <FormTitle>Create an account</FormTitle>
       <FormSubtitle>Sign up to get started with GoSmooth</FormSubtitle>
-
       {error && (
         <FormError
           initial={{ opacity: 0, y: -10 }}
@@ -146,7 +178,6 @@ const Register = () => {
           {error}
         </FormError>
       )}
-
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Input
           label="Full Name"
@@ -170,7 +201,7 @@ const Register = () => {
           placeholder="Enter your email"
           fullWidth
           leftIcon={<Mail size={18} />}
-          error={errors.email?.message}
+          error={errors.email?.message || emailError}
           {...register('email', {
             required: 'Email is required',
             pattern: {
@@ -178,7 +209,10 @@ const Register = () => {
               message: 'Invalid email address',
             },
           })}
-          onChange={() => error && clearError()}
+          onChange={() => {
+            error && clearError();
+            setEmailError('');
+          }}
         />
 
         <Input
@@ -205,56 +239,69 @@ const Register = () => {
           placeholder="Confirm your password"
           fullWidth
           leftIcon={<Lock size={18} />}
-          error={errors.confirmPassword?.message}
+          error={errors.confirmPassword?.message || passwordError}
           {...register('confirmPassword', {
             required: 'Please confirm your password',
-            validate: (value) =>
-              value === watch('password') || 'Passwords do not match',
-          })}
-          onChange={() => error && clearError()}
-        />
-
-        <Input
-          label="บ้านเลขที่/ถนน"
-          placeholder="123/45 ถนนพหลโยธิน"
-          fullWidth
-          error={errors.addressLine?.message}
-          {...register('addressLine', { required: 'กรุณากรอกบ้านเลขที่/ถนน' })}
-          onChange={() => error && clearError()}
-        />
-
-        <Input
-          label="เขต/อำเภอ"
-          placeholder="เขตจตุจักร"
-          fullWidth
-          error={errors.city?.message}
-          {...register('city', { required: 'กรุณากรอกเขต/อำเภอ' })}
-          onChange={() => error && clearError()}
-        />
-
-        <Input
-          label="จังหวัด"
-          placeholder="กรุงเทพมหานคร"
-          fullWidth
-          error={errors.province?.message}
-          {...register('province', { required: 'กรุณากรอกจังหวัด' })}
-          onChange={() => error && clearError()}
-        />
-
-        <Input
-          label="รหัสไปรษณีย์"
-          placeholder="10900"
-          fullWidth
-          error={errors.zipcode?.message}
-          {...register('zipcode', {
-            required: 'กรุณากรอกรหัสไปรษณีย์',
-            pattern: {
-              value: /^[0-9]{5}$/,
-              message: 'รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก',
+            validate: (value) => {
+              const valid = value === watch('password');
+              if (!valid) setPasswordError('รหัสผ่านไม่ตรงกัน');
+              else setPasswordError('');
+              return valid || 'Passwords do not match';
             },
           })}
-          onChange={() => error && clearError()}
+          onChange={() => {
+            error && clearError();
+            setPasswordError('');
+          }}
         />
+
+        <div style={{ fontSize: 13, color: '#888', margin: '8px 0 8px 0' }}>
+          ตัวอย่างที่อยู่: 123/45 ถนนพหลโยธิน แขวงลาดยาว เขตจตุจักร กรุงเทพฯ 10900 ประเทศไทย
+        </div>
+        <AddressGrid>
+          <div>
+            <Input
+              label="บ้านเลขที่/ถนน"
+              placeholder="123/45 ถนนพหลโยธิน"
+              fullWidth
+              error={errors.addressLine?.message}
+              {...register('addressLine', { required: 'กรุณากรอกบ้านเลขที่/ถนน' })}
+              onChange={() => error && clearError()}
+            />
+            <Input
+              label="เขต/อำเภอ"
+              placeholder="เขตจตุจักร"
+              fullWidth
+              error={errors.city?.message}
+              {...register('city', { required: 'กรุณากรอกเขต/อำเภอ' })}
+              onChange={() => error && clearError()}
+            />
+          </div>
+          <div>
+            <Input
+              label="จังหวัด"
+              placeholder="กรุงเทพมหานคร"
+              fullWidth
+              error={errors.province?.message}
+              {...register('province', { required: 'กรุณากรอกจังหวัด' })}
+              onChange={() => error && clearError()}
+            />
+            <Input
+              label="รหัสไปรษณีย์"
+              placeholder="10900"
+              fullWidth
+              error={errors.zipcode?.message}
+              {...register('zipcode', {
+                required: 'กรุณากรอกรหัสไปรษณีย์',
+                pattern: {
+                  value: /^[0-9]{5}$/,
+                  message: 'รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก',
+                },
+              })}
+              onChange={() => error && clearError()}
+            />
+          </div>
+        </AddressGrid>
 
         <select
           {...register('country', { required: 'กรุณาเลือกประเทศ' })}
@@ -265,9 +312,9 @@ const Register = () => {
           <option value="Thailand">Thailand</option>
           {/* เพิ่มประเทศอื่น ๆ ได้ */}
         </select>
-        {errors.country && <div style={{ color: 'red', marginBottom: 8 }}>{errors.country.message}</div>}
+        {errors.country && <FieldError>{errors.country.message}</FieldError>}
         <div style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>
-          ตัวอย่างที่อยู่: 123/45 ถนนพหลโยธิน แขวงลาดยาว เขตจตุจักร กรุงเทพฯ 10900 ประเทศไทย
+          <b>หมายเหตุ:</b> ที่อยู่ที่กรอกอาจจะไม่ตรงกับที่อยู่จริง 100% แต่คุณสามารถแก้ไขหรือปักหมุดที่อยู่เองได้ในภายหลัง<br />
         </div>
 
         <FormActions>

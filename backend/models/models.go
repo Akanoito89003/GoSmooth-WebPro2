@@ -13,6 +13,8 @@ type User struct {
 	Password  string             `bson:"password" json:"-"`
 	Name      string             `bson:"name" json:"name" validate:"required"`
 	Role      string             `bson:"role" json:"role"`
+	Status    string             `bson:"status" json:"status"`
+	BanReason string             `bson:"ban_reason,omitempty" json:"ban_reason,omitempty"`
 	Address   Address            `bson:"address,omitempty" json:"address,omitempty"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
@@ -40,8 +42,10 @@ type UpdateProfileInput struct {
 
 // UpdateUserInput represents the input for updating user (admin only)
 type UpdateUserInput struct {
-	Name string `json:"name" validate:"required"`
-	Role string `json:"role" validate:"required,oneof=user admin"`
+	Name      string `json:"name"`
+	Role      string `json:"role"`
+	Status    string `json:"status"`
+	BanReason string `json:"ban_reason,omitempty"`
 }
 
 // Comment represents a comment on a review

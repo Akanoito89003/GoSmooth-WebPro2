@@ -168,10 +168,20 @@ func UpdateUser(c *gin.Context) {
 
 	update := bson.M{
 		"$set": bson.M{
-			"name":       input.Name,
-			"role":       input.Role,
 			"updated_at": time.Now(),
 		},
+	}
+	if input.Name != "" {
+		update["$set"].(bson.M)["name"] = input.Name
+	}
+	if input.Role != "" {
+		update["$set"].(bson.M)["role"] = input.Role
+	}
+	if input.Status != "" {
+		update["$set"].(bson.M)["status"] = input.Status
+	}
+	if input.BanReason != "" {
+		update["$set"].(bson.M)["ban_reason"] = input.BanReason
 	}
 
 	_, err = db.Collection("users").UpdateOne(context.Background(), bson.M{"_id": objectID}, update)

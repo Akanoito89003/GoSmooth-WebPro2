@@ -59,6 +59,7 @@ func Register(c *gin.Context) {
 		Password:  string(hashedPassword),
 		Name:      input.Name,
 		Role:      "user",
+		Status:    "active",
 		Address:   input.Address,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -89,6 +90,26 @@ func Login(c *gin.Context) {
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		return
+	}
+
+	// เช็คสถานะ user
+	if user.Status != "active" {
+		msg := "account is not active"
+		if user.Status == "banned" {
+			msg = "account is banned"
+		} else if user.Status == "hidden" {
+			msg = "account is hidden"
+		}
+		c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+		return
+	}
+
+	if user.Status == "banned" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error":      "account is banned",
+			"ban_reason": user.BanReason,
+		})
 		return
 	}
 

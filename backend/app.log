@@ -12169,3 +12169,522 @@
 2025/06/03 07:20:59 [DEBUG] Place found: {ObjectID:ObjectID("683da14b96c3e1c594339ce6") ID:2 Name:แผงขนมตลาดนัดจตุจักร LocationID:1 LocationName: Description:แผงสตรีทฟู้ดภายในตลาดนัดจตุจักรที่รวบรวมขนมและของว่างพื้นเมืองไทย ทั้งกล้วยทอด มันทอด ข้าวเหนียวมะม่วง ปาท่องโก๋ และน้ำผลไม้สดคั้นสด เสิร์ฟร้อน ๆ จากเตา Category:Food Stall CoverImage:CoverImage/Chatuchak-Snack-Stall-1.jpg HighlightImages:[HighlightImages/Chatuchak-Snack-Stall-1.jpg HighlightImages/Chatuchak-Snack-Stall-2.jpg HighlightImages/Chatuchak-Snack-Stall-3.jpg HighlightImages/Chatuchak-Snack-Stall-4.jpg HighlightImages/Chatuchak-Snack-Stall-5.jpg] Rating:4 Coordinates:{Lat:13.8 Lng:100.5539} Address:ถนนกำแพงเพชร 2 แขวงจตุจักร เขตจตุจักร กรุงเทพมหานคร Phone:02-272-8008 Website:https://www.chatuchakmarket.org/ Hours:06:00น. - 18:00น. ศุกร์–อาทิตย์ CreatedAt:2025-06-02 13:04:11.956 +0000 UTC UpdatedAt:2025-06-02 13:04:11.956 +0000 UTC}
 2025/06/03 07:20:59 [DEBUG] GET /api/places/:id called with id=2
 2025/06/03 07:20:59 [DEBUG] Place found: {ObjectID:ObjectID("683da14b96c3e1c594339ce6") ID:2 Name:แผงขนมตลาดนัดจตุจักร LocationID:1 LocationName: Description:แผงสตรีทฟู้ดภายในตลาดนัดจตุจักรที่รวบรวมขนมและของว่างพื้นเมืองไทย ทั้งกล้วยทอด มันทอด ข้าวเหนียวมะม่วง ปาท่องโก๋ และน้ำผลไม้สดคั้นสด เสิร์ฟร้อน ๆ จากเตา Category:Food Stall CoverImage:CoverImage/Chatuchak-Snack-Stall-1.jpg HighlightImages:[HighlightImages/Chatuchak-Snack-Stall-1.jpg HighlightImages/Chatuchak-Snack-Stall-2.jpg HighlightImages/Chatuchak-Snack-Stall-3.jpg HighlightImages/Chatuchak-Snack-Stall-4.jpg HighlightImages/Chatuchak-Snack-Stall-5.jpg] Rating:4 Coordinates:{Lat:13.8 Lng:100.5539} Address:ถนนกำแพงเพชร 2 แขวงจตุจักร เขตจตุจักร กรุงเทพมหานคร Phone:02-272-8008 Website:https://www.chatuchakmarket.org/ Hours:06:00น. - 18:00น. ศุกร์–อาทิตย์ CreatedAt:2025-06-02 13:04:11.956 +0000 UTC UpdatedAt:2025-06-02 13:04:11.956 +0000 UTC}
+2025/06/03 13:52:33 [DEBUG] Found 32 places
+2025/06/03 13:52:33 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 13:52:33 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 13:52:33 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 13:52:33 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 13:52:33 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 13:52:33 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 13:52:33 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 13:52:33 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 13:52:33 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 13:52:33 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 13:52:33 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 13:52:33 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 13:52:33 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 13:52:33 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 13:52:33 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 13:52:33 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 13:52:33 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 13:52:33 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 13:52:33 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 13:52:33 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 13:52:33 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 13:52:33 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 13:52:33 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 13:52:33 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 13:52:33 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 13:52:33 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 13:52:33 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 13:52:33 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 13:52:33 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 13:52:33 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 13:52:33 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 13:52:33 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 13:52:33 [DEBUG] Found 32 places
+2025/06/03 13:52:33 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 13:52:33 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 13:52:33 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 13:52:33 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 13:52:33 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 13:52:33 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 13:52:33 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 13:52:33 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 13:52:33 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 13:52:33 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 13:52:33 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 13:52:33 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 13:52:33 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 13:52:33 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 13:52:33 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 13:52:33 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 13:52:33 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 13:52:33 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 13:52:33 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 13:52:33 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 13:52:33 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 13:52:33 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 13:52:33 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 13:52:33 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 13:52:33 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 13:52:33 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 13:52:33 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 13:52:33 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 13:52:33 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 13:52:33 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 13:52:33 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 13:52:33 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 13:52:59 [DEBUG] GET /api/places/:id called with id=1
+2025/06/03 13:52:59 [DEBUG] Place found: {ObjectID:ObjectID("683da14b96c3e1c594339ce5") ID:1 Name:คาเฟ่จิม ทอมป์สัน LocationID:1 LocationName: Description:คาเฟ่ในพิพิธภัณฑ์ จิม ทอมป์สัน เสิร์ฟกาแฟพิเศษและขนมหวานโฮมเมดในบรรยากาศบ้านไทยโบราณ Category:Cafe CoverImage:CoverImage/Jim-Thompson-Silk-Café-1.jpg HighlightImages:[HighlightImages/Jim-Thompson-Silk-Café-1.jpg HighlightImages/Jim-Thompson-Silk-Café-2.jpg HighlightImages/Jim-Thompson-Silk-Café-3.jpg HighlightImages/Jim-Thompson-Silk-Café-4.png HighlightImages/Jim-Thompson-Silk-Café-5.jpg HighlightImages/Jim-Thompson-Silk-Café-6.jpg] Rating:4.3 Coordinates:{Lat:13.7491 Lng:100.5282} Address:ถนนพระราม 1 แขวงวังใหม่ เขตปทุมวัน กรุงเทพมหานคร Phone:02-623-5500 Website:https://jimthompsonrestaurant.com/restaurant/silk-cafe/ Hours:10:00น. - 20:00น. เปิดทุกวัน CreatedAt:2025-06-02 13:04:11.956 +0000 UTC UpdatedAt:2025-06-02 13:04:11.956 +0000 UTC}
+2025/06/03 13:52:59 [DEBUG] GET /api/places/:id called with id=1
+2025/06/03 13:52:59 [DEBUG] Place found: {ObjectID:ObjectID("683da14b96c3e1c594339ce5") ID:1 Name:คาเฟ่จิม ทอมป์สัน LocationID:1 LocationName: Description:คาเฟ่ในพิพิธภัณฑ์ จิม ทอมป์สัน เสิร์ฟกาแฟพิเศษและขนมหวานโฮมเมดในบรรยากาศบ้านไทยโบราณ Category:Cafe CoverImage:CoverImage/Jim-Thompson-Silk-Café-1.jpg HighlightImages:[HighlightImages/Jim-Thompson-Silk-Café-1.jpg HighlightImages/Jim-Thompson-Silk-Café-2.jpg HighlightImages/Jim-Thompson-Silk-Café-3.jpg HighlightImages/Jim-Thompson-Silk-Café-4.png HighlightImages/Jim-Thompson-Silk-Café-5.jpg HighlightImages/Jim-Thompson-Silk-Café-6.jpg] Rating:4.3 Coordinates:{Lat:13.7491 Lng:100.5282} Address:ถนนพระราม 1 แขวงวังใหม่ เขตปทุมวัน กรุงเทพมหานคร Phone:02-623-5500 Website:https://jimthompsonrestaurant.com/restaurant/silk-cafe/ Hours:10:00น. - 20:00น. เปิดทุกวัน CreatedAt:2025-06-02 13:04:11.956 +0000 UTC UpdatedAt:2025-06-02 13:04:11.956 +0000 UTC}
+2025/06/03 13:53:02 [DEBUG] Found 32 places
+2025/06/03 13:53:02 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 13:53:02 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 13:53:02 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 13:53:02 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 13:53:02 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 13:53:02 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 13:53:02 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 13:53:02 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 13:53:02 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 13:53:02 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 13:53:02 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 13:53:02 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 13:53:02 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 13:53:02 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 13:53:02 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 13:53:02 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 13:53:02 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 13:53:02 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 13:53:02 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 13:53:02 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 13:53:02 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 13:53:02 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 13:53:02 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 13:53:02 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 13:53:02 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 13:53:02 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 13:53:02 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 13:53:02 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 13:53:02 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 13:53:02 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 13:53:02 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 13:53:02 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 13:53:02 [DEBUG] Found 32 places
+2025/06/03 13:53:02 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 13:53:02 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 13:53:02 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 13:53:02 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 13:53:02 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 13:53:02 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 13:53:02 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 13:53:02 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 13:53:02 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 13:53:02 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 13:53:02 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 13:53:02 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 13:53:02 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 13:53:02 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 13:53:02 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 13:53:02 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 13:53:02 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 13:53:02 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 13:53:02 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 13:53:02 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 13:53:02 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 13:53:02 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 13:53:02 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 13:53:02 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 13:53:02 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 13:53:02 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 13:53:02 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 13:53:02 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 13:53:02 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 13:53:02 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 13:53:02 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 13:53:02 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 13:53:03 [DEBUG] GET /api/places/:id called with id=2
+2025/06/03 13:53:03 [DEBUG] Place found: {ObjectID:ObjectID("683da14b96c3e1c594339ce6") ID:2 Name:แผงขนมตลาดนัดจตุจักร LocationID:1 LocationName: Description:แผงสตรีทฟู้ดภายในตลาดนัดจตุจักรที่รวบรวมขนมและของว่างพื้นเมืองไทย ทั้งกล้วยทอด มันทอด ข้าวเหนียวมะม่วง ปาท่องโก๋ และน้ำผลไม้สดคั้นสด เสิร์ฟร้อน ๆ จากเตา Category:Food Stall CoverImage:CoverImage/Chatuchak-Snack-Stall-1.jpg HighlightImages:[HighlightImages/Chatuchak-Snack-Stall-1.jpg HighlightImages/Chatuchak-Snack-Stall-2.jpg HighlightImages/Chatuchak-Snack-Stall-3.jpg HighlightImages/Chatuchak-Snack-Stall-4.jpg HighlightImages/Chatuchak-Snack-Stall-5.jpg] Rating:4 Coordinates:{Lat:13.8 Lng:100.5539} Address:ถนนกำแพงเพชร 2 แขวงจตุจักร เขตจตุจักร กรุงเทพมหานคร Phone:02-272-8008 Website:https://www.chatuchakmarket.org/ Hours:06:00น. - 18:00น. ศุกร์–อาทิตย์ CreatedAt:2025-06-02 13:04:11.956 +0000 UTC UpdatedAt:2025-06-02 13:04:11.956 +0000 UTC}
+2025/06/03 13:53:03 [DEBUG] GET /api/places/:id called with id=2
+2025/06/03 13:53:03 [DEBUG] Place found: {ObjectID:ObjectID("683da14b96c3e1c594339ce6") ID:2 Name:แผงขนมตลาดนัดจตุจักร LocationID:1 LocationName: Description:แผงสตรีทฟู้ดภายในตลาดนัดจตุจักรที่รวบรวมขนมและของว่างพื้นเมืองไทย ทั้งกล้วยทอด มันทอด ข้าวเหนียวมะม่วง ปาท่องโก๋ และน้ำผลไม้สดคั้นสด เสิร์ฟร้อน ๆ จากเตา Category:Food Stall CoverImage:CoverImage/Chatuchak-Snack-Stall-1.jpg HighlightImages:[HighlightImages/Chatuchak-Snack-Stall-1.jpg HighlightImages/Chatuchak-Snack-Stall-2.jpg HighlightImages/Chatuchak-Snack-Stall-3.jpg HighlightImages/Chatuchak-Snack-Stall-4.jpg HighlightImages/Chatuchak-Snack-Stall-5.jpg] Rating:4 Coordinates:{Lat:13.8 Lng:100.5539} Address:ถนนกำแพงเพชร 2 แขวงจตุจักร เขตจตุจักร กรุงเทพมหานคร Phone:02-272-8008 Website:https://www.chatuchakmarket.org/ Hours:06:00น. - 18:00น. ศุกร์–อาทิตย์ CreatedAt:2025-06-02 13:04:11.956 +0000 UTC UpdatedAt:2025-06-02 13:04:11.956 +0000 UTC}
+2025/06/03 13:53:58 [DEBUG] Found 32 places
+2025/06/03 13:53:58 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 13:53:58 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 13:53:58 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 13:53:58 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 13:53:58 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 13:53:58 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 13:53:58 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 13:53:58 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 13:53:58 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 13:53:58 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 13:53:58 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 13:53:58 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 13:53:58 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 13:53:58 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 13:53:58 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 13:53:58 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 13:53:58 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 13:53:58 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 13:53:58 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 13:53:58 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 13:53:58 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 13:53:58 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 13:53:58 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 13:53:58 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 13:53:58 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 13:53:58 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 13:53:58 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 13:53:58 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 13:53:58 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 13:53:58 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 13:53:58 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 13:53:58 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 13:53:58 [DEBUG] Found 32 places
+2025/06/03 13:53:58 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 13:53:58 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 13:53:58 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 13:53:58 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 13:53:58 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 13:53:58 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 13:53:58 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 13:53:58 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 13:53:58 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 13:53:58 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 13:53:58 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 13:53:58 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 13:53:58 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 13:53:58 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 13:53:58 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 13:53:58 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 13:53:58 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 13:53:58 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 13:53:58 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 13:53:58 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 13:53:58 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 13:53:58 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 13:53:58 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 13:53:58 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 13:53:58 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 13:53:58 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 13:53:58 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 13:53:58 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 13:53:58 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 13:53:58 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 13:53:58 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 13:53:58 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 13:53:59 [DEBUG] Found 32 places
+2025/06/03 13:53:59 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 13:53:59 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 13:53:59 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 13:53:59 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 13:53:59 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 13:53:59 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 13:53:59 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 13:53:59 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 13:53:59 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 13:53:59 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 13:53:59 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 13:53:59 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 13:53:59 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 13:53:59 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 13:53:59 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 13:53:59 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 13:53:59 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 13:53:59 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 13:53:59 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 13:53:59 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 13:53:59 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 13:53:59 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 13:53:59 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 13:53:59 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 13:53:59 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 13:53:59 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 13:53:59 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 13:53:59 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 13:53:59 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 13:53:59 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 13:53:59 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 13:53:59 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 13:53:59 [DEBUG] Found 32 places
+2025/06/03 13:53:59 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 13:53:59 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 13:53:59 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 13:53:59 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 13:53:59 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 13:53:59 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 13:53:59 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 13:53:59 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 13:53:59 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 13:53:59 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 13:53:59 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 13:53:59 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 13:53:59 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 13:53:59 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 13:53:59 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 13:53:59 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 13:53:59 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 13:53:59 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 13:53:59 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 13:53:59 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 13:53:59 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 13:53:59 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 13:53:59 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 13:53:59 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 13:53:59 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 13:53:59 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 13:53:59 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 13:53:59 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 13:53:59 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 13:53:59 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 13:53:59 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 13:53:59 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 14:21:00 Shutting down server...
+2025/06/03 14:21:00 Server exiting
+2025/06/03 14:21:07 Admin user created successfully
+2025/06/03 14:21:07 Initial locations created
+2025/06/03 14:21:07 Initial places created
+2025/06/03 14:21:07 Migrate places id to ObjectID completed
+2025/06/03 14:21:07 Initial routes created
+2025/06/03 14:21:07 Server starting on port 8080...
+2025/06/03 14:22:20 [DEBUG] Found 32 places
+2025/06/03 14:22:20 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 14:22:20 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 14:22:20 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 14:22:20 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 14:22:20 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 14:22:20 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 14:22:20 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 14:22:20 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 14:22:20 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 14:22:20 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 14:22:20 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 14:22:20 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 14:22:20 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 14:22:20 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 14:22:20 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 14:22:20 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 14:22:20 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 14:22:20 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 14:22:20 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 14:22:20 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 14:22:20 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 14:22:20 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 14:22:20 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 14:22:20 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 14:22:20 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 14:22:20 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 14:22:20 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 14:22:20 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 14:22:20 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 14:22:20 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 14:22:20 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 14:22:20 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 14:22:20 [DEBUG] Found 32 places
+2025/06/03 14:22:20 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 14:22:20 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 14:22:20 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 14:22:20 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 14:22:20 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 14:22:20 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 14:22:20 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 14:22:20 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 14:22:20 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 14:22:20 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 14:22:20 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 14:22:20 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 14:22:20 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 14:22:20 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 14:22:20 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 14:22:20 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 14:22:20 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 14:22:20 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 14:22:20 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 14:22:20 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 14:22:20 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 14:22:20 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 14:22:20 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 14:22:20 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 14:22:20 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 14:22:20 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 14:22:20 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 14:22:20 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 14:22:20 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 14:22:20 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 14:22:20 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 14:22:20 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 14:33:37 [DEBUG] Found 32 places
+2025/06/03 14:33:37 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 14:33:37 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 14:33:37 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 14:33:37 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 14:33:37 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 14:33:37 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 14:33:37 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 14:33:37 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 14:33:37 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 14:33:37 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 14:33:37 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 14:33:37 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 14:33:37 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 14:33:37 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 14:33:37 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 14:33:37 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 14:33:37 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 14:33:37 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 14:33:37 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 14:33:37 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 14:33:37 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 14:33:37 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 14:33:37 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 14:33:37 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 14:33:37 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 14:33:37 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 14:33:37 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 14:33:37 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 14:33:37 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 14:33:37 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 14:33:37 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 14:33:37 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 14:45:52 [DEBUG] Found 32 places
+2025/06/03 14:45:52 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 14:45:52 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 14:45:52 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 14:45:52 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 14:45:52 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 14:45:52 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 14:45:52 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 14:45:52 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 14:45:52 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 14:45:52 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 14:45:52 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 14:45:52 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 14:45:52 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 14:45:52 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 14:45:52 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 14:45:52 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 14:45:52 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 14:45:52 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 14:45:52 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 14:45:52 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 14:45:52 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 14:45:52 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 14:45:52 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 14:45:52 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 14:45:52 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 14:45:52 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 14:45:52 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 14:45:52 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 14:45:52 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 14:45:52 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 14:45:52 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 14:45:52 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 14:45:52 [DEBUG] Found 32 places
+2025/06/03 14:45:52 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 14:45:52 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 14:45:52 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 14:45:52 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 14:45:52 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 14:45:52 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 14:45:52 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 14:45:52 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 14:45:52 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 14:45:52 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 14:45:52 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 14:45:52 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 14:45:52 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 14:45:52 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 14:45:52 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 14:45:52 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 14:45:52 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 14:45:52 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 14:45:52 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 14:45:52 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 14:45:52 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 14:45:52 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 14:45:52 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 14:45:52 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 14:45:52 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 14:45:52 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 14:45:52 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 14:45:52 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 14:45:52 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 14:45:52 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 14:45:52 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 14:45:52 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 14:45:56 [DEBUG] GET /api/places/:id called with id=2
+2025/06/03 14:45:56 [DEBUG] Place found: {ObjectID:ObjectID("683ea263908ccfb20bdd2411") ID:2 Name:แผงขนมตลาดนัดจตุจักร LocationID:1 LocationName: Description:แผงสตรีทฟู้ดภายในตลาดนัดจตุจักรที่รวบรวมขนมและของว่างพื้นเมืองไทย ทั้งกล้วยทอด มันทอด ข้าวเหนียวมะม่วง ปาท่องโก๋ และน้ำผลไม้สดคั้นสด เสิร์ฟร้อน ๆ จากเตา Category:Food Stall CoverImage:CoverImage/Chatuchak-Snack-Stall-1.jpg HighlightImages:[HighlightImages/Chatuchak-Snack-Stall-1.jpg HighlightImages/Chatuchak-Snack-Stall-2.jpg HighlightImages/Chatuchak-Snack-Stall-3.jpg HighlightImages/Chatuchak-Snack-Stall-4.jpg HighlightImages/Chatuchak-Snack-Stall-5.jpg] Rating:4 Coordinates:{Lat:13.8 Lng:100.5539} Address:ถนนกำแพงเพชร 2 แขวงจตุจักร เขตจตุจักร กรุงเทพมหานคร Phone:02-272-8008 Website:https://www.chatuchakmarket.org/ Hours:06:00น. - 18:00น. ศุกร์–อาทิตย์ CreatedAt:2025-06-03 07:21:07.715 +0000 UTC UpdatedAt:2025-06-03 07:21:07.715 +0000 UTC}
+2025/06/03 14:45:56 [DEBUG] GET /api/places/:id called with id=2
+2025/06/03 14:45:56 [DEBUG] Place found: {ObjectID:ObjectID("683ea263908ccfb20bdd2411") ID:2 Name:แผงขนมตลาดนัดจตุจักร LocationID:1 LocationName: Description:แผงสตรีทฟู้ดภายในตลาดนัดจตุจักรที่รวบรวมขนมและของว่างพื้นเมืองไทย ทั้งกล้วยทอด มันทอด ข้าวเหนียวมะม่วง ปาท่องโก๋ และน้ำผลไม้สดคั้นสด เสิร์ฟร้อน ๆ จากเตา Category:Food Stall CoverImage:CoverImage/Chatuchak-Snack-Stall-1.jpg HighlightImages:[HighlightImages/Chatuchak-Snack-Stall-1.jpg HighlightImages/Chatuchak-Snack-Stall-2.jpg HighlightImages/Chatuchak-Snack-Stall-3.jpg HighlightImages/Chatuchak-Snack-Stall-4.jpg HighlightImages/Chatuchak-Snack-Stall-5.jpg] Rating:4 Coordinates:{Lat:13.8 Lng:100.5539} Address:ถนนกำแพงเพชร 2 แขวงจตุจักร เขตจตุจักร กรุงเทพมหานคร Phone:02-272-8008 Website:https://www.chatuchakmarket.org/ Hours:06:00น. - 18:00น. ศุกร์–อาทิตย์ CreatedAt:2025-06-03 07:21:07.715 +0000 UTC UpdatedAt:2025-06-03 07:21:07.715 +0000 UTC}
+2025/06/03 14:46:06 [DEBUG] GET /api/places/:id called with id=2
+2025/06/03 14:46:06 [DEBUG] Place found: {ObjectID:ObjectID("683ea263908ccfb20bdd2411") ID:2 Name:แผงขนมตลาดนัดจตุจักร LocationID:1 LocationName: Description:แผงสตรีทฟู้ดภายในตลาดนัดจตุจักรที่รวบรวมขนมและของว่างพื้นเมืองไทย ทั้งกล้วยทอด มันทอด ข้าวเหนียวมะม่วง ปาท่องโก๋ และน้ำผลไม้สดคั้นสด เสิร์ฟร้อน ๆ จากเตา Category:Food Stall CoverImage:CoverImage/Chatuchak-Snack-Stall-1.jpg HighlightImages:[HighlightImages/Chatuchak-Snack-Stall-1.jpg HighlightImages/Chatuchak-Snack-Stall-2.jpg HighlightImages/Chatuchak-Snack-Stall-3.jpg HighlightImages/Chatuchak-Snack-Stall-4.jpg HighlightImages/Chatuchak-Snack-Stall-5.jpg] Rating:4 Coordinates:{Lat:13.8 Lng:100.5539} Address:ถนนกำแพงเพชร 2 แขวงจตุจักร เขตจตุจักร กรุงเทพมหานคร Phone:02-272-8008 Website:https://www.chatuchakmarket.org/ Hours:06:00น. - 18:00น. ศุกร์–อาทิตย์ CreatedAt:2025-06-03 07:21:07.715 +0000 UTC UpdatedAt:2025-06-03 07:21:07.715 +0000 UTC}
+2025/06/03 14:46:06 [DEBUG] GET /api/places/:id called with id=2
+2025/06/03 14:46:06 [DEBUG] Place found: {ObjectID:ObjectID("683ea263908ccfb20bdd2411") ID:2 Name:แผงขนมตลาดนัดจตุจักร LocationID:1 LocationName: Description:แผงสตรีทฟู้ดภายในตลาดนัดจตุจักรที่รวบรวมขนมและของว่างพื้นเมืองไทย ทั้งกล้วยทอด มันทอด ข้าวเหนียวมะม่วง ปาท่องโก๋ และน้ำผลไม้สดคั้นสด เสิร์ฟร้อน ๆ จากเตา Category:Food Stall CoverImage:CoverImage/Chatuchak-Snack-Stall-1.jpg HighlightImages:[HighlightImages/Chatuchak-Snack-Stall-1.jpg HighlightImages/Chatuchak-Snack-Stall-2.jpg HighlightImages/Chatuchak-Snack-Stall-3.jpg HighlightImages/Chatuchak-Snack-Stall-4.jpg HighlightImages/Chatuchak-Snack-Stall-5.jpg] Rating:4 Coordinates:{Lat:13.8 Lng:100.5539} Address:ถนนกำแพงเพชร 2 แขวงจตุจักร เขตจตุจักร กรุงเทพมหานคร Phone:02-272-8008 Website:https://www.chatuchakmarket.org/ Hours:06:00น. - 18:00น. ศุกร์–อาทิตย์ CreatedAt:2025-06-03 07:21:07.715 +0000 UTC UpdatedAt:2025-06-03 07:21:07.715 +0000 UTC}
+2025/06/03 14:56:48 [DEBUG] Found 32 places
+2025/06/03 14:56:48 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 14:56:48 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 14:56:48 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 14:56:48 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 14:56:48 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 14:56:48 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 14:56:48 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 14:56:48 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 14:56:48 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 14:56:48 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 14:56:48 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 14:56:48 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 14:56:48 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 14:56:48 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 14:56:48 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 14:56:48 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 14:56:48 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 14:56:48 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 14:56:48 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 14:56:48 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 14:56:48 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 14:56:48 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 14:56:48 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 14:56:48 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 14:56:48 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 14:56:48 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 14:56:48 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 14:56:48 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 14:56:48 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 14:56:48 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 14:56:48 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 14:56:48 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}
+2025/06/03 14:56:48 [DEBUG] Found 32 places
+2025/06/03 14:56:48 [DEBUG] Place: คาเฟ่จิม ทอมป์สัน, Coordinates: {Lat:13.7491 Lng:100.5282}
+2025/06/03 14:56:48 [DEBUG] Place: แผงขนมตลาดนัดจตุจักร, Coordinates: {Lat:13.8 Lng:100.5539}
+2025/06/03 14:56:48 [DEBUG] Place: ศูนย์อาหารเทอร์มินอล 21, Coordinates: {Lat:13.7378 Lng:100.5624}
+2025/06/03 14:56:48 [DEBUG] Place: เส้นทางวิ่งสวนลุมพินี, Coordinates: {Lat:13.73 Lng:100.5413}
+2025/06/03 14:56:48 [DEBUG] Place: สยามโอเชียนเวิลด์, Coordinates: {Lat:13.7465 Lng:100.5343}
+2025/06/03 14:56:48 [DEBUG] Place: ยอดดอยอินทนนท์, Coordinates: {Lat:18.587797 Lng:98.486963}
+2025/06/03 14:56:48 [DEBUG] Place: น้ำตกวชิรธาร, Coordinates: {Lat:18.542306 Lng:98.597306}
+2025/06/03 14:56:48 [DEBUG] Place: วัดเจดีย์หลวง, Coordinates: {Lat:18.787007 Lng:98.986489}
+2025/06/03 14:56:48 [DEBUG] Place: วัดพระสิงห์, Coordinates: {Lat:18.788534 Lng:98.981353}
+2025/06/03 14:56:48 [DEBUG] Place: นิทรรศการวัดร่องขุ่น, Coordinates: {Lat:19.8247 Lng:99.7633}
+2025/06/03 14:56:48 [DEBUG] Place: จุดถ่ายภาพปราสาทพนมรุ้ง, Coordinates: {Lat:14.531856 Lng:102.940299}
+2025/06/03 14:56:48 [DEBUG] Place: ภาพเขียนสีผาแต้ม, Coordinates: {Lat:15.4213 Lng:105.532}
+2025/06/03 14:56:48 [DEBUG] Place: หาดอ่าวพร้าว, Coordinates: {Lat:12.56778 Lng:101.45472}
+2025/06/03 14:56:48 [DEBUG] Place: สาธิตการแกะสลักไม้, Coordinates: {Lat:12.97278 Lng:100.88889}
+2025/06/03 14:56:48 [DEBUG] Place: น้ำตกเอราวัณ ชั้นที่ 7, Coordinates: {Lat:14.3833 Lng:99.1167}
+2025/06/03 14:56:48 [DEBUG] Place: น้ำตกไทรโยคน้อย, Coordinates: {Lat:14.41778 Lng:98.74722}
+2025/06/03 14:56:48 [DEBUG] Place: รถไฟข้ามสะพานแม่น้ำแคว, Coordinates: {Lat:14.003611 Lng:99.538333}
+2025/06/03 14:56:48 [DEBUG] Place: อ่าวมาหยา, Coordinates: {Lat:7.676761 Lng:98.766067}
+2025/06/03 14:56:48 [DEBUG] Place: เกาะเจมส์บอนด์, Coordinates: {Lat:8.283 Lng:98.6}
+2025/06/03 14:56:48 [DEBUG] Place: ล่องเรือทะเลสาบเชี่ยวหลาน, Coordinates: {Lat:8.9184 Lng:98.8154}
+2025/06/03 14:56:48 [DEBUG] Place: Bangkok National Museum, Coordinates: {Lat:13.7579 Lng:100.4951}
+2025/06/03 14:56:48 [DEBUG] Place: Grand Palace, Coordinates: {Lat:13.75 Lng:100.4913}
+2025/06/03 14:56:48 [DEBUG] Place: Khao San Road, Coordinates: {Lat:13.758 Lng:100.4975}
+2025/06/03 14:56:48 [DEBUG] Place: Lumpini Park, Coordinates: {Lat:13.73 Lng:100.5418}
+2025/06/03 14:56:48 [DEBUG] Place: MBK Center, Coordinates: {Lat:13.7461 Lng:100.5298}
+2025/06/03 14:56:48 [DEBUG] Place: Siam Paragon, Coordinates: {Lat:13.746 Lng:100.5346}
+2025/06/03 14:56:48 [DEBUG] Place: Taling Chan Floating Market, Coordinates: {Lat:13.7948 Lng:100.4605}
+2025/06/03 14:56:48 [DEBUG] Place: Terminal 21, Coordinates: {Lat:13.7373 Lng:100.5608}
+2025/06/03 14:56:48 [DEBUG] Place: Victory Monument, Coordinates: {Lat:13.7648 Lng:100.5385}
+2025/06/03 14:56:48 [DEBUG] Place: Wat Arun, Coordinates: {Lat:13.7437 Lng:100.488}
+2025/06/03 14:56:48 [DEBUG] Place: Wat Phra Kaew, Coordinates: {Lat:13.7516 Lng:100.4925}
+2025/06/03 14:56:48 [DEBUG] Place: Yaowarat Road, Coordinates: {Lat:13.7415 Lng:100.5101}

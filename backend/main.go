@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -116,13 +115,7 @@ func main() {
 	router.Use(ErrorLogger())
 
 	// Configure CORS with more specific settings
-	frontendURL := os.Getenv("FRONTEND_URL")
-	allowOrigins := []string{}
-	if frontendURL != "" && (strings.HasPrefix(frontendURL, "http://") || strings.HasPrefix(frontendURL, "https://")) {
-		allowOrigins = []string{frontendURL}
-	} else {
-		allowOrigins = []string{"*"}
-	}
+	allowOrigins := []string{"http://localhost:5173"}
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     allowOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaStar, FaMapMarkerAlt, FaRoute, FaHeart, FaRegHeart, FaShareAlt, FaMoneyBillWave, FaPhone, FaGlobe, FaClock, FaInfo } from 'react-icons/fa';
 import axios from 'axios';
@@ -9,8 +9,10 @@ import { Place, Review } from '../types/place';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { api } from '../services/api';
-import { UserCircle, Heart } from 'lucide-react';
+import { UserCircle, Heart, AlertTriangle } from 'lucide-react';
 import { reviewsAPI } from '../services/api';
+import { LuFlag, LuMapPin } from 'react-icons/lu';
+import { toast } from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -36,6 +38,13 @@ const PlaceDetailPage: React.FC = () => {
   const [reviewRating, setReviewRating] = useState(0);
   const [posting, setPosting] = useState(false);
   const [userId, setUserId] = useState<string>('');
+  const [showWarning, setShowWarning] = useState(false);
+  const [pendingReview, setPendingReview] = useState<{
+    rating: number;
+    comment: string;
+  } | null>(null);
+  const [showRouteModal, setShowRouteModal] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => { fetchPlaceDetails(); }, [id]);
 
@@ -63,8 +72,15 @@ const PlaceDetailPage: React.FC = () => {
       const response = await axios.get(`${API_URL}/api/places/${id}`);
       console.log('[DEBUG] API response:', response.data);
       const p = response.data.place || response.data;
+      const getPlaceId = (p: any) =>
+        (typeof p.place_id === 'string' && p.place_id) ||
+        (typeof p.PlaceID === 'string' && p.PlaceID) ||
+        (typeof p.id === 'string' && p.id) ||
+        (typeof p._id === 'string' && p._id) ||
+        (p._id && typeof p._id === 'object' && typeof p._id.$oid === 'string' && p._id.$oid) ||
+        '';
       const placeData: Place = {
-        id: p.id || p._id || p.ID || p.PlaceID || p.place_id || p.name,
+        id: getPlaceId(p),
         name: p.name || p.Name,
         location: p.location || p.Location || p.address || p.Address || '',
         description: p.description || p.Description || '',
@@ -133,23 +149,53 @@ const PlaceDetailPage: React.FC = () => {
     setIsFavorite(!isFavorite);
   };
 
-  const handleReviewSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleReviewSubmit = () => {
     if (!user) return;
-    if (userReview.rating === 0) {
-      alert('Please select a rating');
+    if (reviewRating === 0) {
+      alert('กรุณาให้คะแนน');
       return;
     }
+    if (!reviewText.trim()) {
+      alert('กรุณากรอกข้อความรีวิว');
+      return;
+    }
+    // Show warning modal first
+    setPendingReview({
+      rating: reviewRating,
+      comment: reviewText,
+    });
+    setShowWarning(true);
+  };
+
+  const handleConfirmReview = async () => {
+    if (!pendingReview || !place) return;
     try {
       setIsSubmittingReview(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setUserReview({ rating: 0, comment: '' });
+      // เรียก API เพื่อบันทึกรีวิวลง database
+      const response = await reviewsAPI.createReview({
+        placeId: place.id,
+        placeName: place.name,
+        rating: pendingReview.rating,
+        comment: pendingReview.comment,
+      });
+
+      if (!response.data || !response.data.id) {
+        throw new Error('ไม่สามารถสร้างรีวิวได้');
+      }
+
+      // refresh reviews list
+      await fetchReviews(place.id);
+      setReviewRating(0);
+      setReviewText('');
       setReviewSuccess(true);
       setTimeout(() => { setReviewSuccess(false); }, 3000);
-    } catch (error) {
-      // Handle error
+    } catch (error: any) {
+      console.error('Error posting review:', error);
+      toast.error(error.response?.data?.error || error.message || 'เกิดข้อผิดพลาด');
     } finally {
       setIsSubmittingReview(false);
+      setShowWarning(false);
+      setPendingReview(null);
     }
   };
 
@@ -234,14 +280,31 @@ const PlaceDetailPage: React.FC = () => {
           <div className="lg:w-2/3">
             {/* Action Buttons */}
             <div className="card p-4 mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-center">
-              <Link to={`/routes?destination=${encodeURIComponent(place.name)}`} className="btn btn-primary flex-1 sm:mr-2 flex items-center justify-center">
-                <FaRoute className="mr-2" />
-                Get Directions
-              </Link>
-              <button onClick={toggleFavorite} className="btn btn-outline flex-1 sm:ml-2 flex items-center justify-center">
-                {isFavorite ? (<><FaHeart className="mr-2 text-primary-600" />Saved</>) : (<><FaRegHeart className="mr-2" />Save</>)}
-              </button>
-              <button className="btn btn-outline sm:ml-2 p-3 flex items-center justify-center"><FaShareAlt /></button>
+              {/* Find Route Button (Minimal, prominent, centered) */}
+              <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0 18px 0' }}>
+                <button
+                  onClick={() => setShowRouteModal(true)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    background: '#e0f2fe',
+                    color: '#2563eb',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    border: 'none',
+                    borderRadius: 8,
+                    boxShadow: '0 2px 8px 0 rgba(30,64,175,0.07)',
+                    padding: '10px 20px',
+                    cursor: 'pointer',
+                    transition: 'background 0.18s',
+                    outline: 'none',
+                  }}
+                  onMouseOver={e => e.currentTarget.style.background='#bae6fd'}
+                  onMouseOut={e => e.currentTarget.style.background='#e0f2fe'}
+                >
+                  <FaRoute size={18} style={{ color: '#2563eb', marginBottom: -2 }} />
+                  <span>Find Route to <span style={{ color: '#1e293b', fontWeight: 700 }}>{place.name}</span></span>
+                </button>
+              </div>
             </div>
             {/* Tabs Navigation */}
             <div className="card overflow-hidden mb-6">
@@ -373,38 +436,69 @@ const PlaceDetailPage: React.FC = () => {
                           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                             <button
                               className="btn btn-primary"
-                              onClick={async () => {
-                                if (!reviewRating) return alert('กรุณาให้คะแนน');
-                                if (!reviewText.trim()) return alert('กรุณากรอกข้อความรีวิว');
-                                setPosting(true);
-                                try {
-                                  const placeAny = place as any;
-                                  const placeIdToSend = placeAny.place_id || placeAny.PlaceID || placeAny.id;
-                                  const placeNameToSend = placeAny.name || placeAny.Name;
-                                  const payload = {
-                                    placeId: placeIdToSend,
-                                    placeName: placeNameToSend,
-                                    rating: reviewRating,
-                                    comment: reviewText,
-                                  };
-                                  console.log('DEBUG: POST REVIEW payload', payload);
-                                  await api.post('/api/reviews', payload);
-                                  setReviewText('');
-                                  setReviewRating(0);
-                                  fetchReviews(placeIdToSend); // refresh reviews
-                                  alert('โพสต์รีวิวสำเร็จ!');
-                                } catch (e: any) {
-                                  console.error('POST REVIEW ERROR', e?.response?.data || e);
-                                  alert('เกิดข้อผิดพลาด: ' + (e?.response?.data?.error || e.message || ''));
-                                } finally {
-                                  setPosting(false);
-                                }
-                              }}
-                              disabled={posting}
+                              onClick={handleReviewSubmit}
+                              disabled={isSubmittingReview}
                               style={{ minWidth: 130, fontSize: 17, padding: '10px 0', width: 160 }}
                             >
-                              {posting ? 'กำลังโพสต์...' : 'โพสต์รีวิว'}
+                              {isSubmittingReview ? 'กำลังโพสต์...' : 'โพสต์รีวิว'}
                             </button>
+                          </div>
+                        </div>
+                      )}
+                      {/* Warning Modal ภาษาไทย */}
+                      {showWarning && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                            <div className="flex items-center gap-3 mb-4 text-yellow-600">
+                              <AlertTriangle size={24} />
+                              <h3 className="text-xl font-semibold">ข้อควรปฏิบัติในการรีวิว</h3>
+                            </div>
+                            <p className="text-gray-600 mb-4">
+                              ก่อนโพสต์รีวิว กรุณาปฏิบัติตามข้อควรระวังดังต่อไปนี้:
+                            </p>
+                            <ul className="list-none space-y-2 mb-4">
+                              <li className="flex items-start gap-2">
+                                <span className="text-yellow-600 font-bold">•</span>
+                                <span className="text-gray-600">ใช้ถ้อยคำสุภาพ หลีกเลี่ยงคำหยาบคายหรือดูหมิ่นผู้อื่น</span>
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <span className="text-yellow-600 font-bold">•</span>
+                                <span className="text-gray-600">แบ่งปันประสบการณ์จริงและข้อมูลที่ถูกต้อง</span>
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <span className="text-yellow-600 font-bold">•</span>
+                                <span className="text-gray-600">ห้ามโพสต์สแปมหรือเนื้อหาโฆษณา</span>
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <span className="text-yellow-600 font-bold">•</span>
+                                <span className="text-gray-600">ห้ามเปิดเผยข้อมูลส่วนตัว</span>
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <span className="text-yellow-600 font-bold">•</span>
+                                <span className="text-gray-600">ห้ามรีวิวเท็จหรือบิดเบือนความจริง</span>
+                              </li>
+                            </ul>
+                            <p className="text-red-500 text-sm mb-6">
+                              หากฝ่าฝืน อาจส่งผลให้บัญชีของคุณถูกระงับการใช้งาน
+                            </p>
+                            <div className="flex justify-end gap-3">
+                              <button
+                                onClick={() => {
+                                  setShowWarning(false);
+                                  setPendingReview(null);
+                                }}
+                                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                              >
+                                ยกเลิก
+                              </button>
+                              <button
+                                onClick={handleConfirmReview}
+                                disabled={isSubmittingReview}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                              >
+                                {isSubmittingReview ? 'กำลังโพสต์...' : 'เข้าใจแล้ว, โพสต์รีวิว'}
+                              </button>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -503,22 +597,57 @@ const PlaceDetailPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            {/* Additional Info */}
-            <div className="card p-6">
-              <div className="flex items-center bg-primary-50 text-primary-700 p-4 rounded-lg mb-4">
-                <FaInfo className="mr-3 flex-shrink-0" />
-                <p className="text-sm">Ready to visit? Use our route finder to get directions and explore the most convenient way to reach {place.name}.</p>
-              </div>
-              <Link 
-                to={`/routes?destination=${encodeURIComponent(place.name)}`}
-                className="btn btn-primary w-full"
-              >
-                Find Route to {place.name}
-              </Link>
-            </div>
           </div>
         </div>
       </div>
+      {/* Modal เลือก Origin/Destination */}
+      {showRouteModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(30,64,175,0.10)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#f8fbff', borderRadius: 16, padding: 30, minWidth: 320, maxWidth: 370, boxShadow: '0 2px 16px 0 rgba(30,64,175,0.10)', textAlign: 'center', border: '1.5px solid #bae6fd', position: 'relative' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 8 }}>
+              <FaRoute size={32} style={{ color: '#2563eb', margin: 0 }} />
+            </div>
+            <h3 style={{ fontSize: 19, fontWeight: 700, marginBottom: 13, color: '#1e293b' }}>เลือกการวางตำแหน่งเส้นทาง</h3>
+            <div style={{ fontSize: 15, color: '#2563eb', marginBottom: 18, fontWeight: 500 }}>ต้องการใช้ <span style={{ color: '#0ea5e9', fontWeight: 700 }}>&quot;{place.name}&quot;</span> เป็นจุดเริ่มต้นหรือจุดหมาย?</div>
+            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', marginBottom: 18 }}>
+              <button 
+                className="btn" 
+                style={{ minWidth: 104, background: '#e0f2fe', color: '#2563eb', fontWeight: 600, fontSize: 15, border: '1.5px solid #38bdf8', borderRadius: 8, transition: 'background 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} 
+                onClick={() => { 
+                  setShowRouteModal(false); 
+                  navigate(`/route-planner?origin=${place.id}`); 
+                }} 
+                onMouseOver={e => e.currentTarget.style.background='#bae6fd'} 
+                onMouseOut={e => e.currentTarget.style.background='#e0f2fe'}
+              >
+                <LuFlag size={18} style={{ color: '#2563eb' }} /> Origin
+              </button>
+              <button 
+                className="btn" 
+                style={{ minWidth: 104, background: '#e0f2fe', color: '#0ea5e9', fontWeight: 600, fontSize: 15, border: '1.5px solid #38bdf8', borderRadius: 8, transition: 'background 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} 
+                onClick={() => { 
+                  setShowRouteModal(false); 
+                  navigate(`/route-planner?destination=${place.id}`); 
+                }} 
+                onMouseOver={e => e.currentTarget.style.background='#bae6fd'} 
+                onMouseOut={e => e.currentTarget.style.background='#e0f2fe'}
+              >
+                <LuMapPin size={18} style={{ color: '#0ea5e9' }} /> Destination
+              </button>
+            </div>
+            <button 
+              className="btn btn-outline" 
+              style={{ color: '#2563eb', border: '1.5px solid #bae6fd', background: '#f0f9ff', borderRadius: 8, padding: '7px 22px', fontWeight: 400, fontSize: 15, marginTop: 2, transition: 'background 0.2s' }} 
+              onClick={() => setShowRouteModal(false)} 
+              onMouseOver={e => e.currentTarget.style.background='#e0f2fe'} 
+              onMouseOut={e => e.currentTarget.style.background='#f0f9ff'}
+            >
+              ยกเลิก
+            </button>
+            <span style={{ position: 'absolute', top: 10, right: 16, cursor: 'pointer', color: '#60a5fa', fontSize: 20 }} onClick={() => setShowRouteModal(false)}>&times;</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

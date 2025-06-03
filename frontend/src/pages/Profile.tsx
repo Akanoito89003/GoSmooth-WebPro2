@@ -9,7 +9,7 @@ import L from 'leaflet';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 
-const EditProfileModal = ({ open, onClose, user, onSave }: { open: boolean, onClose: () => void, user: any, onSave: (data: any) => void }) => {
+const EditProfileModal = ({ open, onClose, user, onSave, onAddressChange }: { open: boolean, onClose: () => void, user: any, onSave: (data: any) => void, onAddressChange?: (address: any) => void }) => {
   const [name, setName] = useState(user?.name || '');
   const [addressLine, setAddressLine] = useState(user?.address?.addressLine || '');
   const [city, setCity] = useState(user?.address?.city || '');
@@ -30,11 +30,22 @@ const EditProfileModal = ({ open, onClose, user, onSave }: { open: boolean, onCl
       const data = await res.json();
       if (!data.address) throw new Error('ไม่พบข้อมูลที่อยู่จากพิกัดนี้');
       const addr = data.address || {};
-      setAddressLine(addr.road || addr.house_number || '');
-      setCity(addr.suburb || addr.city || addr.town || '');
-      setProvince(addr.state || '');
-      setZipcode(addr.postcode || '');
-      setCountry(addr.country || 'Thailand');
+      setAddressLine((prev: string) => prev || addr.road || addr.house_number || '');
+      setCity((prev: string) => prev || addr.suburb || addr.city || addr.town || '');
+      setProvince((prev: string) => prev || addr.state || '');
+      setZipcode((prev: string) => prev || addr.postcode || '');
+      setCountry((prev: string) => prev || addr.country || 'Thailand');
+      if (onAddressChange) {
+        onAddressChange({
+          addressLine: addressLine || addr.road || addr.house_number || '',
+          city: city || addr.suburb || addr.city || addr.town || '',
+          province: province || addr.state || '',
+          zipcode: zipcode || addr.postcode || '',
+          country: country || addr.country || 'Thailand',
+          lat,
+          lng
+        });
+      }
     } catch (e: any) {
       toast.error(e.message || 'เกิดข้อผิดพลาดในการดึงที่อยู่');
     } finally {
@@ -229,10 +240,11 @@ const Profile = () => {
     popupAnchor: [1, -34],
     shadowSize: [41, 41],
   });
-  const address = user?.address;
   const [editOpen, setEditOpen] = useState(false);
   const [changePwOpen, setChangePwOpen] = useState(false);
+  const [addressPreview, setAddressPreview] = useState<any>(user?.address);
   const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
+  const address = editOpen ? addressPreview : user?.address;
   return (
     <div className="container mx-auto px-2 py-8">
       {/* Profile Header */}
@@ -307,6 +319,7 @@ const Profile = () => {
                   dragging={false}
                   doubleClickZoom={false}
                   zoomControl={false}
+                  key={`${address.lat}-${address.lng}`}
                 >
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -345,7 +358,7 @@ const Profile = () => {
           </div>
         </div>
       </div>
-      <EditProfileModal open={editOpen} onClose={() => setEditOpen(false)} user={user} onSave={async (data) => {
+      <EditProfileModal open={editOpen} onClose={() => { setEditOpen(false); setAddressPreview(user?.address); }} user={user} onSave={async (data) => {
         try {
           await updateProfile(data);
           toast.success('Profile updated successfully!');
@@ -353,7 +366,7 @@ const Profile = () => {
         } catch (err: any) {
           toast.error(err.message || 'Update failed');
         }
-      }} />
+      }} onAddressChange={setAddressPreview} />
       <ChangePasswordModal open={changePwOpen} onClose={() => setChangePwOpen(false)} onSave={async (data) => {
         try {
           await changePassword({ currentPassword: data.oldPassword, newPassword: data.newPassword });

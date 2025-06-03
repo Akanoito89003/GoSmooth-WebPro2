@@ -10,6 +10,7 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import L from 'leaflet';
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 // Type Place รองรับทั้ง id, place_id, name, coordinates (และ fallback สำหรับ id)
 interface Place {
@@ -236,7 +237,14 @@ const SetViewOnChange = ({ center }: { center: [number, number] }) => {
   return null;
 };
 
-const getPlaceId = (p: Place) => p._id?.$oid || p._id || p.place_id || p.PlaceID || p.id || '';
+const getPlaceId = (p: Place) =>
+  (typeof p.place_id === 'string' && p.place_id) ||
+  (typeof p.PlaceID === 'string' && p.PlaceID) ||
+  (typeof p.id === 'string' && p.id) ||
+  (typeof p._id === 'string' && p._id) ||
+  (p._id && typeof p._id === 'object' && typeof p._id.$oid === 'string' && p._id.$oid) ||
+  '';
+
 const getPlaceName = (p: Place) => p.name || p.Name || '';
 const getPlaceCoordinates = (p: Place) => p.coordinates || p.Coordinates;
 
@@ -252,6 +260,7 @@ const homeIcon = new L.Icon({
 
 const RoutePlanner = () => {
   const { user } = useAuth();
+  const location = useLocation();
   // DEBUG: log user address
   console.log('DEBUG: user.address', user?.address);
   if (user?.address) {
@@ -316,6 +325,34 @@ const RoutePlanner = () => {
         console.log('places from API:', res.data.places);
       });
   }, []);
+
+  useEffect(() => {
+    // อ่าน origin, destination จาก query string
+    const params = new URLSearchParams(location.search);
+    const originQ = params.get('origin');
+    const destQ = params.get('destination');
+    if (originQ) {
+      setOriginId(originQ);
+      setOrigin(''); // จะ auto fill เมื่อ places โหลดเสร็จ
+    }
+    if (destQ) {
+      setDestinationId(destQ);
+      setDestination('');
+    }
+  }, [location.search]);
+
+  // ใน useEffect ที่ places โหลดเสร็จ ให้ auto fill ชื่อ place ถ้ามี originId/destinationId
+  useEffect(() => {
+    if (originId && places.length > 0) {
+      const o = places.find(p => getPlaceId(p) === originId);
+      if (o) setOrigin(getPlaceName(o));
+    }
+    if (destinationId && places.length > 0) {
+      const d = places.find(p => getPlaceId(p) === destinationId);
+      if (d) setDestination(getPlaceName(d));
+    }
+    // eslint-disable-next-line
+  }, [places, originId, destinationId]);
 
   useEffect(() => {
     let oCoord: [number, number] | null = null;

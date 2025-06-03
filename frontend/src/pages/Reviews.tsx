@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { Star, Filter, ChevronDown, ChevronUp, Image, UserCircle, Heart, Share2, MoreHorizontal, X } from 'lucide-react';
+import { Star, Filter, ChevronDown, ChevronUp, Image, UserCircle, Heart, Share2, MoreHorizontal, X, AlertTriangle } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -403,6 +403,55 @@ const FormActions = styled.div`
   margin-top: 1.5rem;
 `;
 
+const WarningModal = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+`;
+
+const WarningContent = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+`;
+
+const WarningHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: #f59e0b;
+`;
+
+const WarningList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+`;
+
+const WarningItem = styled.li`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #4b5563;
+  font-size: 15px;
+  
+  &:before {
+    content: "•";
+    color: #f59e0b;
+    font-weight: bold;
+  }
+`;
+
 const LIMIT = 10;
 
 // เพิ่มฟังก์ชัน map id แบบ RoutePlanner
@@ -440,6 +489,13 @@ const Reviews = () => {
   const [placeSuggestions, setPlaceSuggestions] = useState<{id: string, name: string}[]>([]);
   const [showPlaceDropdown, setShowPlaceDropdown] = useState(false);
   const [userId, setUserId] = useState<string>('');
+  const [showWarning, setShowWarning] = useState(false);
+  const [pendingReview, setPendingReview] = useState<{
+    placeId: string;
+    placeName: string;
+    rating: number;
+    comment: string;
+  } | null>(null);
 
   // Fetch reviews (infinite scroll)
   useEffect(() => {
@@ -529,13 +585,9 @@ const Reviews = () => {
 
   // Modified handlePostReview to include image upload
   const handlePostReview = async () => {
-    console.log('DEBUG: handlePostReview called');
-    console.log('selectedPlace:', selectedPlace);
-    console.log('places:', places);
     const selectedPlaceObj = places.find(p => p.id === selectedPlace);
     if (!selectedPlace || !selectedPlaceObj) {
       toast.error('กรุณาเลือกสถานที่จากรายการ');
-      console.log('DEBUG: Invalid selectedPlace:', selectedPlace);
       return;
     }
     if (!reviewRating) {
@@ -547,45 +599,46 @@ const Reviews = () => {
       return;
     }
 
+    // Show warning modal first
+    setPendingReview({
+      placeId: selectedPlace,
+      placeName: selectedPlaceObj.name,
+      rating: reviewRating,
+      comment: reviewText,
+    });
+    setShowWarning(true);
+  };
+
+  const handleConfirmPost = async () => {
+    if (!pendingReview) return;
+
     setPosting(true);
     try {
-      // 1. สร้างรีวิว
-      console.log('DEBUG: Creating review', {
-        placeId: selectedPlace,
-        placeName: selectedPlaceObj.name,
-        rating: reviewRating,
-        comment: reviewText,
-      });
       const response = await reviewsAPI.createReview({
-        placeId: selectedPlace,
-        placeName: selectedPlaceObj.name,
-        rating: reviewRating,
-        comment: reviewText,
+        placeId: pendingReview.placeId,
+        placeName: pendingReview.placeName,
+        rating: pendingReview.rating,
+        comment: pendingReview.comment,
       });
-      console.log('DEBUG: createReview response', response);
 
       if (!response.data || !response.data.id) {
-        console.log('DEBUG: Invalid response from createReview', response.data);
         throw new Error('ไม่สามารถสร้างรีวิวได้');
       }
 
-      // 3. ดึงรีวิวใหม่ทั้งหมด (refresh)
       await fetchReviews(1, true);
-
-      // 4. Reset & ปิด popup
       setShowWrite(false);
       setSelectedPlace('');
       setPlaceInput('');
       setReviewText('');
       setReviewRating(0);
       toast.success('โพสต์รีวิวสำเร็จ!');
-      console.log('DEBUG: Review post success, form reset');
     } catch (e: any) {
       console.error('Error posting review:', e);
       toast.error(e.response?.data?.error || e.message || 'เกิดข้อผิดพลาด');
     } finally {
       setPosting(false);
-      console.log('DEBUG: setPosting(false)');
+      setShowWarning(false);
+      setPendingReview(null);
     }
   };
 
@@ -837,6 +890,67 @@ const Reviews = () => {
           {!hasMore && !loading && <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>No more reviews</div>}
         </div>
       </ReviewsContainer>
+
+      {/* Warning Modal */}
+      {showWarning && (
+        <WarningModal
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <WarningContent>
+            <WarningHeader>
+              <AlertTriangle size={24} />
+              <h3 style={{ fontSize: 20, fontWeight: 600 }}>ข้อควรปฏิบัติในการรีวิว</h3>
+            </WarningHeader>
+            <p style={{ color: '#4b5563', marginBottom: 16 }}>
+              ก่อนโพสต์รีวิว กรุณาปฏิบัติตามข้อควรระวังดังต่อไปนี้:
+            </p>
+            <WarningList>
+              <WarningItem>ใช้ถ้อยคำสุภาพ หลีกเลี่ยงคำหยาบคายหรือดูหมิ่นผู้อื่น</WarningItem>
+              <WarningItem>แบ่งปันประสบการณ์จริงและข้อมูลที่ถูกต้อง</WarningItem>
+              <WarningItem>ห้ามโพสต์สแปมหรือเนื้อหาโฆษณา</WarningItem>
+              <WarningItem>ห้ามเปิดเผยข้อมูลส่วนตัว</WarningItem>
+              <WarningItem>ห้ามรีวิวเท็จหรือบิดเบือนความจริง</WarningItem>
+            </WarningList>
+            <p style={{ color: '#ef4444', fontSize: 14, marginBottom: 24 }}>
+              หากฝ่าฝืน อาจส่งผลให้บัญชีของคุณถูกระงับการใช้งาน
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+              <button
+                onClick={() => {
+                  setShowWarning(false);
+                  setPendingReview(null);
+                }}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 8,
+                  border: '1px solid #e5e7eb',
+                  background: 'white',
+                  color: '#4b5563',
+                  cursor: 'pointer',
+                }}
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={handleConfirmPost}
+                disabled={posting}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 8,
+                  background: '#3b82f6',
+                  color: 'white',
+                  cursor: 'pointer',
+                  opacity: posting ? 0.7 : 1,
+                }}
+              >
+                {posting ? 'กำลังโพสต์...' : 'เข้าใจแล้ว, โพสต์รีวิว'}
+              </button>
+            </div>
+          </WarningContent>
+        </WarningModal>
+      )}
     </PageContainer>
   );
 };

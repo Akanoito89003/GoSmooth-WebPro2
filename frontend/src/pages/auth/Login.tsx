@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, AlertTriangle } from 'lucide-react';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { useAuth } from '../../hooks/useAuth';
@@ -11,6 +11,19 @@ import { useAuth } from '../../hooks/useAuth';
 interface LoginFormValues {
   email: string;
   password: string;
+}
+
+interface LoginResponse {
+  user?: {
+    status: 'active' | 'banned';
+    banReason?: string;
+  };
+}
+
+interface AuthContextType {
+  login: (email: string, password: string, remember: boolean) => Promise<LoginResponse | void>;
+  error: string | null;
+  clearError: () => void;
 }
 
 const Form = styled.form`
@@ -81,11 +94,24 @@ const RememberMeWrapper = styled.label`
   user-select: none;
 `;
 
+const BanMessage = styled(motion.div)`
+  background-color: ${({ theme }) => theme.colors.error[50]};
+  border: 1px solid ${({ theme }) => theme.colors.error[300]};
+  color: ${({ theme }) => theme.colors.error[700]};
+  padding: 1rem;
+  border-radius: ${({ theme }) => theme.radii.md};
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+`;
+
 const Login = () => {
-  const { login, error, clearError } = useAuth();
+  const { login, error, clearError } = useAuth() as AuthContextType;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [banReason, setBanReason] = useState<string | null>(null);
   
   const {
     register,
@@ -96,7 +122,13 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       setIsSubmitting(true);
-      await login(data.email, data.password, rememberMe);
+      const response = await login(data.email, data.password, rememberMe);
+      
+      // Check if user is banned
+      if (response && response.user?.status === 'banned') {
+        setBanReason(response.user.banReason || 'No reason provided');
+        return;
+      }
     } catch (error: any) {
       // Show specific error messages based on backend response
       if (error?.response?.data?.error) {
@@ -106,6 +138,8 @@ const Login = () => {
         } else if (error.response.data.error.includes('password') || error.response.data.error.includes('credentials')) {
           clearError();
           setFormError('Incorrect password');
+        } else if (error.response.data.error.includes('banned')) {
+          setBanReason(error.response.data.banReason || 'No reason provided');
         } else {
           setFormError(error.response.data.error);
         }
@@ -122,7 +156,22 @@ const Login = () => {
       <FormTitle>Welcome back</FormTitle>
       <FormSubtitle>Log in to your account to continue</FormSubtitle>
 
-      {formError && (
+      {banReason && (
+        <BanMessage
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+        >
+          <AlertTriangle className="w-5 h-5" />
+          <div>
+            <p className="font-medium">Your account has been banned</p>
+            <p className="text-sm mt-1">Reason: {banReason}</p>
+            <p className="text-sm mt-1">Please contact support if you believe this is a mistake.</p>
+          </div>
+        </BanMessage>
+      )}
+
+      {formError && !banReason && (
         <FormError
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -147,7 +196,10 @@ const Login = () => {
               message: 'Invalid email address',
             },
           })}
-          onChange={() => error && clearError()}
+          onChange={() => {
+            error && clearError();
+            banReason && setBanReason(null);
+          }}
         />
 
         <Input
@@ -164,7 +216,10 @@ const Login = () => {
               message: 'Password must be at least 8 characters',
             },
           })}
-          onChange={() => error && clearError()}
+          onChange={() => {
+            error && clearError();
+            banReason && setBanReason(null);
+          }}
         />
 
         <RememberMeWrapper>
@@ -185,7 +240,7 @@ const Login = () => {
             type="submit"
             fullWidth
             isLoading={isSubmitting}
-            disabled={isSubmitting}
+            disabled={isSubmitting || !!banReason}
           >
             Log In
           </Button>

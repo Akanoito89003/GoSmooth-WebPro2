@@ -8,6 +8,9 @@ import ReactStars from 'react-stars';
 import { Place, Review } from '../types/place';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { api } from '../services/api';
+import { UserCircle, Heart } from 'lucide-react';
+import { reviewsAPI } from '../services/api';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,6 +30,12 @@ const PlaceDetailPage: React.FC = () => {
   const [userReview, setUserReview] = useState<UserReview>({ rating: 0, comment: '' });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [rating, setRating] = useState<number>(0);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewRating, setReviewRating] = useState(0);
+  const [posting, setPosting] = useState(false);
+  const [userId, setUserId] = useState<string>('');
 
   useEffect(() => { fetchPlaceDetails(); }, [id]);
 
@@ -39,6 +48,15 @@ const PlaceDetailPage: React.FC = () => {
     }
   }, [place]);
 
+  useEffect(() => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      setUserId(user.id || user._id || '');
+    } catch {
+      setUserId('');
+    }
+  }, []);
+
   const fetchPlaceDetails = async () => {
     try {
       console.log('[DEBUG] PlaceDetailPage id:', id);
@@ -46,7 +64,7 @@ const PlaceDetailPage: React.FC = () => {
       console.log('[DEBUG] API response:', response.data);
       const p = response.data.place || response.data;
       const placeData: Place = {
-        id: p.id || p._id || p.ID || p.PlaceID || p.name,
+        id: p.id || p._id || p.ID || p.PlaceID || p.place_id || p.name,
         name: p.name || p.Name,
         location: p.location || p.Location || p.address || p.Address || '',
         description: p.description || p.Description || '',
@@ -85,6 +103,31 @@ const PlaceDetailPage: React.FC = () => {
     }
   };
 
+  const fetchReviews = async (placeIdToFetch?: string) => {
+    try {
+      if (!placeIdToFetch) return;
+      const res = await api.get(`/api/reviews?placeId=${placeIdToFetch}`);
+      setReviews(res.data.reviews || []);
+      if (res.data.reviews && res.data.reviews.length > 0) {
+        const avg = res.data.reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0) / res.data.reviews.length;
+        setRating(avg);
+      } else {
+        setRating(0);
+      }
+    } catch (e) {
+      setReviews([]);
+      setRating(0);
+    }
+  };
+
+  useEffect(() => {
+    const placeAny = place as any;
+    if (placeAny && (placeAny.place_id || placeAny.PlaceID || placeAny.id)) {
+      const placeIdToFetch = placeAny.place_id || placeAny.PlaceID || placeAny.id;
+      fetchReviews(placeIdToFetch);
+    }
+  }, [place]);
+
   const toggleFavorite = async () => {
     if (!user) return;
     setIsFavorite(!isFavorite);
@@ -108,6 +151,22 @@ const PlaceDetailPage: React.FC = () => {
     } finally {
       setIsSubmittingReview(false);
     }
+  };
+
+  const handleLikeReview = async (reviewId: string) => {
+    setReviews(prev => prev.map(r => {
+      if (r.id !== reviewId) return r;
+      const likedBy = r.liked_by || [];
+      const liked = likedBy.includes(userId);
+      return {
+        ...r,
+        likes: liked ? r.likes - 1 : r.likes + 1,
+        liked_by: liked ? likedBy.filter((id: string) => id !== userId) : [...likedBy, userId],
+      };
+    }));
+    try {
+      await reviewsAPI.toggleLike(reviewId);
+    } catch {}
   };
 
   if (loading) {
@@ -190,7 +249,7 @@ const PlaceDetailPage: React.FC = () => {
                 <nav className="flex gap-6">
                   <button onClick={() => setActiveTab('overview')} className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}>Overview</button>
                   <button onClick={() => setActiveTab('photos')} className={`tab-button ${activeTab === 'photos' ? 'active' : ''}`}>Photos</button>
-                  <button onClick={() => setActiveTab('reviews')} className={`tab-button ${activeTab === 'reviews' ? 'active' : ''}`}>Reviews ({place.reviews.length})</button>
+                  <button onClick={() => setActiveTab('reviews')} className={`tab-button ${activeTab === 'reviews' ? 'active' : ''}`}>Reviews ({reviews.length})</button>
                 </nav>
               </div>
               <div className="p-6">
@@ -269,90 +328,123 @@ const PlaceDetailPage: React.FC = () => {
                     <div className="mb-8">
                       <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center">
-                          <div className="bg-primary-100 text-primary-700 rounded-lg px-3 py-2 text-2xl font-bold mr-3">{place.rating.toFixed(1)}</div>
+                          <div className="bg-primary-100 text-primary-700 rounded-lg px-3 py-2 text-2xl font-bold mr-3">{rating.toFixed(1)}</div>
                           <div>
                             <div className="flex items-center">
                               {[1, 2, 3, 4, 5].map((star) => (
-                                <FaStar key={star} className={star <= Math.round(place.rating) ? "text-accent-400" : "text-neutral-300"} />
+                                <FaStar key={star} className={star <= Math.round(rating) ? "text-accent-400" : "text-neutral-300"} />
                               ))}
                             </div>
-                            <p className="text-neutral-500">Based on {place.reviews.length} reviews</p>
+                            <p className="text-neutral-500">Based on {reviews.length} reviews</p>
                           </div>
                         </div>
                       </div>
-                      {/* Write a Review */}
-                      {user && (
+                      {/* Write a Review (เหมือน Reviews.tsx แต่ล็อก placeId) */}
+                      {user && place && (
                         <div className="bg-neutral-50 rounded-lg p-4 mb-6">
                           <h3 className="font-medium mb-3">Write a Review</h3>
-                          {reviewSuccess ? (
-                            <div className="alert alert-success">Thank you for your review! It has been submitted successfully.</div>
-                          ) : (
-                            <form onSubmit={handleReviewSubmit}>
-                              <div className="form-group">
-                                <label className="form-label">Your Rating</label>
-                                <ReactStars
-                                  count={5}
-                                  value={userReview.rating}
-                                  onChange={(newRating: number) => setUserReview({ ...userReview, rating: newRating })}
-                                  size={24}
-                                  color2={'#FFC107'}
-                                  half={false}
-                                />
-                              </div>
-                              <div className="form-group">
-                                <label htmlFor="review-comment" className="form-label">Your Review</label>
-                                <textarea
-                                  id="review-comment"
-                                  rows={3}
-                                  value={userReview.comment}
-                                  onChange={(e) => setUserReview({ ...userReview, comment: e.target.value })}
-                                  className="input"
-                                  placeholder="Share your experience with this place..."
-                                ></textarea>
-                              </div>
-                              <button
-                                type="submit"
-                                disabled={isSubmittingReview}
-                                className={`btn btn-primary ${isSubmittingReview ? 'opacity-70 cursor-not-allowed' : ''}`}
-                              >
-                                {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
-                              </button>
-                            </form>
-                          )}
+                          <div style={{ marginBottom: 18 }}>
+                            <label style={{ color: '#666', fontSize: 16, marginBottom: 4, display: 'block' }}>สถานที่</label>
+                            <input
+                              type="text"
+                              value={place.name}
+                              readOnly
+                              style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #e5e7eb', background: '#f3f4f6', color: '#888', fontSize: 17 }}
+                            />
+                          </div>
+                          <div style={{ marginBottom: 18 }}>
+                            <div style={{ marginBottom: 8, color: '#666', fontSize: 16 }}>ให้คะแนนสถานที่นี้</div>
+                            <div style={{ display: 'flex', gap: 6 }}>
+                              {[1,2,3,4,5].map(i => (
+                                <button key={i} type="button" onClick={() => setReviewRating(i)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                                  <FaStar size={32} color={reviewRating >= i ? '#facc15' : '#e5e7eb'} />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <div style={{ marginBottom: 18 }}>
+                            <textarea
+                              value={reviewText}
+                              onChange={e => setReviewText(e.target.value)}
+                              placeholder="เล่าให้ฟังหน่อยว่าที่นี่เป็นยังไงบ้าง? อาหารอร่อยไหม? ที่พักดีไหม? มีอะไรน่าสนใจบ้าง..."
+                              style={{ width: '100%', minHeight: 90, borderRadius: 8, border: '1px solid #e5e7eb', padding: 12, fontSize: 17, resize: 'vertical' }}
+                            />
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <button
+                              className="btn btn-primary"
+                              onClick={async () => {
+                                if (!reviewRating) return alert('กรุณาให้คะแนน');
+                                if (!reviewText.trim()) return alert('กรุณากรอกข้อความรีวิว');
+                                setPosting(true);
+                                try {
+                                  const placeAny = place as any;
+                                  const placeIdToSend = placeAny.place_id || placeAny.PlaceID || placeAny.id;
+                                  const placeNameToSend = placeAny.name || placeAny.Name;
+                                  const payload = {
+                                    placeId: placeIdToSend,
+                                    placeName: placeNameToSend,
+                                    rating: reviewRating,
+                                    comment: reviewText,
+                                  };
+                                  console.log('DEBUG: POST REVIEW payload', payload);
+                                  await api.post('/api/reviews', payload);
+                                  setReviewText('');
+                                  setReviewRating(0);
+                                  fetchReviews(placeIdToSend); // refresh reviews
+                                  alert('โพสต์รีวิวสำเร็จ!');
+                                } catch (e: any) {
+                                  console.error('POST REVIEW ERROR', e?.response?.data || e);
+                                  alert('เกิดข้อผิดพลาด: ' + (e?.response?.data?.error || e.message || ''));
+                                } finally {
+                                  setPosting(false);
+                                }
+                              }}
+                              disabled={posting}
+                              style={{ minWidth: 130, fontSize: 17, padding: '10px 0', width: 160 }}
+                            >
+                              {posting ? 'กำลังโพสต์...' : 'โพสต์รีวิว'}
+                            </button>
+                          </div>
                         </div>
                       )}
                       {/* Review List */}
                       <div className="space-y-6">
-                        {place.reviews.map((review) => (
-                          <div key={review.id} className="border-b border-neutral-200 pb-6 last:border-b-0">
-                            <div className="flex justify-between items-start mb-2">
-                              <div className="flex items-center">
-                                <img
-                                  src={review.user.image}
-                                  alt={review.user.name}
-                                  className="w-10 h-10 rounded-full object-cover mr-3"
-                                />
-                                <div>
-                                  <h4 className="font-medium">{review.user.name}</h4>
-                                  <p className="text-neutral-500 text-sm">{review.date}</p>
+                        {reviews.map((r) => {
+                          const review = r as any;
+                          const isLiked = Array.isArray(review.liked_by) && review.liked_by.includes(userId);
+                          return (
+                            <div key={review.id} className="border-b border-neutral-200 pb-6 last:border-b-0">
+                              <div className="flex justify-between items-start mb-2">
+                                <div className="flex items-center">
+                                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 22, color: '#6366f1', marginRight: 12 }}>
+                                    <UserCircle size={36} />
+                                  </div>
+                                  <div>
+                                    <div style={{ fontWeight: 600 }}>{review.username || 'Unknown'}</div>
+                                    <div style={{ fontSize: 13, color: '#6b7280' }}>@{review.username?.toLowerCase().replace(/\s/g, '_') || 'user'}</div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <FaStar
+                                      key={star}
+                                      className={star <= Math.floor(review.rating) ? "text-accent-400" : "text-neutral-300"}
+                                      size={14}
+                                    />
+                                  ))}
                                 </div>
                               </div>
-                              <div className="flex items-center">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <FaStar
-                                    key={star}
-                                    className={star <= Math.floor(review.rating) ? "text-accent-400" : "text-neutral-300"}
-                                    size={14}
-                                  />
-                                ))}
-                                {review.rating % 1 !== 0 && (
-                                  <div className="text-sm ml-1 text-accent-400">+</div>
-                                )}
+                              <p className="text-neutral-700">{review.comment}</p>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 8 }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: isLiked ? '#ef4444' : '#aaa', cursor: 'pointer' }} onClick={() => handleLikeReview(review.id)}>
+                                  <Heart size={18} fill={isLiked ? '#ef4444' : 'none'} />{(review as any).likes}
+                                </span>
                               </div>
                             </div>
-                            <p className="text-neutral-700">{review.comment}</p>
-                          </div>
-                        ))}
+                          );
+                        })}
+                        {reviews.length === 0 && <div className="text-neutral-400">No reviews yet.</div>}
                       </div>
                     </div>
                   </div>

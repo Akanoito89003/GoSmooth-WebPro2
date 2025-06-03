@@ -33,14 +33,16 @@ export interface Place {
 
 export interface Review {
   id: string;
-  user: {
-    id: string;
-    name: string;
-    image: string;
-  };
+  user_id: string;
+  username?: string;
+  place_id: string;
+  place_name?: string;
   rating: number;
   comment: string;
-  date: string;
+  likes: number;
+  liked_by?: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface NearbyPlace {

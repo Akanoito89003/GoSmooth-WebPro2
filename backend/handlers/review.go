@@ -249,8 +249,16 @@ func LikeComment(c *gin.Context) {
 
 // GetReviews handles getting all reviews (with user, place, comments, username)
 func GetReviews(c *gin.Context) {
+	placeId := c.Query("placeId")
+	filter := bson.M{}
+	if placeId != "" {
+		filter["place_id"] = placeId
+	}
+
+	fmt.Println("[DEBUG] GetReviews placeId:", placeId)
+
 	var reviews []models.Review
-	cursor, err := db.Collection("reviews").Find(context.Background(), bson.M{})
+	cursor, err := db.Collection("reviews").Find(context.Background(), filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get reviews"})
 		return
@@ -260,6 +268,11 @@ func GetReviews(c *gin.Context) {
 	if err = cursor.All(context.Background(), &reviews); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to decode reviews"})
 		return
+	}
+
+	fmt.Printf("[DEBUG] GetReviews found %d reviews\n", len(reviews))
+	if len(reviews) > 0 {
+		fmt.Printf("[DEBUG] First review: %+v\n", reviews[0])
 	}
 
 	// ดึง place ทั้งหมดมา map id -> name

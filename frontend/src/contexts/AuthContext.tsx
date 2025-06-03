@@ -6,11 +6,23 @@ import { api } from '../services/api';
 import Cookies from 'js-cookie';
 import React from 'react';
 
+interface Address {
+  addressLine: string;
+  city: string;
+  province: string;
+  zipcode: string;
+  country: string;
+  lat: number;
+  lng: number;
+}
+
 interface User {
   id: string;
   email: string;
   name: string;
   role: string;
+  address?: Address;
+  created_at?: string;
 }
 
 export interface AuthContextType {
@@ -24,6 +36,22 @@ export interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<string | void>;
   logout: () => void;
   clearError: () => void;
+  registerUser: (
+    name: string,
+    email: string,
+    password: string,
+    address: {
+      addressLine: string;
+      city: string;
+      province: string;
+      zipcode: string;
+      country: string;
+      lat: number;
+      lng: number;
+    }
+  ) => Promise<any>;
+  updateProfile: (data: { name: string; address: Address }) => Promise<any>;
+  changePassword: (data: { currentPassword: string; newPassword: string }) => Promise<any>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -37,6 +65,9 @@ export const AuthContext = createContext<AuthContextType>({
   register: async () => {},
   logout: () => {},
   clearError: () => {},
+  registerUser: async () => {},
+  updateProfile: async () => {},
+  changePassword: async () => {},
 });
 
 // Check token expiration
@@ -53,7 +84,7 @@ const isTokenExpired = (token: string): boolean => {
 // Inactivity tracker
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [authState, setAuthState] = useState<AuthContextType>({
     token: null,
     user: null,
@@ -65,6 +96,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     register: async () => {},
     logout: () => {},
     clearError: () => {},
+    registerUser: async () => {},
+    updateProfile: async () => {},
+    changePassword: async () => {},
   });
   
   const navigate = useNavigate();
@@ -108,6 +142,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             register: async () => {},
             logout: () => {},
             clearError: () => {},
+            registerUser: async () => {},
+            updateProfile: async () => {},
+            changePassword: async () => {},
           });
           resetInactivityTimer();
         } catch (error) {
@@ -125,6 +162,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             register: async () => {},
             logout: () => {},
             clearError: () => {},
+            registerUser: async () => {},
+            updateProfile: async () => {},
+            changePassword: async () => {},
           });
         }
       } else {
@@ -142,6 +182,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           register: async () => {},
           logout: () => {},
           clearError: () => {},
+          registerUser: async () => {},
+          updateProfile: async () => {},
+          changePassword: async () => {},
         });
       }
     };
@@ -186,6 +229,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register: async () => {},
         logout: () => {},
         clearError: () => {},
+        registerUser: async () => {},
+        updateProfile: async () => {},
+        changePassword: async () => {},
       });
       resetInactivityTimer();
       navigate('/');
@@ -250,6 +296,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       register: async () => {},
       logout: () => {},
       clearError: () => {},
+      registerUser: async () => {},
+      updateProfile: async () => {},
+      changePassword: async () => {},
     });
     navigate('/login');
     window.location.reload();
@@ -263,6 +312,55 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const registerUser = async (
+    name: string,
+    email: string,
+    password: string,
+    address: {
+      addressLine: string;
+      city: string;
+      province: string;
+      zipcode: string;
+      country: string;
+      lat: number;
+      lng: number;
+    }
+  ) => {
+    try {
+      const response = await axios.post('/api/auth/register', {
+        name,
+        email,
+        password,
+        address,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Registration failed');
+    }
+  };
+
+  const updateProfile = async (data: { name: string; address: Address }) => {
+    try {
+      const response = await api.put('/api/profile', data);
+      setAuthState((prev) => ({
+        ...prev,
+        user: response.data.user || response.data,
+      }));
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Update profile failed');
+    }
+  };
+
+  const changePassword = async (data: { currentPassword: string; newPassword: string }) => {
+    try {
+      const response = await api.post('/api/auth/change-password', data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Change password failed');
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -271,6 +369,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         logout,
         clearError,
+        registerUser,
+        updateProfile,
+        changePassword,
       }}
     >
       {children}

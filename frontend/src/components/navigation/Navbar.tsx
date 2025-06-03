@@ -397,9 +397,6 @@ const Navbar = () => {
               <NavLinkStyled to="/route-planner">Route Planner</NavLinkStyled>
             </NavItem>
             <NavItem>
-              <NavLinkStyled to="/cost-estimator">Cost Estimator</NavLinkStyled>
-            </NavItem>
-            <NavItem>
               <NavLinkStyled to="/reviews">Reviews</NavLinkStyled>
             </NavItem>
           </NavList>

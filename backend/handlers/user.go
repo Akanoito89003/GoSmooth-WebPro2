@@ -31,7 +31,7 @@ func GetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
-// UpdateProfile handles updating user profile
+// UpdateProfile handles updating user profile (name + address)
 func UpdateProfile(c *gin.Context) {
 	userID := c.GetString("userID")
 	objectID, err := primitive.ObjectIDFromHex(userID)
@@ -40,15 +40,25 @@ func UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	var input models.UpdateProfileInput
+	var input struct {
+		Name    string         `json:"name" binding:"required"`
+		Address models.Address `json:"address" binding:"required"`
+	}
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Validate address fields (optional: เพิ่ม validate เพิ่มเติม)
+	if input.Address.Lat == 0 || input.Address.Lng == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid address coordinates"})
 		return
 	}
 
 	update := bson.M{
 		"$set": bson.M{
 			"name":       input.Name,
+			"address":    input.Address,
 			"updated_at": time.Now(),
 		},
 	}
@@ -59,7 +69,15 @@ func UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "profile updated successfully"})
+	// ส่ง user กลับ (อัปเดตล่าสุด)
+	var user models.User
+	err = db.Collection("users").FindOne(context.Background(), bson.M{"_id": objectID}).Decode(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch updated user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"user": user, "message": "profile updated successfully"})
 }
 
 // RefreshToken handles token refresh

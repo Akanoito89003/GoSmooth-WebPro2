@@ -9,7 +9,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   rightIcon?: React.ReactNode;
 }
 
-const InputContainer = styled.div<{ fullWidth: boolean }>`
+const InputContainer = styled.div<{ fullWidth?: boolean }>`
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
@@ -27,10 +27,15 @@ const InputLabel = styled.label`
   margin-bottom: 0.25rem;
 `;
 
-const InputWrapper = styled.div`
+const InputWrapper = styled.div<{ fullWidth?: boolean }>`
   position: relative;
   display: flex;
   align-items: center;
+  ${({ fullWidth }) =>
+    fullWidth &&
+    css`
+      width: 100%;
+    `}
 `;
 
 const LeftIconWrapper = styled.div`
@@ -120,7 +125,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <InputContainer fullWidth={fullWidth}>
         {label && <InputLabel htmlFor={inputId}>{label}</InputLabel>}
-        <InputWrapper>
+        <InputWrapper fullWidth={fullWidth}>
           {leftIcon && <LeftIconWrapper>{leftIcon}</LeftIconWrapper>}
           <StyledInput
             id={inputId}

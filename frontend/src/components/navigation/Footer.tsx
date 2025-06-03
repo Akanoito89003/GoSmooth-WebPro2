@@ -155,21 +155,10 @@ const Footer = () => {
             GoSmooth
           </FooterLogo>
           <FooterDescription>
-            Making travel planning seamless and efficient. 
-            Find the best routes, estimate costs, and read reviews
-            to make your journey smooth.
+            ทำให้การวางแผนการเดินทางราบรื่นและมีประสิทธิภาพ
+            ค้นหาเส้นทางที่ดีที่สุด ประเมินค่าใช้จ่าย และอ่านบทวิจารณ์
+            เพื่อให้การเดินทางของคุณราบรื่น
           </FooterDescription>
-          <SocialIcons>
-            <SocialIcon href="#" aria-label="Facebook">
-              <Facebook size={18} />
-            </SocialIcon>
-            <SocialIcon href="#" aria-label="Twitter">
-              <Twitter size={18} />
-            </SocialIcon>
-            <SocialIcon href="#" aria-label="Instagram">
-              <Instagram size={18} />
-            </SocialIcon>
-          </SocialIcons>
         </FooterColumn>
         
         <FooterColumn>
@@ -179,44 +168,30 @@ const Footer = () => {
               <FooterLinkAnchor to="/">Home</FooterLinkAnchor>
             </FooterLink>
             <FooterLink>
-              <FooterLinkAnchor to="/route-planner">Route Planner</FooterLinkAnchor>
+              <FooterLinkAnchor to="/places">Places</FooterLinkAnchor>
             </FooterLink>
             <FooterLink>
-              <FooterLinkAnchor to="/cost-estimator">Cost Estimator</FooterLinkAnchor>
+              <FooterLinkAnchor to="/route-planner">Route Planner</FooterLinkAnchor>
             </FooterLink>
             <FooterLink>
               <FooterLinkAnchor to="/reviews">Reviews</FooterLinkAnchor>
             </FooterLink>
-          </FooterLinks>
-        </FooterColumn>
-        
-        <FooterColumn>
-          <ColumnTitle>Support</ColumnTitle>
-          <FooterLinks>
-            <FooterLink>
-              <FooterLinkAnchor to="/help">Help Center</FooterLinkAnchor>
-            </FooterLink>
-            <FooterLink>
-              <FooterLinkAnchor to="/faq">FAQ</FooterLinkAnchor>
-            </FooterLink>
             <FooterLink>
               <FooterLinkAnchor to="/contact">Contact Us</FooterLinkAnchor>
             </FooterLink>
-            <FooterLink>
-              <FooterLinkAnchor to="/feedback">Feedback</FooterLinkAnchor>
-            </FooterLink>
           </FooterLinks>
         </FooterColumn>
         
+      
         <FooterColumn>
           <ColumnTitle>Contact</ColumnTitle>
           <ContactItem>
             <Mail size={18} />
-            <span>info@gosmooth.com</span>
+            <span>info@gosmooth.co.th</span>
           </ContactItem>
           <ContactItem>
             <Phone size={18} />
-            <span>+1 (555) 123-4567</span>
+            <span>+66 99 999 9999</span>
           </ContactItem>
         </FooterColumn>
       </FooterContent>
@@ -225,11 +200,6 @@ const Footer = () => {
         <Copyright>
           &copy; {currentYear} GoSmooth Travel. All rights reserved.
         </Copyright>
-        <LegalLinks>
-          <LegalLink to="/terms">Terms of Service</LegalLink>
-          <LegalLink to="/privacy">Privacy Policy</LegalLink>
-          <LegalLink to="/cookies">Cookies</LegalLink>
-        </LegalLinks>
       </BottomBar>
     </FooterContainer>
   );

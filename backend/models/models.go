@@ -13,15 +13,17 @@ type User struct {
 	Password  string             `bson:"password" json:"-"`
 	Name      string             `bson:"name" json:"name" validate:"required"`
 	Role      string             `bson:"role" json:"role"`
+	Address   Address            `bson:"address,omitempty" json:"address,omitempty"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
 
 // RegisterInput represents the input for user registration
 type RegisterInput struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=6"`
-	Name     string `json:"name" validate:"required"`
+	Email    string  `json:"email" validate:"required,email"`
+	Password string  `json:"password" validate:"required,min=6"`
+	Name     string  `json:"name" validate:"required"`
+	Address  Address `json:"address" validate:"required"`
 }
 
 // LoginCredentials represents the input for user login
@@ -42,12 +44,29 @@ type UpdateUserInput struct {
 	Role string `json:"role" validate:"required,oneof=user admin"`
 }
 
+// Comment represents a comment on a review
+type Comment struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	UserID    string             `bson:"user_id" json:"user_id"`
+	Username  string             `bson:"username" json:"username"`
+	Text      string             `bson:"text" json:"text"`
+	Likes     int                `bson:"likes" json:"likes"`
+	LikedBy   []string           `bson:"liked_by" json:"liked_by"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+}
+
 // Review represents a user review
 type Review struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	UserID    string             `bson:"user_id" json:"user_id"`
+	Username  string             `bson:"username" json:"username"`
+	PlaceID   string             `bson:"place_id" json:"placeId"`
+	PlaceName string             `bson:"place_name" json:"placeName"`
 	Rating    int                `bson:"rating" json:"rating" validate:"required,min=1,max=5"`
 	Comment   string             `bson:"comment" json:"comment" validate:"required"`
+	Likes     int                `bson:"likes" json:"likes"`
+	LikedBy   []string           `bson:"liked_by" json:"liked_by"`
+	Comments  []Comment          `bson:"comments" json:"comments"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
@@ -72,18 +91,10 @@ type RouteInput struct {
 }
 
 // Location represents a geographical location with details
-// (เพิ่มฟิลด์ตามตัวอย่าง JSON)
 type Location struct {
-	ID          string   `bson:"location_id" json:"LocationID"`
-	Name        string   `bson:"name" json:"Name"`
-	Description string   `bson:"description" json:"Description"`
-	Category    string   `bson:"category" json:"Category"`
-	Latitude    float64  `bson:"latitude" json:"Latitude"`
-	Longitude   float64  `bson:"longitude" json:"Longitude"`
-	Address     string   `bson:"address" json:"Address"`
-	Phone       string   `bson:"phone" json:"Phone"`
-	Website     string   `bson:"website" json:"Website"`
-	ImageURL    []string `bson:"image_url" json:"ImageURL"`
+	ID          string `bson:"location_id" json:"LocationID"`
+	Name        string `bson:"name" json:"Name"`
+	Description string `bson:"description" json:"Description"`
 }
 
 // Route represents a route between two locations
@@ -99,19 +110,26 @@ type Route struct {
 	UpdatedAt     time.Time          `bson:"updated_at" json:"UpdatedAt"`
 }
 
-// Place represents a place in the system (ปรับให้ตรงกับ JSON)
+// Place represents a place in the system
 type Place struct {
-	ID          string   `bson:"place_id" json:"PlaceID"`
-	Name        string   `bson:"name" json:"Name"`
-	Location    string   `bson:"location" json:"Location"`
-	Description string   `bson:"description" json:"Description"`
-	Category    string   `bson:"category" json:"Category"`
-	ImageURL    []string `bson:"image_url" json:"ImageURL"`
-	Rating      float64  `bson:"rating" json:"Rating"`
-	Coordinates struct {
+	ObjectID        primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	ID              string             `bson:"place_id" json:"PlaceID"`
+	Name            string             `bson:"name" json:"Name"`
+	LocationID      string             `bson:"location_id" json:"LocationID"`
+	LocationName    string             `bson:"location_name,omitempty" json:"LocationName,omitempty"`
+	Description     string             `bson:"description" json:"Description"`
+	Category        string             `bson:"category" json:"Category"`
+	CoverImage      string             `bson:"cover_image" json:"CoverImage"`
+	HighlightImages []string           `bson:"highlight_images" json:"HighlightImages"`
+	Rating          float64            `bson:"rating" json:"Rating"`
+	Coordinates     struct {
 		Lat float64 `bson:"lat" json:"lat"`
 		Lng float64 `bson:"lng" json:"lng"`
 	} `bson:"coordinates" json:"Coordinates"`
+	Address   string    `bson:"address" json:"Address"`
+	Phone     string    `bson:"phone" json:"Phone"`
+	Website   string    `bson:"website" json:"Website"`
+	Hours     string    `bson:"hours" json:"Hours"`
 	CreatedAt time.Time `bson:"created_at" json:"CreatedAt"`
 	UpdatedAt time.Time `bson:"updated_at" json:"UpdatedAt"`
 }
@@ -120,5 +138,16 @@ type Place struct {
 type UpdatePlaceInput struct {
 	Name        string `json:"name" validate:"required"`
 	Description string `json:"description"`
-	Location    string `json:"location" validate:"required"`
+	LocationID  string `json:"location_id" validate:"required"`
+}
+
+// Address represents the address of a user
+type Address struct {
+	AddressLine string  `bson:"addressLine,omitempty" json:"addressLine,omitempty"`
+	City        string  `bson:"city,omitempty" json:"city,omitempty"`
+	Province    string  `bson:"province,omitempty" json:"province,omitempty"`
+	Zipcode     string  `bson:"zipcode,omitempty" json:"zipcode,omitempty"`
+	Country     string  `bson:"country,omitempty" json:"country,omitempty"`
+	Lat         float64 `bson:"lat,omitempty" json:"lat,omitempty"`
+	Lng         float64 `bson:"lng,omitempty" json:"lng,omitempty"`
 }

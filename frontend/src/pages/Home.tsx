@@ -4,6 +4,10 @@ import { Link } from 'react-router-dom';
 import { Map, DollarSign, Star, Route } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const HeroSection = styled.section`
   position: relative;
@@ -179,6 +183,55 @@ const CtaText = styled.p`
 `;
 
 const Home = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [featuredPlaces, setFeaturedPlaces] = useState<any[]>([]);
+  const [loadingPlaces, setLoadingPlaces] = useState(false);
+  const [locations, setLocations] = useState<{[key: string]: string}>({});
+  // mock reviews
+  const reviews = [
+    {
+      username: 'Username',
+      rating: 5,
+      comment: 'TravelEase has completely transformed how I plan my trips. The route suggestions are spot-on, and I love how easy it is to find interesting places along the way.'
+    },
+    {
+      username: 'Username',
+      rating: 5,
+      comment: 'I love discovering new places, and TravelEase makes it so easy to find hidden gems along my route. The reviews are helpful, and the navigation is seamless.'
+    },
+    {
+      username: 'Username',
+      rating: 5,
+      comment: 'As someone who travels frequently for work, this app has been a game-changer. The cost estimates are accurate, and the interface is incredibly user-friendly.'
+    }
+  ];
+
+  useEffect(() => {
+    if (user) {
+      setLoadingPlaces(true);
+      // ดึง location map
+      axios.get(`${import.meta.env.VITE_API_URL}/api/locations`)
+        .then(res => {
+          const locationsData = res.data.locations || [];
+          const locationMap: {[key: string]: string} = {};
+          locationsData.forEach((loc: any) => {
+            locationMap[loc.location_id || loc.LocationID] = loc.name || loc.Name;
+          });
+          setLocations(locationMap);
+        });
+      // ดึง place
+      axios.get(`${import.meta.env.VITE_API_URL}/api/places`)
+        .then(res => {
+          const data = Array.isArray(res.data) ? res.data : res.data.places || res.data.data || [];
+          setFeaturedPlaces(data.slice(0, 3));
+        })
+        .catch(() => setFeaturedPlaces([]))
+        .finally(() => setLoadingPlaces(false));
+    }
+  }, [user]);
+
+  if (!user) {
   return (
     <>
       <HeroSection>
@@ -325,6 +378,116 @@ const Home = () => {
           </Button>
         </CtaContainer>
       </CtaSection>
+      </>
+    );
+  }
+
+  // --- แบบ Login แล้ว ---
+  return (
+    <>
+      <HeroSection>
+        <HeroBg />
+        <HeroContent>
+          <HeroTitle
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            Travel Smarter, Journey Smoother
+          </HeroTitle>
+          <HeroSubtitle
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Plan your trips with ease, estimate costs accurately, 
+            and make informed decisions with GoSmooth Travel.
+          </HeroSubtitle>
+          <HeroButtons
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Button
+              as={Link}
+              to="/route-planner"
+              size="lg"
+            >
+              Plan Your Route
+            </Button>
+          </HeroButtons>
+        </HeroContent>
+      </HeroSection>
+
+      {/* Featured Destinations */}
+      <FeaturesSection>
+        <SectionTitle>
+          Featured <span style={{ color: '#6366f1' }}>Destinations</span>
+        </SectionTitle>
+        <SectionSubtitle>
+          Discover amazing places around the world
+        </SectionSubtitle>
+        {loadingPlaces ? (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
+        ) : featuredPlaces.length === 0 ? (
+          <div style={{ textAlign: 'center', color: 'red', padding: '2rem' }}>No featured places found or failed to load places.</div>
+        ) : (
+          <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
+            {featuredPlaces.map((place) => (
+              <div key={place.place_id || place.PlaceID || place.id} style={{ width: 300, cursor: 'pointer' }} onClick={() => navigate(`/places/${place.place_id || place.PlaceID || place.id}`)}>
+                <Card interactive padding="none">
+                  <img
+                    src={place.CoverImage ? `${import.meta.env.VITE_API_URL}/uploads/${place.CoverImage}` : 'https://images.pexels.com/photos/1287145/pexels-photo-1287145.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'}
+                    alt={place.Name || place.name}
+                    style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 12 }}
+                  />
+                  <div style={{ padding: 16 }}>
+                    <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 4 }}>{place.Name || place.name}</div>
+                    <div style={{ color: '#666', fontSize: 14, marginBottom: 8 }}>
+                      {locations[place.location_id || place.LocationID] || 'Unknown Location'}
+                    </div>
+                    <div style={{ color: '#888', fontSize: 13, marginBottom: 8 }}>{place.Description || place.description}</div>
+                    <Button as={Link} to={`/places/${place.place_id || place.PlaceID || place.id}`} size="sm" style={{ marginTop: 8 }}>
+                      Explore
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <Button as={Link} to="/places" size="lg" variant="secondary">
+            View All
+          </Button>
+        </div>
+      </FeaturesSection>
+
+      {/* What Our Users Say */}
+      <section style={{ background: '#6366f1', color: 'white', padding: '4rem 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 16 }}>What Our Users Say</h2>
+          <p style={{ fontSize: 18, marginBottom: 40 }}>
+            We simplify your travel planning with smart features designed to make your journey smoother.
+          </p>
+          <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
+            {reviews.map((review, idx) => (
+              <div key={idx} style={{ background: 'white', color: '#222', borderRadius: 16, padding: 24, minWidth: 280, maxWidth: 340, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', textAlign: 'left' }}>
+                <div style={{ color: '#facc15', fontSize: 20, marginBottom: 8 }}>
+                  {'★'.repeat(review.rating)}
+                </div>
+                <div style={{ fontSize: 15, marginBottom: 12 }}>{review.comment}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span role="img" aria-label="user">👤</span>
+                  </div>
+                  <span style={{ fontWeight: 600 }}>{review.username}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </>
   );
 };

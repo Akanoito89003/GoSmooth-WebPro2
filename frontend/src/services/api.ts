@@ -98,20 +98,46 @@ export const costAPI = {
 
 // Reviews API
 export const reviewsAPI = {
-  getReviews: (page = 1, limit = 10, sortBy = 'createdAt', order = 'desc') => 
-    api.get('/reviews', { params: { page, limit, sortBy, order } }),
-  
-  getReviewById: (id: string) => 
-    api.get(`/reviews/${id}`),
-  
-  createReview: (reviewData: any) => 
-    api.post('/reviews', reviewData),
-  
-  updateReview: (id: string, reviewData: any) => 
-    api.put(`/reviews/${id}`, reviewData),
-  
-  deleteReview: (id: string) => 
-    api.delete(`/reviews/${id}`),
+  // Get reviews with pagination, filtering, and sorting
+  getReviews: async (page: number = 1, limit: number = 10, sort: string = 'newest', order: 'asc' | 'desc' = 'desc', filters?: any) => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      sort,
+      order,
+      ...filters
+    });
+    return axios.get(`/api/reviews?${params}`);
+  },
+
+  // Create new review
+  createReview: (data: { placeId: string; placeName: string; rating: number; comment: string }) =>
+    api.post('/api/reviews', data),
+
+  // Update review
+  updateReview: async (reviewId: string, data: {
+    rating?: number;
+    comment?: string;
+  }) => {
+    return axios.put(`/api/reviews/${reviewId}`, data);
+  },
+
+  // Delete review
+  deleteReview: async (reviewId: string) => {
+    return axios.delete(`/api/reviews/${reviewId}`);
+  },
+
+  // Like/Unlike review
+  toggleLike: async (reviewId: string) => {
+    return axios.post(`/api/reviews/${reviewId}/like`);
+  },
+
+  // Add comment to review
+  addComment: async (reviewId: string, comment: string) => {
+    return axios.post(`/api/reviews/${reviewId}/comments`, { text: comment });
+  },
+
+  likeReview: (reviewId: string) => api.post(`/api/reviews/${reviewId}/like`),
 };
 
 // Admin API
@@ -139,4 +165,13 @@ export const adminAPI = {
   
   getStats: () => 
     api.get('/admin/stats'),
+};
+
+export const placesAPI = {
+  getPlaces: async () => {
+    return api.get('/api/places');
+  },
+  getPlaceById: async (id: string) => {
+    return api.get(`/api/places/${id}`);
+  }
 };

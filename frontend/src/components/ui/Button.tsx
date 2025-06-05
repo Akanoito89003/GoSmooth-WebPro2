@@ -23,8 +23,8 @@ interface ButtonProps {
 const StyledButton = styled(motion.button)<{
   variant: ButtonVariant;
   size: ButtonSize;
-  fullWidth: boolean;
-  isLoading: boolean;
+  $fullWidth: boolean;
+  $isLoading: boolean;
 }>`
   display: inline-flex;
   align-items: center;
@@ -36,14 +36,14 @@ const StyledButton = styled(motion.button)<{
   white-space: nowrap;
   cursor: pointer;
   
-  ${({ fullWidth }) =>
-    fullWidth &&
+  ${({ $fullWidth }) =>
+    $fullWidth &&
     css`
       width: 100%;
     `}
   
-  ${({ disabled, isLoading }) =>
-    (disabled || isLoading) &&
+  ${({ disabled, $isLoading }) =>
+    (disabled || $isLoading) &&
     css`
       opacity: 0.7;
       cursor: not-allowed;
@@ -194,8 +194,8 @@ export const Button = ({
       type={type}
       variant={variant}
       size={size}
-      fullWidth={fullWidth}
-      isLoading={isLoading}
+      $fullWidth={fullWidth}
+      $isLoading={isLoading}
       disabled={disabled || isLoading}
       onClick={onClick}
       whileTap={{ scale: disabled || isLoading ? 1 : 0.98 }}

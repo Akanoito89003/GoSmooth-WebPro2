@@ -9,12 +9,12 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   rightIcon?: React.ReactNode;
 }
 
-const InputContainer = styled.div<{ fullWidth?: boolean }>`
+const InputContainer = styled.div<{ $fullWidth?: boolean }>`
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
-  ${({ fullWidth }) =>
-    fullWidth &&
+  ${({ $fullWidth }) =>
+    $fullWidth &&
     css`
       width: 100%;
     `}
@@ -27,12 +27,12 @@ const InputLabel = styled.label`
   margin-bottom: 0.25rem;
 `;
 
-const InputWrapper = styled.div<{ fullWidth?: boolean }>`
+const InputWrapper = styled.div<{ $fullWidth?: boolean }>`
   position: relative;
   display: flex;
   align-items: center;
-  ${({ fullWidth }) =>
-    fullWidth &&
+  ${({ $fullWidth }) =>
+    $fullWidth &&
     css`
       width: 100%;
     `}
@@ -55,38 +55,38 @@ const RightIconWrapper = styled.div`
 `;
 
 const StyledInput = styled.input<{
-  hasError: boolean;
-  hasLeftIcon: boolean;
-  hasRightIcon: boolean;
+  $hasError: boolean;
+  $hasLeftIcon: boolean;
+  $hasRightIcon: boolean;
 }>`
   width: 100%;
   padding: 0.625rem 0.75rem;
   font-size: 0.9375rem;
   border-radius: ${({ theme }) => theme.radii.md};
-  border: 1px solid ${({ theme, hasError }) =>
-    hasError ? theme.colors.error[500] : theme.colors.neutral[300]};
+  border: 1px solid ${({ theme, $hasError }) =>
+    $hasError ? theme.colors.error[500] : theme.colors.neutral[300]};
   background-color: ${({ theme }) => theme.colors.neutral[50]};
   color: ${({ theme }) => theme.colors.neutral[900]};
   transition: ${({ theme }) => theme.transitions.default};
   
-  ${({ hasLeftIcon }) =>
-    hasLeftIcon &&
+  ${({ $hasLeftIcon }) =>
+    $hasLeftIcon &&
     css`
       padding-left: 2.5rem;
     `}
   
-  ${({ hasRightIcon }) =>
-    hasRightIcon &&
+  ${({ $hasRightIcon }) =>
+    $hasRightIcon &&
     css`
       padding-right: 2.5rem;
     `}
   
   &:focus {
     outline: none;
-    border-color: ${({ theme, hasError }) =>
-      hasError ? theme.colors.error[500] : theme.colors.primary[500]};
-    box-shadow: 0 0 0 3px ${({ theme, hasError }) =>
-      hasError
+    border-color: ${({ theme, $hasError }) =>
+      $hasError ? theme.colors.error[500] : theme.colors.primary[500]};
+    box-shadow: 0 0 0 3px ${({ theme, $hasError }) =>
+      $hasError
         ? `rgba(239, 68, 68, 0.15)`
         : `rgba(59, 130, 246, 0.15)`};
   }
@@ -123,16 +123,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
     return (
-      <InputContainer fullWidth={fullWidth}>
+      <InputContainer $fullWidth={fullWidth}>
         {label && <InputLabel htmlFor={inputId}>{label}</InputLabel>}
-        <InputWrapper fullWidth={fullWidth}>
+        <InputWrapper $fullWidth={fullWidth}>
           {leftIcon && <LeftIconWrapper>{leftIcon}</LeftIconWrapper>}
           <StyledInput
             id={inputId}
             ref={ref}
-            hasError={!!error}
-            hasLeftIcon={!!leftIcon}
-            hasRightIcon={!!rightIcon}
+            $hasError={!!error}
+            $hasLeftIcon={!!leftIcon}
+            $hasRightIcon={!!rightIcon}
             aria-invalid={!!error}
             {...props}
           />

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -255,10 +256,41 @@ func GetReviews(c *gin.Context) {
 		filter["place_id"] = placeId
 	}
 
-	fmt.Println("[DEBUG] GetReviews placeId:", placeId)
+	ratingStr := c.Query("rating")
+	if ratingStr != "" {
+		// แปลงเป็น int
+		if rating, err := strconv.Atoi(ratingStr); err == nil {
+			filter["rating"] = rating
+		}
+	}
 
+	q := c.Query("q")
+	if q != "" {
+		// ค้นหาใน comment หรือ place_name (case-insensitive)
+		filter["$or"] = []bson.M{
+			{"comment": bson.M{"$regex": q, "$options": "i"}},
+			{"place_name": bson.M{"$regex": q, "$options": "i"}},
+		}
+	}
+
+	sortParam := c.DefaultQuery("sort", "newest")
+	var sort bson.D
+	switch sortParam {
+	case "oldest":
+		sort = bson.D{{Key: "created_at", Value: 1}}
+	case "highest":
+		sort = bson.D{{Key: "rating", Value: -1}, {Key: "created_at", Value: -1}}
+	case "lowest":
+		sort = bson.D{{Key: "rating", Value: 1}, {Key: "created_at", Value: -1}}
+	default: // newest
+		sort = bson.D{{Key: "created_at", Value: -1}}
+	}
+
+	fmt.Println("[DEBUG] GetReviews placeId:", placeId, "sort:", sortParam, "filter:", filter)
+
+	findOpts := options.Find().SetSort(sort)
 	var reviews []models.Review
-	cursor, err := db.Collection("reviews").Find(context.Background(), filter)
+	cursor, err := db.Collection("reviews").Find(context.Background(), filter, findOpts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get reviews"})
 		return
@@ -368,12 +400,68 @@ func DeleteReview(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid review ID"})
 		return
 	}
-
+	userID := c.GetString("userID")
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "missing user ID"})
+		return
+	}
+	var review models.Review
+	err = db.Collection("reviews").FindOne(context.Background(), bson.M{"_id": objectID}).Decode(&review)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "review not found"})
+		return
+	}
+	if review.UserID != userID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "you can only delete your own review"})
+		return
+	}
 	_, err = db.Collection("reviews").DeleteOne(context.Background(), bson.M{"_id": objectID})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete review"})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"message": "review deleted successfully"})
+}
+
+// ReportReview handles reporting a review
+func ReportReview(c *gin.Context) {
+	reviewID := c.Param("id")
+	userID := c.GetString("userID")
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "missing user ID"})
+		return
+	}
+	var user models.User
+	userObjID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user ID"})
+		return
+	}
+	if err := db.Collection("users").FindOne(context.Background(), bson.M{"_id": userObjID}).Decode(&user); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user not found"})
+		return
+	}
+	var input struct {
+		Type   string `json:"type" binding:"required"`
+		Detail string `json:"detail"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil || input.Type == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "report type is required"})
+		return
+	}
+	report := models.ReviewReport{
+		ReviewID:   reviewID,
+		ReporterID: userID,
+		Reporter:   user.Name,
+		Type:       input.Type,
+		Detail:     input.Detail,
+		Status:     "pending",
+		CreatedAt:  time.Now(),
+	}
+	_, err = db.Collection("review_reports").InsertOne(context.Background(), report)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create report"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "report submitted"})
 }

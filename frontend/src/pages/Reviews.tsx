@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { Star, Filter, ChevronDown, ChevronUp, Image, UserCircle, Heart, Share2, MoreHorizontal, X, AlertTriangle } from 'lucide-react';
+import { Star, Filter, ChevronDown, ChevronUp, Image, UserCircle, Heart, Share2, MoreHorizontal, X, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -9,6 +9,9 @@ import { reviewsAPI } from '../services/api';
 import { placesAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import Modal from '../components/ui/Modal';
+import ReviewOptionsMenu from '../components/ui/ReviewOptionsMenu';
+import { useAuth } from '../contexts/AuthContext';
+import ReportReviewModal from '../components/ui/ReportReviewModal';
 
 // Types
 interface User {
@@ -44,6 +47,7 @@ interface Review {
   likes: number;
   comments: Comment[];
   createdAt: string;
+  created_at?: string;
   images?: ReviewImage[];
   liked_by?: string[];
 }
@@ -452,22 +456,61 @@ const WarningItem = styled.li`
   }
 `;
 
-const LIMIT = 10;
+const SuccessModal = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+`;
+
+const SuccessContent = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+`;
+
+const SuccessIcon = styled.div`
+  color: #22c55e;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+`;
+
+const SuccessMessage = styled.div`
+  font-size: 18px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 24px;
+`;
+
+const SuccessButton = styled.button`
+  padding: 8px 24px;
+  border-radius: 8px;
+  background: #22c55e;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background: #16a34a;
+  }
+`;
+
+const LIMIT = 5;
 
 // เพิ่มฟังก์ชัน map id แบบ RoutePlanner
-const getPlaceId = (p: any) => p._id || p.place_id || p.PlaceID || p.id || '';
-
-// เพิ่ม helper function ตรวจสอบว่า user กด like review นี้หรือยัง
-const getCurrentUserId = () => {
-  try {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    return user.id || user._id || '';
-  } catch {
-    return '';
-  }
-};
+const getPlaceId = (p: any) => p.place_id || p.PlaceID || p.id || '';
 
 const Reviews = () => {
+  const { user } = useAuth();
   const [starFilter, setStarFilter] = useState<number | null>(null);
   const [sortOption, setSortOption] = useState('newest');
   const [showSortMenu, setShowSortMenu] = useState(false);
@@ -488,7 +531,6 @@ const Reviews = () => {
   const [placeInput, setPlaceInput] = useState('');
   const [placeSuggestions, setPlaceSuggestions] = useState<{id: string, name: string}[]>([]);
   const [showPlaceDropdown, setShowPlaceDropdown] = useState(false);
-  const [userId, setUserId] = useState<string>('');
   const [showWarning, setShowWarning] = useState(false);
   const [pendingReview, setPendingReview] = useState<{
     placeId: string;
@@ -496,8 +538,15 @@ const Reviews = () => {
     rating: number;
     comment: string;
   } | null>(null);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReviewId, setReportReviewId] = useState<string | null>(null);
+  const [reportReason, setReportReason] = useState('');
+  const [reportDetail, setReportDetail] = useState('');
+  const [reportLoading, setReportLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
-  // Fetch reviews (infinite scroll)
+  // Fetch reviews (pagination)
   useEffect(() => {
     fetchReviews(1, true);
     // eslint-disable-next-line
@@ -525,7 +574,7 @@ const Reviews = () => {
         console.log('DEBUG: PLACES API RESPONSE', res.data);
         setPlaces(
           (res.data.places || []).map((p: any) => ({
-            id: p._id?.$oid || p._id || p.place_id || p.id || '',
+            id: p.place_id || p.PlaceID || p.id || '',
             name: p.name || p.Name
           }))
         );
@@ -553,24 +602,24 @@ const Reviews = () => {
     // eslint-disable-next-line
   }, [places]);
 
-  useEffect(() => {
-    setUserId(getCurrentUserId());
-  }, []);
-
   const fetchReviews = async (pageToFetch = 1, reset = false) => {
     setLoading(true);
     setError('');
     try {
-      // Optionally pass filter/sort/search to backend
-      const params: any = { page: pageToFetch, limit: LIMIT };
-      if (starFilter) params.rating = starFilter;
-      if (sortOption) params.sort = sortOption;
-      if (searchTerm) params.q = searchTerm;
-      const res = await reviewsAPI.getReviews(params.page, params.limit, params.sort, 'desc');
+      const filters: any = {};
+      if (starFilter) filters.rating = starFilter;
+      if (searchTerm) filters.q = searchTerm;
+      const res = await reviewsAPI.getReviews(pageToFetch, LIMIT, sortOption, 'desc', filters);
       let newReviews = (res.data.reviews || []) as Review[];
-      setReviews(prev => reset ? newReviews : [...prev, ...newReviews]);
-      setPage(pageToFetch);
-      setHasMore(newReviews.length === LIMIT);
+      if (reset) {
+        setReviews(newReviews);
+        setPage(1);
+        setHasMore(newReviews.length === LIMIT);
+      } else {
+        setReviews(prev => [...prev, ...newReviews]);
+        setPage(pageToFetch);
+        setHasMore(newReviews.length === LIMIT);
+      }
       console.log('DEBUG: Reviews mapped', newReviews);
     } catch (e: any) {
       setError(e.message || 'Failed to load reviews');
@@ -585,6 +634,10 @@ const Reviews = () => {
 
   // Modified handlePostReview to include image upload
   const handlePostReview = async () => {
+    if (!user) {
+      toast.error('กรุณาเข้าสู่ระบบก่อนโพสต์รีวิว');
+      return;
+    }
     const selectedPlaceObj = places.find(p => p.id === selectedPlace);
     if (!selectedPlace || !selectedPlaceObj) {
       toast.error('กรุณาเลือกสถานที่จากรายการ');
@@ -598,10 +651,9 @@ const Reviews = () => {
       toast.error('กรุณากรอกข้อความรีวิว');
       return;
     }
-
     // Show warning modal first
     setPendingReview({
-      placeId: selectedPlace,
+      placeId: selectedPlaceObj.id, // ใช้ id จริงของ place
       placeName: selectedPlaceObj.name,
       rating: reviewRating,
       comment: reviewText,
@@ -610,28 +662,25 @@ const Reviews = () => {
   };
 
   const handleConfirmPost = async () => {
-    if (!pendingReview) return;
-
+    if (!pendingReview || !user) return;
     setPosting(true);
     try {
       const response = await reviewsAPI.createReview({
-        placeId: pendingReview.placeId,
+        placeId: pendingReview.placeId, // ส่ง id จริงของ place
         placeName: pendingReview.placeName,
         rating: pendingReview.rating,
         comment: pendingReview.comment,
       });
-
       if (!response.data || !response.data.id) {
         throw new Error('ไม่สามารถสร้างรีวิวได้');
       }
-
       await fetchReviews(1, true);
       setShowWrite(false);
       setSelectedPlace('');
       setPlaceInput('');
       setReviewText('');
       setReviewRating(0);
-      toast.success('โพสต์รีวิวสำเร็จ!');
+      showSuccess('โพสต์รีวิวสำเร็จ!');
     } catch (e: any) {
       console.error('Error posting review:', e);
       toast.error(e.response?.data?.error || e.message || 'เกิดข้อผิดพลาด');
@@ -644,14 +693,15 @@ const Reviews = () => {
 
   // Like review (toggle)
   const handleLikeReview = async (reviewId: string) => {
+    if (!user) return;
     setReviews(prev => prev.map(r => {
       if (r.id !== reviewId) return r;
       const likedBy = r.liked_by || [];
-      const liked = likedBy.includes(userId);
+      const liked = likedBy.includes(user.id);
       return {
         ...r,
         likes: liked ? r.likes - 1 : r.likes + 1,
-        liked_by: liked ? likedBy.filter((id: string) => id !== userId) : [...likedBy, userId],
+        liked_by: liked ? likedBy.filter((id: string) => id !== user.id) : [...likedBy, user.id],
       };
     }));
     try {
@@ -659,13 +709,29 @@ const Reviews = () => {
     } catch {}
   };
 
+  const showSuccess = (message: string) => {
+    setSuccessMessage(message);
+    setShowSuccessModal(true);
+    setTimeout(() => setShowSuccessModal(false), 2000); // ปิดอัตโนมัติหลัง 2 วินาที
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    try {
+      await reviewsAPI.deleteReview(reviewId);
+      setReviews(prev => prev.filter(r => r.id !== reviewId));
+      showSuccess('ลบรีวิวสำเร็จ!');
+    } catch (e) {
+      console.error('Error deleting review:', e);
+      toast.error('เกิดข้อผิดพลาดในการลบรีวิว');
+    }
+  };
+
   return (
     <PageContainer>
       <PageHeader>
         <PageTitle>Traveler Reviews</PageTitle>
         <PageDescription>
-          Read authentic reviews from fellow travelers to make informed decisions 
-          about routes and services. Share your own experiences to help others.
+          อ่านรีวิวจากนักเดินทางจริงเพื่อช่วยในการตัดสินใจ และแบ่งปันประสบการณ์ของคุณให้เพื่อน ๆ ได้รู้
         </PageDescription>
       </PageHeader>
       <ReviewsContainer>
@@ -687,7 +753,7 @@ const Reviews = () => {
           </FilterGroup>
           <SearchBox>
             <Input
-              placeholder="Search reviews..."
+              placeholder="ค้นหารีวิว..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
@@ -696,9 +762,9 @@ const Reviews = () => {
           <SortDropdown>
             <SortButton onClick={() => setShowSortMenu(!showSortMenu)}>
               <Filter size={16} />
-              Sort: {sortOption === 'newest' ? 'Newest' : 
-                     sortOption === 'oldest' ? 'Oldest' :
-                     sortOption === 'highest' ? 'Highest Rated' : 'Lowest Rated'}
+              เรียงลำดับ: {sortOption === 'newest' ? 'ใหม่ล่าสุด' : 
+                    sortOption === 'oldest' ? 'เก่าสุด' :
+                    sortOption === 'highest' ? 'คะแนนสูงสุด' : 'คะแนนต่ำสุด'}
               {showSortMenu ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </SortButton>
             {showSortMenu && (
@@ -708,136 +774,140 @@ const Reviews = () => {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <SortMenuItem isActive={sortOption === 'newest'} onClick={() => setSortOption('newest')}>Newest First</SortMenuItem>
-                <SortMenuItem isActive={sortOption === 'oldest'} onClick={() => setSortOption('oldest')}>Oldest First</SortMenuItem>
-                <SortMenuItem isActive={sortOption === 'highest'} onClick={() => setSortOption('highest')}>Highest Rated</SortMenuItem>
-                <SortMenuItem isActive={sortOption === 'lowest'} onClick={() => setSortOption('lowest')}>Lowest Rated</SortMenuItem>
+                <SortMenuItem isActive={sortOption === 'newest'} onClick={() => setSortOption('newest')}>ใหม่ล่าสุด</SortMenuItem>
+                <SortMenuItem isActive={sortOption === 'oldest'} onClick={() => setSortOption('oldest')}>เก่าสุด</SortMenuItem>
+                <SortMenuItem isActive={sortOption === 'highest'} onClick={() => setSortOption('highest')}>คะแนนสูงสุด</SortMenuItem>
+                <SortMenuItem isActive={sortOption === 'lowest'} onClick={() => setSortOption('lowest')}>คะแนนต่ำสุด</SortMenuItem>
               </SortMenu>
             )}
           </SortDropdown>
         </FilterSection>
-        {/* Write Review Box (moved here) */}
+        {/* Write Review Box */}
         <div style={{ maxWidth: 600, minWidth: 400, width: '100%', margin: '0 auto', marginBottom: 32 }}>
-          {!showWrite ? (
-            <div
-              style={{ background: '#fff', borderRadius: 18, boxShadow: '0 2px 16px 0 rgba(0,0,0,0.06)', padding: 28, display: 'flex', alignItems: 'center', gap: 18, cursor: 'pointer' }}
-              onClick={() => setShowWrite(true)}
-            >
-              <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 24, color: '#6366f1' }}>
-                <UserCircle size={38} />
+          {user ? (
+            !showWrite ? (
+              <div
+                style={{ background: '#fff', borderRadius: 18, boxShadow: '0 2px 16px 0 rgba(0,0,0,0.06)', padding: 28, display: 'flex', alignItems: 'center', gap: 18, cursor: 'pointer' }}
+                onClick={() => setShowWrite(true)}
+              >
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 24, color: '#6366f1' }}>
+                  <UserCircle size={38} />
+                </div>
+                <div style={{ flex: 1, color: '#888', fontSize: 20 }}>แชร์ประสบการณ์การเดินทางของคุณ...</div>
+                <Button variant="primary" style={{ background: '#a5b4fc', color: '#fff', fontWeight: 600, fontSize: 18, padding: '10px 24px' }}>เขียนรีวิว</Button>
               </div>
-              <div style={{ flex: 1, color: '#888', fontSize: 20 }}>แชร์ประสบการณ์การเดินทางของคุณ...</div>
-              <Button variant="primary" style={{ background: '#a5b4fc', color: '#fff', fontWeight: 600, fontSize: 18, padding: '10px 24px' }}>เขียนรีวิว</Button>
-            </div>
-          ) : (
-            <div style={{
-              background: '#fff',
-              borderRadius: 18,
-              boxShadow: '0 2px 16px 0 rgba(0,0,0,0.06)',
-              padding: 32,
-              position: 'relative',
-              maxWidth: 600,
-              minWidth: 400,
-              width: '100%',
-              margin: '0 auto',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 18
-            }}>
-              <button onClick={() => setShowWrite(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', cursor: 'pointer' }}><X size={24} /></button>
-              <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 10 }}>แชร์เรื่องราวการเดินทาง</div>
-              <div style={{ color: '#888', fontSize: 16, marginBottom: 18 }}>บอกเล่าประสบการณ์ให้เพื่อนๆ ฟัง</div>
-              <div style={{ marginBottom: 18 }}>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type="text"
-                    value={placeInput}
-                    onChange={e => {
-                      setPlaceInput(e.target.value);
-                      setShowPlaceDropdown(true);
-                      setSelectedPlace('');
-                    }}
-                    onFocus={() => setShowPlaceDropdown(true)}
-                    onBlur={() => setTimeout(() => setShowPlaceDropdown(false), 150)}
-                    placeholder="คุณไปเที่ยวที่ไหนมา?"
-                    style={{ width: '100%', padding: 12, borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 17 }}
+            ) : (
+              <div style={{
+                background: '#fff',
+                borderRadius: 18,
+                boxShadow: '0 2px 16px 0 rgba(0,0,0,0.06)',
+                padding: 32,
+                position: 'relative',
+                maxWidth: 600,
+                minWidth: 400,
+                width: '100%',
+                margin: '0 auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 18
+              }}>
+                <button onClick={() => setShowWrite(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', cursor: 'pointer' }}><X size={24} /></button>
+                <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 10 }}>แชร์เรื่องราวการเดินทาง</div>
+                <div style={{ color: '#888', fontSize: 16, marginBottom: 18 }}>บอกเล่าประสบการณ์ให้เพื่อนๆ ฟัง</div>
+                <div style={{ marginBottom: 18 }}>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      value={placeInput}
+                      onChange={e => {
+                        setPlaceInput(e.target.value);
+                        setShowPlaceDropdown(true);
+                        setSelectedPlace('');
+                      }}
+                      onFocus={() => setShowPlaceDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowPlaceDropdown(false), 150)}
+                      placeholder="ค้นหาหรือเลือกสถานที่ที่คุณไปเที่ยวมา"
+                      style={{ width: '100%', padding: 12, borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 17 }}
+                    />
+                    {showPlaceDropdown && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        background: '#fff',
+                        border: '1px solid #eee',
+                        borderRadius: 8,
+                        zIndex: 10,
+                        maxHeight: 220,
+                        overflowY: 'auto',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                      }}>
+                        {placeSuggestions.length > 0 ? placeSuggestions.map(p => (
+                          <div
+                            key={p.id}
+                            style={{ padding: 12, cursor: 'pointer', fontSize: 16 }}
+                            onMouseDown={() => {
+                              setSelectedPlace(p.id);
+                              setPlaceInput(p.name);
+                              setShowPlaceDropdown(false);
+                              console.log('DEBUG: Select place', p);
+                            }}
+                          >
+                            {p.name}
+                          </div>
+                        )) : (
+                          <div style={{ padding: 12, color: '#888' }}>ไม่พบสถานที่</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div style={{ marginBottom: 18 }}>
+                  <div style={{ marginBottom: 8, color: '#666', fontSize: 16 }}>ให้คะแนนสถานที่นี้</div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {[1,2,3,4,5].map(i => (
+                      <button key={i} type="button" onClick={() => setReviewRating(i)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                        <Star size={32} fill={reviewRating >= i ? '#facc15' : 'none'} color="#facc15" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ marginBottom: 18 }}>
+                  <textarea
+                    value={reviewText}
+                    onChange={e => setReviewText(e.target.value)}
+                    placeholder="เล่าให้ฟังหน่อยว่าที่นี่เป็นยังไงบ้าง? อาหารอร่อยไหม? ที่พักดีไหม? มีอะไรน่าสนใจบ้าง..."
+                    style={{ width: '100%', minHeight: 90, borderRadius: 8, border: '1px solid #e5e7eb', padding: 12, fontSize: 17, resize: 'vertical' }}
                   />
-                  {showPlaceDropdown && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      background: '#fff',
-                      border: '1px solid #eee',
-                      borderRadius: 8,
-                      zIndex: 10,
-                      maxHeight: 220,
-                      overflowY: 'auto',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-                    }}>
-                      {placeSuggestions.length > 0 ? placeSuggestions.map(p => (
-                        <div
-                          key={p.id}
-                          style={{ padding: 12, cursor: 'pointer', fontSize: 16 }}
-                          onMouseDown={() => {
-                            setSelectedPlace(p.id);
-                            setPlaceInput(p.name);
-                            setShowPlaceDropdown(false);
-                            console.log('DEBUG: Select place', p);
-                          }}
-                        >
-                          {p.name}
-                        </div>
-                      )) : (
-                        <div style={{ padding: 12, color: '#888' }}>ไม่พบสถานที่</div>
-                      )}
-                    </div>
-                  )}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button variant="primary" style={{ background: '#a5b4fc', color: '#fff', fontWeight: 600, minWidth: 130, fontSize: 17, padding: '10px 0', width: 160 }} onClick={handlePostReview} disabled={posting}>
+                    {posting ? 'กำลังโพสต์...' : 'โพสต์รีวิว'}
+                  </Button>
                 </div>
               </div>
-              <div style={{ marginBottom: 18 }}>
-                <div style={{ marginBottom: 8, color: '#666', fontSize: 16 }}>ให้คะแนนสถานที่นี้</div>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  {[1,2,3,4,5].map(i => (
-                    <button key={i} type="button" onClick={() => setReviewRating(i)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                      <Star size={32} fill={reviewRating >= i ? '#facc15' : 'none'} color="#facc15" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div style={{ marginBottom: 18 }}>
-                <textarea
-                  value={reviewText}
-                  onChange={e => setReviewText(e.target.value)}
-                  placeholder="เล่าให้ฟังหน่อยว่าที่นี่เป็นยังไงบ้าง? อาหารอร่อยไหม? ที่พักดีไหม? มีอะไรน่าสนใจบ้าง..."
-                  style={{ width: '100%', minHeight: 90, borderRadius: 8, border: '1px solid #e5e7eb', padding: 12, fontSize: 17, resize: 'vertical' }}
-                />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button variant="primary" style={{ background: '#a5b4fc', color: '#fff', fontWeight: 600, minWidth: 130, fontSize: 17, padding: '10px 0', width: 160 }} onClick={handlePostReview} disabled={posting}>
-                  {posting ? 'กำลังโพสต์...' : 'โพสต์รีวิว'}
-                </Button>
-              </div>
-            </div>
-          )}
+            )
+          ) : null}
         </div>
-        {/* Feed Reviews */}
+        {/* Feed Reviews (แสดงกับทุกคน) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', margin: '0 auto', maxWidth: 600 }}>
-          {filteredReviews.map((review, idx) => {
-            const isLiked = Array.isArray(review.liked_by) && review.liked_by.includes(userId);
+          {reviews.map((review, idx) => {
+            const isLiked = user ? Array.isArray(review.liked_by) && review.liked_by.includes(user.id) : false;
+            const isOwner = !!(user && review.user_id === user.id);
             // ฟังก์ชัน normalize id เพื่อเปรียบเทียบ id ที่อาจมีรูปแบบต่างกัน
             const normalizeId = (id: string) => id?.toString()?.toLowerCase()?.replace(/[^a-z0-9]/gi, '');
             // ฟังก์ชันตรวจสอบว่า string เป็น id (24 ตัวอักษร hex) หรือไม่
             const isIdString = (str: string) => /^[a-f0-9]{24}$/i.test(str);
             // logic แสดงชื่อสถานที่
             let placeName = '';
-            if (review.place_name && !isIdString(review.place_name)) {
+            if (review.place_name) {
               placeName = review.place_name;
             } else if (places.length > 0) {
-              const found = places.find(p => normalizeId(p.id) === normalizeId(review.place_id));
+              const found = places.find(p => p.id === review.place_id);
               if (found) placeName = found.name;
             }
+            const reviewDate = review.createdAt || review.created_at;
             return (
               <div key={review.id} style={{ background: '#fff', borderRadius: 18, boxShadow: '0 2px 16px 0 rgba(0,0,0,0.06)', padding: 24, position: 'relative' }}>
                 {/* Header */}
@@ -849,9 +919,18 @@ const Reviews = () => {
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600 }}>{review.username || 'Unknown'}</div>
                     <div style={{ fontSize: 13, color: '#6b7280' }}>@{review.username?.toLowerCase().replace(/\s/g, '_') || 'user'}</div>
+                    <div style={{ fontSize: 13, color: '#6b7280' }}>
+                      {reviewDate && !isNaN(new Date(reviewDate).getTime())
+                        ? new Date(reviewDate).toLocaleString('th-TH')
+                        : '-'}
+                    </div>
                   </div>
                   <div style={{ color: '#6b7280', fontSize: 13 }}>{review.createdAt ? new Date(review.createdAt).toLocaleString() : ''}</div>
-                  <MoreHorizontal size={20} style={{ color: '#9ca3af', marginLeft: 8 }} />
+                  <ReviewOptionsMenu
+                    isOwner={isOwner}
+                    onDelete={() => handleDeleteReview(review.id)}
+                    onReport={user ? () => { setReportReviewId(review.id); setShowReportModal(true); } : undefined}
+                  />
                 </div>
                 {/* Location/Place */}
                 <div style={{ marginBottom: 8 }}>
@@ -876,7 +955,16 @@ const Reviews = () => {
                     <span style={{ fontWeight: 600, color: '#f59e42', marginLeft: 4 }}>{review.rating}/5</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: isLiked ? '#ef4444' : '#aaa', cursor: 'pointer' }} onClick={() => handleLikeReview(review.id)}>
+                    <span
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        color: isLiked ? '#ef4444' : '#aaa',
+                        cursor: user ? 'pointer' : 'not-allowed',
+                        opacity: user ? 1 : 0.5
+                      }}
+                      onClick={user ? () => handleLikeReview(review.id) : undefined}
+                      title={user ? '' : 'เข้าสู่ระบบเพื่อกดไลก์'}
+                    >
                       <Heart size={18} fill={isLiked ? '#ef4444' : 'none'} />{review.likes}
                     </span>
                   </div>
@@ -886,8 +974,19 @@ const Reviews = () => {
           })}
           {loading && <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>Loading...</div>}
           {error && <div style={{ textAlign: 'center', color: 'red', margin: 24 }}>{error}</div>}
-          <div ref={loaderRef} style={{ height: 1 }} />
-          {!hasMore && !loading && <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>No more reviews</div>}
+          {hasMore && !loading && reviews.length > 0 && (
+            <div style={{ textAlign: 'center', margin: 24 }}>
+              <Button variant="secondary" onClick={() => fetchReviews(page + 1)}>
+                อ่านรีวิวอื่นเพิ่มเติม
+              </Button>
+            </div>
+          )}
+          {!hasMore && !loading && reviews.length > 0 && (
+            <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>ไม่มีโพสต์รีวิวแล้ว</div>
+          )}
+          {!loading && reviews.length === 0 && (
+            <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>ยังไม่มีรีวิว</div>
+          )}
         </div>
       </ReviewsContainer>
 
@@ -950,6 +1049,43 @@ const Reviews = () => {
             </div>
           </WarningContent>
         </WarningModal>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <SuccessModal
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <SuccessContent>
+            <SuccessIcon>
+              <CheckCircle2 size={48} />
+            </SuccessIcon>
+            <SuccessMessage>{successMessage}</SuccessMessage>
+          </SuccessContent>
+        </SuccessModal>
+      )}
+
+      {/* Report Review Modal */}
+      {showReportModal && user && (
+        <ReportReviewModal
+          open={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          onSubmit={async (type: string, detail: string) => {
+            if (!reportReviewId) return;
+            setReportLoading(true);
+            try {
+              await reviewsAPI.reportReview(reportReviewId, { type, detail });
+              showSuccess('รายงานรีวิวสำเร็จ!');
+              setShowReportModal(false);
+            } catch (e: any) {
+              toast.error(e?.response?.data?.error || 'เกิดข้อผิดพลาด');
+            } finally {
+              setReportLoading(false);
+            }
+          }}
+        />
       )}
     </PageContainer>
   );

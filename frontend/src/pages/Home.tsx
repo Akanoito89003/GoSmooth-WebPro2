@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { reviewsAPI } from '../services/api';
 
 const HeroSection = styled.section`
   position: relative;
@@ -188,24 +189,8 @@ const Home = () => {
   const [featuredPlaces, setFeaturedPlaces] = useState<any[]>([]);
   const [loadingPlaces, setLoadingPlaces] = useState(false);
   const [locations, setLocations] = useState<{[key: string]: string}>({});
-  // mock reviews
-  const reviews = [
-    {
-      username: 'Username',
-      rating: 5,
-      comment: 'TravelEase has completely transformed how I plan my trips. The route suggestions are spot-on, and I love how easy it is to find interesting places along the way.'
-    },
-    {
-      username: 'Username',
-      rating: 5,
-      comment: 'I love discovering new places, and TravelEase makes it so easy to find hidden gems along my route. The reviews are helpful, and the navigation is seamless.'
-    },
-    {
-      username: 'Username',
-      rating: 5,
-      comment: 'As someone who travels frequently for work, this app has been a game-changer. The cost estimates are accurate, and the interface is incredibly user-friendly.'
-    }
-  ];
+  const [latestReviews, setLatestReviews] = useState<any[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -231,6 +216,18 @@ const Home = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    // ดึง 3 รีวิวล่าสุด (ไม่ต้อง login ก็เห็นได้)
+    setLoadingReviews(true);
+    reviewsAPI.getReviews(1, 3, 'newest', 'desc')
+      .then(res => {
+        const data = res.data.reviews || [];
+        setLatestReviews(data);
+      })
+      .catch(() => setLatestReviews([]))
+      .finally(() => setLoadingReviews(false));
+  }, []);
+
   if (!user) {
   return (
     <>
@@ -249,8 +246,8 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Plan your trips with ease, estimate costs accurately, 
-            and make informed decisions with GoSmooth Travel.
+            วางแผนการเดินทางของคุณอย่างง่ายดาย ประเมินค่าใช้จ่ายได้แม่นยำ
+            และตัดสินใจได้อย่างมั่นใจด้วย GoSmooth
           </HeroSubtitle>
           <HeroButtons
             initial={{ opacity: 0, y: 20 }}
@@ -280,7 +277,7 @@ const Home = () => {
       <FeaturesSection>
         <SectionTitle>Why Choose GoSmooth?</SectionTitle>
         <SectionSubtitle>
-          Our platform offers comprehensive tools to make your travel planning experience smooth and efficient.
+          GoSmooth ช่วยให้การวางแผนท่องเที่ยวของคุณเป็นเรื่องง่าย สะดวก และมั่นใจ ด้วยเครื่องมือครบครันสำหรับค้นหาเส้นทางและอ่านรีวิวจากนักเดินทางจริง
         </SectionSubtitle>
 
         <FeaturesGrid>
@@ -296,7 +293,7 @@ const Home = () => {
               </FeatureIconWrapper>
               <FeatureTitle>Smart Route Planning</FeatureTitle>
               <FeatureDescription>
-                Find the most efficient routes with real-time traffic updates and multiple alternatives.
+                วางแผนเส้นทางเดินทางที่เหมาะสมที่สุด พร้อมเปรียบเทียบตัวเลือกและข้อมูลจราจรแบบเรียลไทม์
               </FeatureDescription>
               <Button
                 as={Link}
@@ -304,7 +301,7 @@ const Home = () => {
                 variant="ghost"
                 style={{ marginTop: 'auto' }}
               >
-                Plan Now
+                วางแผนเลย
               </Button>
             </FeatureCard>
           </motion.div>
@@ -319,17 +316,17 @@ const Home = () => {
               <FeatureIconWrapper>
                 <DollarSign size={28} />
               </FeatureIconWrapper>
-              <FeatureTitle>Accurate Cost Estimation</FeatureTitle>
+              <FeatureTitle>Flexible Route Options</FeatureTitle>
               <FeatureDescription>
-                Get precise cost breakdowns for different transportation modes to budget effectively.
+                เลือกเส้นทางและวิธีเดินทางที่หลากหลาย ให้เหมาะกับไลฟ์สไตล์และความต้องการของคุณ
               </FeatureDescription>
               <Button
                 as={Link}
-                to="/cost-estimator"
+                to="/route-planner"
                 variant="ghost"
                 style={{ marginTop: 'auto' }}
               >
-                Estimate Costs
+                วางแผนเลย
               </Button>
             </FeatureCard>
           </motion.div>
@@ -346,7 +343,7 @@ const Home = () => {
               </FeatureIconWrapper>
               <FeatureTitle>Trusted Reviews</FeatureTitle>
               <FeatureDescription>
-                Read authentic reviews from fellow travelers to make informed decisions about routes and services.
+                อ่านรีวิวสถานที่จริงจากนักเดินทาง เพื่อประกอบการตัดสินใจเลือกเส้นทางและจุดหมายปลายทาง
               </FeatureDescription>
               <Button
                 as={Link}
@@ -354,7 +351,7 @@ const Home = () => {
                 variant="ghost"
                 style={{ marginTop: 'auto' }}
               >
-                Read Reviews
+                อ่านรีวิว
               </Button>
             </FeatureCard>
           </motion.div>
@@ -363,10 +360,9 @@ const Home = () => {
 
       <CtaSection>
         <CtaContainer>
-          <CtaTitle>Ready to Travel Smarter?</CtaTitle>
+          <CtaTitle>พร้อมเดินทางอย่างชาญฉลาดไปกับ GoSmooth หรือยัง?</CtaTitle>
           <CtaText>
-            Join thousands of satisfied travelers who use GoSmooth to plan their journeys.
-            Sign up today and experience the difference.
+            เข้าร่วมกับนักเดินทางมากมายที่เลือกใช้ GoSmooth ในการวางแผนทริป ค้นหาเส้นทาง และประเมินค่าใช้จ่าย สมัครสมาชิกฟรีวันนี้ แล้วสัมผัสประสบการณ์ใหม่ในการเดินทางของคุณ
           </CtaText>
           <Button
             as={Link}
@@ -400,8 +396,8 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Plan your trips with ease, estimate costs accurately, 
-            and make informed decisions with GoSmooth Travel.
+            วางแผนการเดินทางของคุณอย่างง่ายดาย ประเมินค่าใช้จ่ายได้
+            และตัดสินใจได้อย่างมั่นใจด้วย GoSmooth
           </HeroSubtitle>
           <HeroButtons
             initial={{ opacity: 0, y: 20 }}
@@ -466,26 +462,35 @@ const Home = () => {
       {/* What Our Users Say */}
       <section style={{ background: '#6366f1', color: 'white', padding: '4rem 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 16 }}>What Our Users Say</h2>
+          <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 16 }}>รีวิวสถานที่จากผู้ใช้งาน</h2>
           <p style={{ fontSize: 18, marginBottom: 40 }}>
-            We simplify your travel planning with smart features designed to make your journey smoother.
+            ประสบการณ์จริงจากนักเดินทางที่ไปเยือนสถานที่ต่าง ๆ ด้วย GoSmooth
           </p>
-          <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
-            {reviews.map((review, idx) => (
-              <div key={idx} style={{ background: 'white', color: '#222', borderRadius: 16, padding: 24, minWidth: 280, maxWidth: 340, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', textAlign: 'left' }}>
-                <div style={{ color: '#facc15', fontSize: 20, marginBottom: 8 }}>
-                  {'★'.repeat(review.rating)}
-                </div>
-                <div style={{ fontSize: 15, marginBottom: 12 }}>{review.comment}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span role="img" aria-label="user">👤</span>
+          {loadingReviews ? (
+            <div style={{ color: '#fff', fontSize: 18 }}>กำลังโหลดรีวิว...</div>
+          ) : latestReviews.length === 0 ? (
+            <div style={{ color: '#fff', fontSize: 18 }}>ยังไม่มีรีวิวจากผู้ใช้</div>
+          ) : (
+            <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {latestReviews.map((review, idx) => (
+                <div key={review.id || idx} style={{ background: 'white', color: '#222', borderRadius: 16, padding: 24, minWidth: 280, maxWidth: 340, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', textAlign: 'left' }}>
+                  <div style={{ color: '#facc15', fontSize: 20, marginBottom: 8 }}>
+                    {'★'.repeat(review.rating || 0)}
                   </div>
-                  <span style={{ fontWeight: 600 }}>{review.username}</span>
+                  <div style={{ fontSize: 15, marginBottom: 8, fontWeight: 600, color: '#6366f1' }}>
+                    {review.place_name ? `สถานที่: ${review.place_name}` : ''}
+                  </div>
+                  <div style={{ fontSize: 15, marginBottom: 12 }}>{review.comment}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span role="img" aria-label="user">👤</span>
+                    </div>
+                    <span style={{ fontWeight: 600 }}>{review.username || 'ผู้ใช้ไม่ระบุชื่อ'}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </>

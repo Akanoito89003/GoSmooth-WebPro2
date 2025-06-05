@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { Mail, Lock, AlertTriangle } from 'lucide-react';
+import { Mail, Lock, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { useAuth } from '../../hooks/useAuth';
@@ -55,19 +55,6 @@ const FormActions = styled.div`
   margin-top: 2rem;
 `;
 
-const ForgotPassword = styled(Link)`
-  display: block;
-  font-size: 0.875rem;
-  color: ${({ theme }) => theme.colors.primary[600]};
-  text-align: right;
-  margin-top: 0.5rem;
-  margin-bottom: 1.5rem;
-  
-  &:hover {
-    color: ${({ theme }) => theme.colors.primary[700]};
-  }
-`;
-
 const RegisterLink = styled.div`
   margin-top: 2rem;
   text-align: center;
@@ -112,6 +99,7 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [banReason, setBanReason] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   
   const {
     register,
@@ -122,29 +110,26 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       setIsSubmitting(true);
-      const response = await login(data.email, data.password, rememberMe);
-      
-      // Check if user is banned
-      if (response && response.user?.status === 'banned') {
-        setBanReason(response.user.banReason || 'No reason provided');
+      await login(data.email, data.password, rememberMe);
+    } catch (error: any) {
+      if (error?.banned) {
+        setBanReason(error.banReason || 'No reason provided');
         return;
       }
-    } catch (error: any) {
-      // Show specific error messages based on backend response
       if (error?.response?.data?.error) {
         if (error.response.data.error.includes('email')) {
           clearError();
-          setFormError('Email not found');
+          setFormError('อีเมลที่กรอกไม่ถูกต้อง');
         } else if (error.response.data.error.includes('password') || error.response.data.error.includes('credentials')) {
           clearError();
-          setFormError('Incorrect password');
+          setFormError('รหัสผ่านไม่ถูกต้อง');
         } else if (error.response.data.error.includes('banned')) {
           setBanReason(error.response.data.banReason || 'No reason provided');
         } else {
           setFormError(error.response.data.error);
         }
       } else {
-        setFormError('Login failed');
+        setFormError('ไม่สามารถเข้าสู่ระบบได้ กรุณาลองใหม่อีกครั้ง');
       }
     } finally {
       setIsSubmitting(false);
@@ -161,12 +146,21 @@ const Login = () => {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
+          style={{ flexDirection: 'column', alignItems: 'flex-start' }}
         >
-          <AlertTriangle className="w-5 h-5" />
-          <div>
-            <p className="font-medium">Your account has been banned</p>
-            <p className="text-sm mt-1">Reason: {banReason}</p>
-            <p className="text-sm mt-1">Please contact support if you believe this is a mistake.</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+            <AlertTriangle size={32} style={{ color: '#e53935' }} />
+            <span style={{ fontWeight: 600, fontSize: '1.1rem', color: '#b71c1c' }}>
+              บัญชีของคุณถูกระงับการใช้งาน
+            </span>
+          </div>
+          <div style={{ marginLeft: '2.5rem' }}>
+            <div style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>
+              <b>สาเหตุ:</b> {banReason}
+            </div>
+            <div style={{ fontSize: '0.95rem', color: '#b71c1c' }}>
+              หากคิดว่าเกิดข้อผิดพลาด กรุณาติดต่อฝ่ายสนับสนุน
+            </div>
           </div>
         </BanMessage>
       )}
@@ -204,7 +198,7 @@ const Login = () => {
 
         <Input
           label="Password"
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           placeholder="Enter your password"
           fullWidth
           leftIcon={<Lock size={18} />}
@@ -220,6 +214,11 @@ const Login = () => {
             error && clearError();
             banReason && setBanReason(null);
           }}
+          rightIcon={
+            <span style={{ cursor: 'pointer' }} onClick={() => setShowPassword(v => !v)}>
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </span>
+          }
         />
 
         <RememberMeWrapper>
@@ -230,10 +229,6 @@ const Login = () => {
           />
           Remember me
         </RememberMeWrapper>
-
-        <ForgotPassword to="/forgot-password">
-          Forgot password?
-        </ForgotPassword>
 
         <FormActions>
           <Button

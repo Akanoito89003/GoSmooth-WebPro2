@@ -235,19 +235,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       resetInactivityTimer();
       navigate('/');
-    } catch (error) {
+    } catch (error: any) {
       if (axios.isAxiosError(error) && error.response) {
+        // ดักกรณีถูกแบน
+        if (error.response.status === 403 && error.response.data?.banReason) {
+          setAuthState({
+            ...authState,
+            error: error.response.data.error,
+            isLoading: false,
+          });
+          throw { banned: true, banReason: error.response.data.banReason };
+        }
+        
+        // จัดการข้อความผิดพลาดเฉพาะ
+        let errorMessage = 'ไม่สามารถเข้าสู่ระบบได้';
+        if (error.response.status === 404) {
+          errorMessage = 'อีเมลที่กรอกไม่ถูกต้อง';
+        } else if (error.response.status === 401) {
+          errorMessage = 'รหัสผ่านไม่ถูกต้อง';
+        } else if (error.response.data?.error) {
+          errorMessage = error.response.data.error;
+        }
+
         setAuthState({
           ...authState,
-          error: error.response.data.message || 'Failed to login',
+          error: errorMessage,
           isLoading: false,
         });
+        throw { response: { data: { error: errorMessage } } };
       } else {
         setAuthState({
           ...authState,
-          error: 'An unexpected error occurred',
+          error: 'เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองใหม่อีกครั้ง',
           isLoading: false,
         });
+        throw { response: { data: { error: 'เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองใหม่อีกครั้ง' } } };
       }
     }
   };
@@ -357,7 +379,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await api.post('/api/auth/change-password', data);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Change password failed');
+      console.log('DEBUG: changePassword error', error, error.response, error.message);
+      // ตรวจสอบ error message จาก backend
+      let msg = error.response?.data?.error || 'Change password failed';
+      if (msg.toLowerCase().includes('current password') || msg.toLowerCase().includes('รหัสผ่านเดิม')) {
+        msg = 'รหัสผ่านเดิมไม่ถูกต้อง';
+      }
+      throw new Error(msg);
     }
   };
 

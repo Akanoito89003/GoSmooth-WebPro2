@@ -34,15 +34,33 @@ export interface Place {
 export interface Review {
   id: string;
   user_id: string;
+  userId?: string;
   username?: string;
   place_id: string;
   place_name?: string;
   rating: number;
   comment: string;
   likes: number;
+  comments?: Comment[];
   liked_by?: string[];
   createdAt?: string;
   updatedAt?: string;
+  images?: ReviewImage[];
+}
+
+export interface Comment {
+  id: string;
+  user_id: string;
+  username: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface ReviewImage {
+  id: string;
+  filename: string;
+  path: string;
+  createdAt: string;
 }
 
 export interface NearbyPlace {

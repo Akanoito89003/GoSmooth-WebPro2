@@ -17,13 +17,14 @@ import { useAuth } from './hooks/useAuth';
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
 const RoutePlanner = lazy(() => import('./pages/RoutePlanner'));
-const CostEstimator = lazy(() => import('./pages/CostEstimator'));
+// const CostEstimator = lazy(() => import('./pages/CostEstimator'));
 const Reviews = lazy(() => import('./pages/Reviews'));
 const Profile = lazy(() => import('./pages/Profile'));
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const PlacesPage = lazy(() => import('./pages/PlacesPage'));
 const PlaceDetailPage = lazy(() => import('./pages/PlaceDetailPage'));
+const PlacesManager = lazy(() => import('./pages/admin/PlacesManager'));
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -78,14 +79,6 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
-              <Route 
-                path="/cost-estimator" 
-                element={
-                  <ProtectedRoute>
-                    <CostEstimator />
-                  </ProtectedRoute>
-                } 
-              />
               <Route path="/reviews" element={<Reviews />} />
               <Route 
                 path="/profile" 
@@ -102,6 +95,14 @@ function App() {
                 element={
                   <AdminRoute>
                     <AdminDashboard />
+                  </AdminRoute>
+                } 
+              />
+              <Route 
+                path="/admin/places" 
+                element={
+                  <AdminRoute>
+                    <PlacesManager />
                   </AdminRoute>
                 } 
               />

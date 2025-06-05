@@ -176,9 +176,6 @@ const Footer = () => {
             <FooterLink>
               <FooterLinkAnchor to="/reviews">Reviews</FooterLinkAnchor>
             </FooterLink>
-            <FooterLink>
-              <FooterLinkAnchor to="/contact">Contact Us</FooterLinkAnchor>
-            </FooterLink>
           </FooterLinks>
         </FooterColumn>
         
@@ -191,8 +188,23 @@ const Footer = () => {
           </ContactItem>
           <ContactItem>
             <Phone size={18} />
-            <span>+66 99 999 9999</span>
+            <span>+66 2 123 4567</span>
           </ContactItem>
+          <ContactItem>
+            <Map size={40} />
+            <span>123 ถนนสุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110</span>
+          </ContactItem>
+        </FooterColumn>
+        <FooterColumn>
+          <ColumnTitle>Follow Us</ColumnTitle>
+          <SocialIcons>
+            <SocialIcon href="https://facebook.com/gosmoothth" target="_blank" rel="noopener noreferrer">
+              <Facebook size={20} />
+            </SocialIcon>
+            <SocialIcon href="https://instagram.com/gosmoothth" target="_blank" rel="noopener noreferrer">
+              <Instagram size={20} />
+            </SocialIcon>
+          </SocialIcons>
         </FooterColumn>
       </FooterContent>
       

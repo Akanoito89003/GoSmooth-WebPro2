@@ -26,9 +26,11 @@ interface PlaceCardProps {
   openDeleteModal?: () => void;
 }
 
-const getImageUrl = (filename: string, apiUrl: string) => {
+const getImageUrl = (filename: string, apiUrl: string, version?: number) => {
   if (!filename) return 'https://images.pexels.com/photos/1287145/pexels-photo-1287145.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2';
-  return `${apiUrl}/uploads/${encodeURIComponent(filename)}`;
+  const cleanImg = filename.startsWith('/') ? filename.slice(1) : filename;
+  const url = cleanImg.startsWith('uploads/') ? `${apiUrl}/${cleanImg}` : `${apiUrl}/uploads/${cleanImg}`;
+  return version ? `${url}?v=${version}` : url;
 };
 
 const PlaceCard: React.FC<PlaceCardProps & { apiUrl: string }> = ({ place, currentUser, openEditModal, openDeleteModal, apiUrl }) => {
@@ -80,10 +82,15 @@ const PlacesPage: React.FC = () => {
   const auth = useAuth();
   const user = auth?.user;
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([ { id: 'all', name: 'All' } ]);
+  const [imgVersion, setImgVersion] = useState(Date.now());
 
   useEffect(() => {
     fetchLocations();
   }, []);
+
+  useEffect(() => {
+    setImgVersion(Date.now());
+  }, [places]);
 
   const fetchLocations = async () => {
     try {
@@ -174,7 +181,7 @@ const PlacesPage: React.FC = () => {
       <div className="container-custom">
         <div className="section-header text-center max-w-3xl mx-auto mb-12">
           <h1 className="section-title">Explore Amazing Places</h1>
-          <p className="section-description">Discover destinations, hotels, restaurants, and attractions from around the world.</p>
+          <p className="section-description">ค้นหาสถานที่ท่องเที่ยว ร้านอาหาร ที่พัก และจุดหมายปลายทางที่น่าสนใจทั่วไทย</p>
         </div>
         <div className="card p-6 mb-8">
           <div className="flex flex-col lg:flex-row justify-between gap-4">
@@ -185,7 +192,7 @@ const PlacesPage: React.FC = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search places, locations, or tags..."
+                  placeholder="ค้นหาสถานที่ สถานที่ตั้ง หรือแท็ก..."
                   value={searchTerm}
                   onChange={handleSearchChange}
                   className="input pl-10"

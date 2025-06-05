@@ -14,6 +14,8 @@ type User struct {
 	Name      string             `bson:"name" json:"name" validate:"required"`
 	Role      string             `bson:"role" json:"role"`
 	Address   Address            `bson:"address,omitempty" json:"address,omitempty"`
+	Status    string             `bson:"status" json:"status"`                            // "active" or "banned"
+	BanReason string             `bson:"ban_reason,omitempty" json:"banReason,omitempty"` // เหตุผลที่แบน
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
@@ -136,9 +138,20 @@ type Place struct {
 
 // UpdatePlaceInput represents the input for updating a place
 type UpdatePlaceInput struct {
-	Name        string `json:"name" validate:"required"`
-	Description string `json:"description"`
-	LocationID  string `json:"location_id" validate:"required"`
+	Name        string   `json:"name" validate:"required"`
+	Description string   `json:"description"`
+	LocationID  string   `json:"location_id" validate:"required"`
+	Category    string   `json:"category"`
+	Address     string   `json:"address"`
+	Phone       string   `json:"phone"`
+	Website     string   `json:"website"`
+	Hours       string   `json:"hours"`
+	CoverImage  string   `json:"coverImage"`
+	Highlights  []string `json:"highlights"`
+	Coordinates struct {
+		Lat float64 `json:"lat"`
+		Lng float64 `json:"lng"`
+	} `json:"coordinates"`
 }
 
 // Address represents the address of a user
@@ -150,4 +163,17 @@ type Address struct {
 	Country     string  `bson:"country,omitempty" json:"country,omitempty"`
 	Lat         float64 `bson:"lat,omitempty" json:"lat,omitempty"`
 	Lng         float64 `bson:"lng,omitempty" json:"lng,omitempty"`
+}
+
+// ReviewReport represents a report on a review
+type ReviewReport struct {
+	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	ReviewID   string             `bson:"review_id" json:"reviewId"`
+	ReporterID string             `bson:"reporter_id" json:"reporterId"`
+	Reporter   string             `bson:"reporter" json:"reporter"`
+	Type       string             `bson:"type" json:"type"` // abuse, spam, etc.
+	Detail     string             `bson:"detail" json:"detail"`
+	Status     string             `bson:"status" json:"status"` // pending, resolved, rejected
+	CreatedAt  time.Time          `bson:"created_at" json:"createdAt"`
+	ResolvedAt *time.Time         `bson:"resolved_at,omitempty" json:"resolvedAt,omitempty"`
 }

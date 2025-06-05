@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -104,6 +104,8 @@ const Register = () => {
   const { registerUser, error, clearError } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const {
     register,
@@ -212,7 +214,7 @@ const Register = () => {
 
           <Input
             label="Password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="Create a password"
             fullWidth
             leftIcon={<Lock size={18} />}
@@ -226,11 +228,16 @@ const Register = () => {
               validate: (value) => /[A-Za-z]/.test(value) || 'Password must contain at least one letter',
             })}
             onChange={() => error && clearError()}
+            rightIcon={
+              <span style={{ cursor: 'pointer' }} onClick={() => setShowPassword(v => !v)}>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </span>
+            }
           />
 
           <Input
             label="Confirm Password"
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
             placeholder="Confirm your password"
             fullWidth
             leftIcon={<Lock size={18} />}
@@ -241,6 +248,11 @@ const Register = () => {
                 value === watch('password') || 'Passwords do not match',
             })}
             onChange={() => error && clearError()}
+            rightIcon={
+              <span style={{ cursor: 'pointer' }} onClick={() => setShowConfirmPassword(v => !v)}>
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </span>
+            }
           />
 
           <div style={{ fontSize: 13, color: '#888', margin: '16px 0 8px 0' }}>

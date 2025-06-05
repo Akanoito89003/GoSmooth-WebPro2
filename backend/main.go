@@ -264,17 +264,17 @@ func initializeDatabase(ctx context.Context) error {
 			Name:        "คาเฟ่จิม ทอมป์สัน",
 			LocationID:  "1",
 			Description: "คาเฟ่ในพิพิธภัณฑ์ จิม ทอมป์สัน เสิร์ฟกาแฟพิเศษและขนมหวานโฮมเมดในบรรยากาศบ้านไทยโบราณ",
-			Category:    "Cafe",
+			Category:    "Food & Drink",
 			CoverImage:  "CoverImage/Jim-Thompson-Silk-Café-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Jim-Thompson-Silk-Café-1.jpg",
 				"HighlightImages/Jim-Thompson-Silk-Café-2.jpg",
 				"HighlightImages/Jim-Thompson-Silk-Café-3.jpg",
-				"HighlightImages/Jim-Thompson-Silk-Café-4.png",
+				"HighlightImages/Jim-Thompson-Silk-Café-4.jpg",
 				"HighlightImages/Jim-Thompson-Silk-Café-5.jpg",
 				"HighlightImages/Jim-Thompson-Silk-Café-6.jpg",
 			},
-			Rating: 4.3,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -291,7 +291,7 @@ func initializeDatabase(ctx context.Context) error {
 			Name:        "แผงขนมตลาดนัดจตุจักร",
 			LocationID:  "1",
 			Description: "แผงสตรีทฟู้ดภายในตลาดนัดจตุจักรที่รวบรวมขนมและของว่างพื้นเมืองไทย ทั้งกล้วยทอด มันทอด ข้าวเหนียวมะม่วง ปาท่องโก๋ และน้ำผลไม้สดคั้นสด เสิร์ฟร้อน ๆ จากเตา",
-			Category:    "Food Stall",
+			Category:    "Food & Drink",
 			CoverImage:  "CoverImage/Chatuchak-Snack-Stall-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Chatuchak-Snack-Stall-1.jpg",
@@ -300,7 +300,7 @@ func initializeDatabase(ctx context.Context) error {
 				"HighlightImages/Chatuchak-Snack-Stall-4.jpg",
 				"HighlightImages/Chatuchak-Snack-Stall-5.jpg",
 			},
-			Rating: 4.0,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -317,7 +317,7 @@ func initializeDatabase(ctx context.Context) error {
 			Name:        "ศูนย์อาหารเทอร์มินอล 21",
 			LocationID:  "1",
 			Description: "ศูนย์อาหารภายใน Terminal 21 ชั้น LG มีร้านอาหารไทย จีน ญี่ปุ่น เกาหลี และฟู้ดทรัค ให้เลือกมากกว่า 20 ร้าน",
-			Category:    "Food Court",
+			Category:    "Food & Drink",
 			CoverImage:  "CoverImage/Pier-21-Food-Court-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Pier-21-Food-Court-1.jpg",
@@ -326,7 +326,7 @@ func initializeDatabase(ctx context.Context) error {
 				"HighlightImages/Pier-21-Food-Court-4.jpg",
 				"HighlightImages/Pier-21-Food-Court-5.jpg",
 			},
-			Rating: 4.3,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -350,9 +350,9 @@ func initializeDatabase(ctx context.Context) error {
 				"HighlightImages/Lumpini-Park-Jogging-Track-2.jpg",
 				"HighlightImages/Lumpini-Park-Jogging-Track-3.jpg",
 				"HighlightImages/Lumpini-Park-Jogging-Track-4.jpg",
-				"HighlightImages/Lumpini-Park-Jogging-Track-5.png",
+				"HighlightImages/Lumpini-Park-Jogging-Track-5.jpg",
 			},
-			Rating: 4.0,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -375,10 +375,10 @@ func initializeDatabase(ctx context.Context) error {
 				"HighlightImages/Siam-Ocean-World-1.jpg",
 				"HighlightImages/Siam-Ocean-World-2.jpg",
 				"HighlightImages/Siam-Ocean-World-3.jpg",
-				"HighlightImages/Siam-Ocean-World-4.png",
+				"HighlightImages/Siam-Ocean-World-4.jpg",
 				"HighlightImages/Siam-Ocean-World-5.jpg",
 			},
-			Rating: 4.5,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -394,15 +394,17 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "6",
 			Name:        "ยอดดอยอินทนนท์",
 			LocationID:  "2",
-			Description: "The highest peak in Thailand at 2,565 m, with panoramic views over the surrounding misty mountains.",
-			Category:    "Attraction",
+			Description: "จุดสูงสุดของประเทศไทยที่ความสูง 2,565 เมตร มีวิวทิวทัศน์แบบพาโนรามาของภูเขาที่ปกคลุมด้วยหมอก",
+			Category:    "Nature",
 			CoverImage:  "CoverImage/Doi-Inthanon-Summit-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Doi-Inthanon-Summit-1.jpg",
 				"HighlightImages/Doi-Inthanon-Summit-2.jpg",
 				"HighlightImages/Doi-Inthanon-Summit-3.jpg",
+				"HighlightImages/Doi-Inthanon-Summit-4.jpg",
+				"HighlightImages/Doi-Inthanon-Summit-5.jpg",
 			},
-			Rating: 4.7,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -418,15 +420,15 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "7",
 			Name:        "น้ำตกวชิรธาร",
 			LocationID:  "2",
-			Description: "A seven‐tiered waterfall with emerald pools, accessible via a short trail from the park road.",
-			Category:    "Attraction",
+			Description: "น้ำตก 7 ชั้นที่มีแอ่งน้ำสีมรกต สามารถเข้าถึงได้ผ่านเส้นทางเดินสั้นๆ จากถนนในอุทยาน",
+			Category:    "Nature",
 			CoverImage:  "CoverImage/Wachirathan-Waterfall-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Wachirathan-Waterfall-1.jpg",
 				"HighlightImages/Wachirathan-Waterfall-2.jpg",
 				"HighlightImages/Wachirathan-Waterfall-3.jpg",
 			},
-			Rating: 4.5,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -442,14 +444,14 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "8",
 			Name:        "วัดเจดีย์หลวง",
 			LocationID:  "2",
-			Description: "Ruined 14th-century Lanna chedi, once housing the Emerald Buddha, now framed by ancient walls.",
-			Category:    "Temple",
+			Description: "เจดีย์ล้านนายุคศตวรรษที่ 14 ที่เคยประดิษฐานพระแก้วมรกต ปัจจุบันล้อมรอบด้วยกำแพงโบราณ",
+			Category:    "Culture",
 			CoverImage:  "CoverImage/Wat-Chedi-Luang-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Wat-Chedi-Luang-1.jpg",
 				"HighlightImages/Wat-Chedi-Luang-2.jpg",
 			},
-			Rating: 4.4,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -465,14 +467,14 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "9",
 			Name:        "วัดพระสิงห์",
 			LocationID:  "2",
-			Description: "Historic Lanna temple enshrining the revered Phra Buddha Sihing statue.",
-			Category:    "Temple",
+			Description: "วัดล้านนาอันเก่าแก่ที่ประดิษฐานพระพุทธสิหิงค์ พระพุทธรูปศักดิ์สิทธิ์",
+			Category:    "Culture",
 			CoverImage:  "CoverImage/Wat-Phra-Singh-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Wat-Phra-Singh-1.jpg",
 				"HighlightImages/Wat-Phra-Singh-2.jpg",
 			},
-			Rating: 4.6,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -488,17 +490,17 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "10",
 			Name:        "นิทรรศการวัดร่องขุ่น",
 			LocationID:  "3",
-			Description: "Contemporary art exhibits and sculptural installations within the White Temple complex.",
-			Category:    "Museum",
-			CoverImage:  "CoverImage/Wat-Rong-Khun-Exhibits-1.jpeg",
+			Description: "นิทรรศการศิลปะร่วมสมัยและการจัดแสดงประติมากรรมภายในวัดขาว",
+			Category:    "Culture",
+			CoverImage:  "CoverImage/Wat-Rong-Khun-Exhibits-1.jpg",
 			HighlightImages: []string{
-				"HighlightImages/Wat-Rong-Khun-Exhibits-1.jpeg",
+				"HighlightImages/Wat-Rong-Khun-Exhibits-1.jpg",
 				"HighlightImages/Wat-Rong-Khun-Exhibits-2.jpg",
-				"HighlightImages/Wat-Rong-Khun-Exhibits-3.webp",
+				"HighlightImages/Wat-Rong-Khun-Exhibits-3.jpg",
 				"HighlightImages/Wat-Rong-Khun-Exhibits-4.jpg",
-				"HighlightImages/Wat-Rong-Khun-Exhibits-5.webp",
+				"HighlightImages/Wat-Rong-Khun-Exhibits-5.jpg",
 			},
-			Rating: 4.8,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -514,17 +516,17 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "11",
 			Name:        "จุดถ่ายภาพปราสาทพนมรุ้ง",
 			LocationID:  "4",
-			Description: "The best vantage for capturing the alignment of Khmer gateways atop the extinct volcano.",
-			Category:    "Attraction",
-			CoverImage:  "CoverImage/Phanom-Rung-Photo-Point-1.webp",
+			Description: "จุดชมวิวที่ดีที่สุดสำหรับถ่ายภาพแนวประตูทางเข้าปราสาทขอมบนยอดภูเขาไฟที่ดับแล้ว",
+			Category:    "Culture",
+			CoverImage:  "CoverImage/Phanom-Rung-Photo-Point-1.jpg",
 			HighlightImages: []string{
-				"HighlightImages/Phanom-Rung-Photo-Point-1.webp",
+				"HighlightImages/Phanom-Rung-Photo-Point-1.jpg",
 				"HighlightImages/Phanom-Rung-Photo-Point-2.jpg",
-				"HighlightImages/Phanom-Rung-Photo-Point-3.webp",
+				"HighlightImages/Phanom-Rung-Photo-Point-3.jpg",
 				"HighlightImages/Phanom-Rung-Photo-Point-4.jpg",
 				"HighlightImages/Phanom-Rung-Photo-Point-5.jpg",
 			},
-			Rating: 4.7,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -540,17 +542,17 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "12",
 			Name:        "ภาพเขียนสีผาแต้ม",
 			LocationID:  "5",
-			Description: "Prehistoric cliff art comprising over 300 red and ochre pictographs along the Mekong River.",
-			Category:    "Attraction",
+			Description: "ศิลปะบนหน้าผายุคก่อนประวัติศาสตร์ที่มีภาพเขียนสีแดงและสีน้ำตาลแดงมากกว่า 300 ภาพตามแนวแม่น้ำโขง",
+			Category:    "Culture",
 			CoverImage:  "CoverImage/Pha-Taem-Cliff-Paintings-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Pha-Taem-Cliff-Paintings-1.jpg",
 				"HighlightImages/Pha-Taem-Cliff-Paintings-2.jpg",
-				"HighlightImages/Pha-Taem-Cliff-Paintings-3.png",
-				"HighlightImages/Pha-Taem-Cliff-Paintings-4.png",
-				"HighlightImages/Pha-Taem-Cliff-Paintings-5.png",
+				"HighlightImages/Pha-Taem-Cliff-Paintings-3.jpg",
+				"HighlightImages/Pha-Taem-Cliff-Paintings-4.jpg",
+				"HighlightImages/Pha-Taem-Cliff-Paintings-5.jpg",
 			},
-			Rating: 4.6,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -566,14 +568,14 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "13",
 			Name:        "หาดอ่าวพร้าว",
 			LocationID:  "6",
-			Description: "Secluded west‑facing beach on Ko Samet, famed for calm waters and golden sunsets.",
-			Category:    "Beach",
+			Description: "หาดที่หันหน้าไปทางทิศตะวันตกบนเกาะเสม็ด มีชื่อเสียงเรื่องน้ำที่สงบและพระอาทิตย์ตกสีทอง",
+			Category:    "Nature",
 			CoverImage:  "CoverImage/Ao-Prao-Beach-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Ao-Prao-Beach-1.jpg",
 				"HighlightImages/Ao-Prao-Beach-2.jpg",
 			},
-			Rating: 4.5,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -587,24 +589,26 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "14",
-			Name:        "สาธิตการแกะสลักไม้",
+			Name:        "ไร่องุ่น ซิลเวอร์เลค",
 			LocationID:  "7",
-			Description: "Live demonstrations of traditional Thai woodcarving within the all‑wood museum.",
-			Category:    "Activity",
-			CoverImage:  "CoverImage/Sanctuary-Workshop-1.jpg",
+			Description: "ไร่องุ่นซิลเวอร์เลค ตั้งอยู่ที่ตำบลนาเกลือ อำเภอสัตหีบ จังหวัดชลบุรี ภายในมีทุ่งองุ่นขนาดใหญ่ บ้านไร่สไตล์ยุโรป ร้านอาหาร Wine & Grill และมุมถ่ายรูปสวยงาม ทั้งยังมีรถรางและจักรยานไว้บริการชมวิวไร่องุ่น",
+			Category:    "Attraction",
+			CoverImage:  "CoverImage/Silverlake-Vineyard-1.jpg",
 			HighlightImages: []string{
-				"HighlightImages/Sanctuary-Workshop-1.jpg",
-				"HighlightImages/Sanctuary-Workshop-2.jpg",
+				"HighlightImages/Silverlake-Vineyard-1.jpg",
+				"HighlightImages/Silverlake-Vineyard-2.jpg",
+				"HighlightImages/Silverlake-Vineyard-3.jpg",
+				"HighlightImages/Silverlake-Vineyard-4.jpg",
 			},
 			Rating: 4.4,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
-			}{Lat: 12.97278, Lng: 100.88889},
-			Address:   "ถนนราชดำเนิน ตำบลบางปลาสร้อย อำเภอเมืองชลบุรี จังหวัดชลบุรี",
-			Phone:     "038-427-200",
-			Website:   "https://www.chonburicity.go.th/",
-			Hours:     "09:00น. - 17:00น. เปิดทุกวัน",
+			}{Lat: 12.757144, Lng: 100.962673},
+			Address:   "31/62 Moo 7 Na-Jomthian, Sattahip District, Chon Buri 20250, Thailand",
+			Phone:     "+66-2261-6565",
+			Website:   "https://www.silverlakevineyard.com/",
+			Hours:     "จันทร์–ศุกร์ 09:00น. - 18:00น., เสาร์–อาทิตย์ 08:30น. - 19:00น.",
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
@@ -612,8 +616,8 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "15",
 			Name:        "น้ำตกเอราวัณ ชั้นที่ 7",
 			LocationID:  "8",
-			Description: "The highest emerald‑green pool of the seven-tiered Erawan Waterfall system.",
-			Category:    "Attraction",
+			Description: "แอ่งน้ำสีมรกตชั้นสูงสุดของน้ำตกเอราวัณ 7 ชั้น",
+			Category:    "Nature",
 			CoverImage:  "CoverImage/Erawan-Falls-Tier7-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Erawan-Falls-Tier7-1.jpg",
@@ -622,7 +626,7 @@ func initializeDatabase(ctx context.Context) error {
 				"HighlightImages/Erawan-Falls-Tier7-4.jpg",
 				"HighlightImages/Erawan-Falls-Tier7-5.jpg",
 			},
-			Rating: 4.7,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -638,8 +642,8 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "16",
 			Name:        "น้ำตกไทรโยคน้อย",
 			LocationID:  "8",
-			Description: "Popular limestone plunge waterfall located next to the terminus of the Death Railway.",
-			Category:    "Attraction",
+			Description: "น้ำตกหินปูนยอดนิยมที่ตั้งอยู่ใกล้กับปลายทางของทางรถไฟสายมรณะ",
+			Category:    "Nature",
 			CoverImage:  "CoverImage/Sai-Yok-Noi-Waterfall-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Sai-Yok-Noi-Waterfall-1.jpg",
@@ -648,7 +652,7 @@ func initializeDatabase(ctx context.Context) error {
 				"HighlightImages/Sai-Yok-Noi-Waterfall-4.jpg",
 				"HighlightImages/Sai-Yok-Noi-Waterfall-5.jpg",
 			},
-			Rating: 4.5,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -664,7 +668,7 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "17",
 			Name:        "รถไฟข้ามสะพานแม่น้ำแคว",
 			LocationID:  "8",
-			Description: "Heritage train journey across the iconic WWII-era steel bridge in Kanchanaburi.",
+			Description: "การเดินทางด้วยรถไฟมรดกข้ามสะพานเหล็กสมัยสงครามโลกครั้งที่ 2 ในกาญจนบุรี",
 			Category:    "Activity",
 			CoverImage:  "CoverImage/River-Kwai-Bridge-Train-Ride-1.jpg",
 			HighlightImages: []string{
@@ -672,9 +676,9 @@ func initializeDatabase(ctx context.Context) error {
 				"HighlightImages/River-Kwai-Bridge-Train-Ride-2.jpg",
 				"HighlightImages/River-Kwai-Bridge-Train-Ride-3.jpg",
 				"HighlightImages/River-Kwai-Bridge-Train-Ride-4.jpg",
-				"HighlightImages/River-Kwai-Bridge-Train-Ride-5.webp",
+				"HighlightImages/River-Kwai-Bridge-Train-Ride-5.jpg",
 			},
-			Rating: 4.6,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -690,14 +694,14 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "18",
 			Name:        "อ่าวมาหยา",
 			LocationID:  "9",
-			Description: "World-famous cove with towering cliffs and white sands, featured in The Beach.",
-			Category:    "Beach",
+			Description: "อ่าวที่มีชื่อเสียงระดับโลก มีหน้าผาสูงชันและหาดทรายขาว ปรากฏในภาพยนตร์ The Beach",
+			Category:    "Nature",
 			CoverImage:  "CoverImage/Maya-Bay-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Maya-Bay-1.jpg",
 				"HighlightImages/Maya-Bay-2.jpg",
 			},
-			Rating: 4.4,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -713,14 +717,14 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "19",
 			Name:        "เกาะเจมส์บอนด์",
 			LocationID:  "10",
-			Description: "Limestone karst island (Khao Phing Kan) and Ko Tapu, made famous in The Man with the Golden Gun.",
-			Category:    "Attraction",
+			Description: "เกาะหินปูน (เขาพิงกัน) และเกาะตาปู ที่มีชื่อเสียงจากภาพยนตร์ The Man with the Golden Gun",
+			Category:    "Nature",
 			CoverImage:  "CoverImage/James-Bond-Island-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/James-Bond-Island-1.jpg",
 				"HighlightImages/James-Bond-Island-2.jpg",
 			},
-			Rating: 4.5,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -736,17 +740,17 @@ func initializeDatabase(ctx context.Context) error {
 			ID:          "20",
 			Name:        "ล่องเรือทะเลสาบเชี่ยวหลาน",
 			LocationID:  "11",
-			Description: "Scenic guided boat excursions on the 165 km² Rajjaprapha Reservoir beneath towering limestone cliffs.",
+			Description: "การล่องเรือชมทิวทัศน์บนอ่างเก็บน้ำรัชชประภา 165 ตารางกิโลเมตร ใต้หน้าผาหินปูนสูงตระหง่าน",
 			Category:    "Activity",
 			CoverImage:  "CoverImage/Cheow-Lan-Lake-Boat-Tour-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Cheow-Lan-Lake-Boat-Tour-1.jpg",
 				"HighlightImages/Cheow-Lan-Lake-Boat-Tour-2.jpg",
 				"HighlightImages/Cheow-Lan-Lake-Boat-Tour-3.jpg",
-				"HighlightImages/Cheow-Lan-Lake-Boat-Tour-4.png",
-				"HighlightImages/Cheow-Lan-Lake-Boat-Tour-5.png",
+				"HighlightImages/Cheow-Lan-Lake-Boat-Tour-4.jpg",
+				"HighlightImages/Cheow-Lan-Lake-Boat-Tour-5.jpg",
 			},
-			Rating: 4.8,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -760,10 +764,10 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "21",
-			Name:        "Bangkok National Museum",
+			Name:        "พิพิธภัณฑสถานแห่งชาติกรุงเทพฯ",
 			LocationID:  "1",
 			Description: "พิพิธภัณฑสถานแห่งชาติกรุงเทพฯ บอกเล่าประวัติศาสตร์ไทยผ่านโบราณวัตถุและงานศิลป์",
-			Category:    "Museum",
+			Category:    "Culture",
 			CoverImage:  "CoverImage/Bangkok-National-Museum-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Bangkok-National-Museum-1.jpg",
@@ -772,7 +776,7 @@ func initializeDatabase(ctx context.Context) error {
 				"HighlightImages/Bangkok-National-Museum-4.jpg",
 				"HighlightImages/Bangkok-National-Museum-5.jpg",
 			},
-			Rating: 4.2,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -786,19 +790,19 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "22",
-			Name:        "Grand Palace",
+			Name:        "พระบรมมหาราชวัง",
 			LocationID:  "1",
 			Description: "พระบรมมหาราชวังเก่าแก่ สถาปัตยกรรมไทยอันวิจิตร และวัดพระศรีรัตนศาสดาราม",
-			Category:    "Palace",
-			CoverImage:  "CoverImage/Grand-Palace-1.webp",
+			Category:    "Culture",
+			CoverImage:  "CoverImage/Grand-Palace-1.jpg",
 			HighlightImages: []string{
-				"HighlightImages/Grand-Palace-1.webp",
+				"HighlightImages/Grand-Palace-1.jpg",
 				"HighlightImages/Grand-Palace-2.jpg",
 				"HighlightImages/Grand-Palace-3.jpg",
 				"HighlightImages/Grand-Palace-4.jpg",
 				"HighlightImages/Grand-Palace-5.jpg",
 			},
-			Rating: 4.7,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -812,19 +816,19 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "23",
-			Name:        "Khao San Road",
+			Name:        "ถนนข้าวสาร",
 			LocationID:  "1",
 			Description: "ถนนคนเดินชื่อดัง แหล่งช็อปปิง ร้านอาหาร และชีวิตกลางคืน",
-			Category:    "Street",
+			Category:    "Food & Drink",
 			CoverImage:  "CoverImage/Khao-San-Road-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Khao-San-Road-1.jpg",
 				"HighlightImages/Khao-San-Road-2.jpg",
 				"HighlightImages/Khao-San-Road-3.jpg",
-				"HighlightImages/Khao-San-Road-4.png",
-				"HighlightImages/Khao-San-Road-5.png",
+				"HighlightImages/Khao-San-Road-4.jpg",
+				"HighlightImages/Khao-San-Road-5.jpg",
 			},
-			Rating: 4.1,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -838,19 +842,19 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "24",
-			Name:        "Lumpini Park",
+			Name:        "สวนลุมพินี",
 			LocationID:  "1",
 			Description: "สวนสาธารณะใจกลางเมือง เหมาะสำหรับพักผ่อน เดินเล่น และออกกำลังกาย",
-			Category:    "Park",
+			Category:    "Nature",
 			CoverImage:  "CoverImage/Lumpini-Park-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Lumpini-Park-1.jpg",
 				"HighlightImages/Lumpini-Park-2.jpg",
 				"HighlightImages/Lumpini-Park-3.jpg",
 				"HighlightImages/Lumpini-Park-4.jpg",
-				"HighlightImages/Lumpini-Park-5.webp",
+				"HighlightImages/Lumpini-Park-5.jpg",
 			},
-			Rating: 4.5,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -864,19 +868,19 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "25",
-			Name:        "MBK Center",
+			Name:        "เอ็มบีเคเซ็นเตอร์",
 			LocationID:  "1",
 			Description: "ศูนย์การค้าหรู มีแบรนด์เนม โรงภาพยนตร์ อควาเรียม และศูนย์อาหารระดับพรีเมียม",
-			Category:    "Shopping Mall",
-			CoverImage:  "CoverImage/MBK-Center-1.webp",
+			Category:    "Shopping",
+			CoverImage:  "CoverImage/MBK-Center-1.jpg",
 			HighlightImages: []string{
-				"HighlightImages/MBK-Center-1.webp",
+				"HighlightImages/MBK-Center-1.jpg",
 				"HighlightImages/MBK-Center-2.jpg",
 				"HighlightImages/MBK-Center-3.jpg",
 				"HighlightImages/MBK-Center-4.jpg",
 				"HighlightImages/MBK-Center-5.jpg",
 			},
-			Rating: 4.2,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -890,10 +894,10 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "26",
-			Name:        "Siam Paragon",
+			Name:        "สยามพารากอน",
 			LocationID:  "1",
 			Description: "ศูนย์การค้าหรู มีแบรนด์เนม โรงภาพยนตร์ อควาเรียม และศูนย์อาหารระดับพรีเมียม",
-			Category:    "Shopping Mall",
+			Category:    "Shopping",
 			CoverImage:  "CoverImage/Siam-Paragon-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Siam-Paragon-1.jpg",
@@ -902,7 +906,7 @@ func initializeDatabase(ctx context.Context) error {
 				"HighlightImages/Siam-Paragon-4.jpg",
 				"HighlightImages/Siam-Paragon-5.jpg",
 			},
-			Rating: 4.5,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -916,19 +920,15 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "27",
-			Name:        "Taling Chan Floating Market",
+			Name:        "ตลาดน้ำตลิ่งชัน",
 			LocationID:  "1",
 			Description: "ตลาดน้ำโบราณ ชิมอาหารพื้นบ้านและซื้อของสดจากเรือพาย",
-			Category:    "Market",
-			CoverImage:  "CoverImage/Taling-Chan-Floating-Market-1.webp",
+			Category:    "Shopping",
+			CoverImage:  "CoverImage/Taling-Chan-Floating-Market-1.jpg",
 			HighlightImages: []string{
-				"HighlightImages/Taling-Chan-Floating-Market-1.webp",
-				"HighlightImages/Taling-Chan-Floating-Market-2.jpg",
-				"HighlightImages/Taling-Chan-Floating-Market-3.jpg",
-				"HighlightImages/Taling-Chan-Floating-Market-4.jpg",
-				"HighlightImages/Taling-Chan-Floating-Market-5.png",
+				"HighlightImages/Taling-Chan-Floating-Market-1.jpg",
 			},
-			Rating: 4.3,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -942,19 +942,15 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "28",
-			Name:        "Terminal 21",
+			Name:        "เทอร์มินอล 21",
 			LocationID:  "1",
 			Description: "ศูนย์การค้าดีไซน์คอนเซ็ปต์แอร์พอร์ต แต่ละชั้นตกแต่งเป็นเมืองต่างๆ ทั่วโลก",
-			Category:    "Shopping Mall",
+			Category:    "Shopping",
 			CoverImage:  "CoverImage/Terminal21-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Terminal21-1.jpg",
-				"HighlightImages/Terminal21-2.jpg",
-				"HighlightImages/Terminal21-3.jpg",
-				"HighlightImages/Terminal21-4.jpg",
-				"HighlightImages/Terminal21-5.jpg",
 			},
-			Rating: 4.4,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -968,19 +964,15 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "29",
-			Name:        "Victory Monument",
+			Name:        "อนุสาวรีย์ชัยสมรภูมิ",
 			LocationID:  "1",
 			Description: "อนุสาวรีย์กลางแยกสำคัญ และเป็นศูนย์รวมรถสาธารณะหลายสาย",
-			Category:    "Monument",
+			Category:    "Culture",
 			CoverImage:  "CoverImage/Victory-Monument-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Victory-Monument-1.jpg",
-				"HighlightImages/Victory-Monument-2.jpg",
-				"HighlightImages/Victory-Monument-3.jpg",
-				"HighlightImages/Victory-Monument-4.jpg",
-				"HighlightImages/Victory-Monument-5.jpg",
 			},
-			Rating: 4.1,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -994,19 +986,15 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "30",
-			Name:        "Wat Arun",
+			Name:        "วัดอรุณราชวราราม",
 			LocationID:  "1",
 			Description: "วัดอรุณราชวราราม ราชวรมหาวิหาร หอปรางค์สูงโดดเด่นริมแม่น้ำเจ้าพระยา",
-			Category:    "Temple",
+			Category:    "Culture",
 			CoverImage:  "CoverImage/Wat-Arun-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Wat-Arun-1.jpg",
-				"HighlightImages/Wat-Arun-2.jpg",
-				"HighlightImages/Wat-Arun-3.jpg",
-				"HighlightImages/Wat-Arun-4.jpg",
-				"HighlightImages/Wat-Arun-5.jpg",
 			},
-			Rating: 4.6,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -1020,10 +1008,10 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "31",
-			Name:        "Wat Phra Kaew",
+			Name:        "วัดพระแก้ว",
 			LocationID:  "1",
 			Description: "วัดพระศรีรัตนศาสดาราม ประดิษฐานพระแก้วมรกต ภายในบริเวณพระบรมมหาราชวัง",
-			Category:    "Temple",
+			Category:    "Culture",
 			CoverImage:  "CoverImage/Wat-Phra-Kaew-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Wat-Phra-Kaew-1.jpg",
@@ -1032,7 +1020,7 @@ func initializeDatabase(ctx context.Context) error {
 				"HighlightImages/Wat-Phra-Kaew-4.jpg",
 				"HighlightImages/Wat-Phra-Kaew-5.jpg",
 			},
-			Rating: 4.8,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -1046,19 +1034,19 @@ func initializeDatabase(ctx context.Context) error {
 		},
 		{
 			ID:          "32",
-			Name:        "Yaowarat Road",
+			Name:        "ถนนเยาวราช",
 			LocationID:  "1",
 			Description: "ถนนเยาวราช แหล่งอาหารจีน เย็น–ค่ำ มีร้านอาหารและสตรีทฟู้ดชื่อดัง",
-			Category:    "Street Food",
+			Category:    "Food & Drink",
 			CoverImage:  "CoverImage/Yaowarat-Road-1.jpg",
 			HighlightImages: []string{
 				"HighlightImages/Yaowarat-Road-1.jpg",
-				"HighlightImages/Yaowarat-Road-2.webp",
-				"HighlightImages/Yaowarat-Road-3.webp",
-				"HighlightImages/Yaowarat-Road-4.webp",
-				"HighlightImages/Yaowarat-Road-5.webp",
+				"HighlightImages/Yaowarat-Road-2.jpg",
+				"HighlightImages/Yaowarat-Road-3.jpg",
+				"HighlightImages/Yaowarat-Road-4.jpg",
+				"HighlightImages/Yaowarat-Road-5.jpg",
 			},
-			Rating: 4.5,
+			Rating: 0.0,
 			Coordinates: struct {
 				Lat float64 `bson:"lat" json:"lat"`
 				Lng float64 `bson:"lng" json:"lng"`
@@ -1180,14 +1168,37 @@ func setupRoutes(router *gin.Engine) {
 				return
 			}
 
+			// --- เพิ่ม logic คำนวณ rating จาก reviews ---
+			for i, place := range places {
+				reviewCursor, err := db.Collection("reviews").Find(ctx, bson.M{"place_id": place.ID})
+				if err == nil {
+					var reviews []struct {
+						Rating int `bson:"rating"`
+					}
+					_ = reviewCursor.All(ctx, &reviews)
+					total := 0
+					for _, r := range reviews {
+						total += r.Rating
+					}
+					if len(reviews) > 0 {
+						places[i].Rating = float64(total) / float64(len(reviews))
+					} else {
+						places[i].Rating = 0.0
+					}
+				}
+			}
+
 			// Debug log
 			log.Printf("[DEBUG] Found %d places", len(places))
 			for _, p := range places {
-				log.Printf("[DEBUG] Place: %s, Coordinates: %+v", p.Name, p.Coordinates)
+				log.Printf("[DEBUG] Place: %s, Coordinates: %+v, Rating: %.2f", p.Name, p.Coordinates, p.Rating)
 			}
 
 			c.JSON(200, gin.H{"places": places})
 		})
+
+		// Public route for getting reviews
+		api.GET("/reviews", handlers.GetReviews)
 
 		// Auth routes
 		auth := api.Group("/auth")
@@ -1211,15 +1222,15 @@ func setupRoutes(router *gin.Engine) {
 			protected.POST("/routes/suggest", handlers.SuggestRoute)
 			protected.GET("/routes/cost", handlers.EstimateCost)
 
-			// Reviews routes
+			// Reviews routes (protected)
 			protected.POST("/reviews", handlers.CreateReview)
-			protected.GET("/reviews", handlers.GetReviews)
 			protected.GET("/reviews/:id", handlers.GetReview)
 			protected.PUT("/reviews/:id", handlers.UpdateReview)
 			protected.DELETE("/reviews/:id", handlers.DeleteReview)
 			protected.POST("/reviews/:id/like", handlers.LikeReview)
 			protected.POST("/reviews/:id/comments", handlers.AddComment)
 			protected.POST("/reviews/:id/comments/:commentId/like", handlers.LikeComment)
+			protected.POST("/reviews/:id/report", handlers.ReportReview)
 
 			// Admin routes
 			admin := protected.Group("/admin")
@@ -1229,12 +1240,17 @@ func setupRoutes(router *gin.Engine) {
 				admin.GET("/users/:id", handlers.GetUser)
 				admin.PUT("/users/:id", handlers.UpdateUser)
 				admin.DELETE("/users/:id", handlers.DeleteUser)
+				admin.POST("/users/:id/ban", handlers.BanUser)
+				admin.POST("/users/:id/unban", handlers.UnbanUser)
 				admin.GET("/stats", handlers.GetStats)
 				admin.GET("/places", handlers.GetPlaces)
 				admin.POST("/places", handlers.CreatePlace)
+
 				admin.PUT("/places/:id", handlers.UpdatePlace)
 				admin.DELETE("/places/:id", handlers.DeletePlace)
 				admin.POST("/upload-image", handlers.UploadImage)
+				admin.GET("/review-reports", handlers.GetAllReviewReports)
+				admin.PATCH("/review-reports/:id/status", handlers.UpdateReviewReportStatus)
 			}
 
 			// New endpoint for getting all locations

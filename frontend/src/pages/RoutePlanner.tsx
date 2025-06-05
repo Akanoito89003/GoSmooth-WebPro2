@@ -173,10 +173,13 @@ const fetchRoute = async (
   start: [number, number],
   end: [number, number],
   mode: string
-): Promise<[number, number][]> => {
+): Promise<{ coords: [number, number][], distance: number, duration: number }> => {
   if (mode === 'plane' || mode === 'train' || mode === 'bus') {
     // วาดเส้นตรง (great-circle) สำหรับโหมดที่ไม่มี routing จริง
-    return [start, end];
+    const dist = haversine(start[0], start[1], end[0], end[1]);
+    // duration สมมติ (นาที)
+    let duration = dist * (mode === 'bus' ? 3 : mode === 'train' ? 2.5 : 1);
+    return { coords: [start, end], distance: dist, duration: duration };
   }
   const profile = mode === 'car' ? 'driving-car' : 'driving-car';
   const url = `https://api.openrouteservice.org/v2/directions/${profile}?api_key=${ORS_API_KEY}&start=${start[1]},${start[0]}&end=${end[1]},${end[0]}`;
@@ -187,45 +190,56 @@ const fetchRoute = async (
       throw new Error(`ORS API error: ${res.status} ${res.statusText}`);
     }
     const data = await res.json();
-    if (!data.features || !data.features[0]) return [start, end];
-    return data.features[0].geometry.coordinates.map(([lng, lat]: [number, number]) => [lat, lng]);
-  } catch (err) {
-    console.error('fetchRoute error:', err);
-    throw err;
+    if (!data.features || !data.features[0]) return { coords: [start, end], distance: 0, duration: 0 };
+    const coords = data.features[0].geometry.coordinates.map(([lng, lat]: [number, number]) => [lat, lng]);
+    const distance = (data.features[0].properties.summary.distance || 0) / 1000; // เมตร -> กม.
+    const duration = (data.features[0].properties.summary.duration || 0) / 60; // วินาที -> นาที
+    return { coords, distance, duration };
+  } catch (error: any) {
+    console.error('fetchRoute error:', error);
+    throw error;
   }
 };
 
+// Haversine formula: ใช้คำนวณระยะทางเส้นตรง (great-circle distance) ระหว่างจุดสองจุดบนโลกจากพิกัด lat/lon
+// อ้างอิง: https://en.wikipedia.org/wiki/Haversine_formula
 const haversine = (
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number
 ): number => {
-  const toRad = (x: number) => (x * Math.PI) / 180;
-  const R = 6371; // km
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  const toRad = (x: number) => (x * Math.PI) / 180; // แปลงองศาเป็นเรเดียน
+  const R = 6371; // รัศมีโลกโดยเฉลี่ย (กิโลเมตร)
+  const dLat = toRad(lat2 - lat1); // ผลต่างละติจูด (เรเดียน)
+  const dLon = toRad(lon2 - lon1); // ผลต่างลองจิจูด (เรเดียน)
+  // สูตร Haversine
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
     Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  return R * c; // ระยะทาง (กิโลเมตร)
 };
 
+// ฟังก์ชันคำนวณค่าใช้จ่ายโดยประมาณสำหรับแต่ละโหมดการเดินทาง
+// - car: อิงค่าน้ำมันเฉลี่ยรถยนต์ 8-12 กม./ลิตร, น้ำมัน 35-40 บาท/ลิตร → ประมาณ 3.5-5 บาท/กม. (เลือก 4 บาท/กม.)
+// - bus: รถเมล์ไทย/รถบัสในเมือง เริ่มต้น 20 บาท + 1.5 บาท/กม. (อ้างอิง ขสมก.)
+// - train: รถไฟไทย เริ่มต้น 30 บาท + 2.5 บาท/กม. (อ้างอิง รฟท.)
+// - plane: เครื่องบินในประเทศ เริ่มต้น 500 บาท + 3.5 บาท/กม. (อ้างอิงสายการบินโลว์คอสต์)
+// หมายเหตุ: เป็นการประมาณจากระยะทางเส้นตรง ไม่ใช่เส้นทางจริง
 const calculateCost = (
   mode: string,
   start: [number, number] | null,
   end: [number, number] | null
 ): number => {
   if (!start || !end) return 0;
-  const dist = haversine(start[0], start[1], end[0], end[1]);
-  // ตัวอย่างสูตรคำนวณ (สามารถปรับได้)
+  const dist = haversine(start[0], start[1], end[0], end[1]); // ระยะทางเส้นตรง (กม.)
   switch (mode) {
-    case 'car': return dist * 4; // 4 บาท/กม.
-    case 'bus': return 20 + dist * 1.5; // 20 บาท + 1.5 บาท/กม.
-    case 'train': return 30 + dist * 2.5;
-    case 'plane': return 500 + dist * 3.5;
+    // case 'car': return dist * 4; // ตัดออก เพราะ mode car ใช้ระยะทางจริงจาก ORS API
+    case 'bus': return 20 + dist * 1.5; // 20 บาท + 1.5 บาท/กม. (รถเมล์/บัส)
+    case 'train': return 30 + dist * 2.5; // 30 บาท + 2.5 บาท/กม. (รถไฟ)
+    case 'plane': return 500 + dist * 3.5; // 500 บาท + 3.5 บาท/กม. (เครื่องบิน)
     default: return 0;
   }
 };
@@ -392,15 +406,22 @@ const RoutePlanner = () => {
       if (originCoord && destCoord) {
         setLoadingRoute(true);
         try {
-          const coords = await fetchRoute(originCoord, destCoord, mode);
-          setRouteCoords(coords);
-          const dist = haversine(originCoord[0], originCoord[1], destCoord[0], destCoord[1]);
+          const result = await fetchRoute(originCoord, destCoord, mode);
+          setRouteCoords(result.coords);
+          let dist = result.distance;
+          let duration = result.duration;
           setDistance(dist);
-          setDuration(dist * (mode === 'car' ? 2 : mode === 'bus' ? 3 : mode === 'train' ? 2.5 : 1));
-          setCost(calculateCost(mode, originCoord, destCoord));
+          setDuration(duration);
+          setCost(mode === 'car' ? dist * 4 : calculateCost(mode, originCoord, destCoord));
           setIsRouteCalculated(true);
         } catch (error: any) {
-          setErrorMsg('ไม่สามารถดึงเส้นทางถนนจริงจาก ORS API ได้ กรุณาตรวจสอบ API Key, พิกัด, หรืออินเทอร์เน็ต\n' + (error?.message || ''));
+          setErrorMsg(
+            'ไม่สามารถค้นหาเส้นทางถนนจริงจาก ORS API ได้\n' +
+            '\n- กรุณาตรวจสอบ API Key, พิกัด, หรือการเชื่อมต่ออินเทอร์เน็ต' +
+            '\n- ปลายทางนี้อาจไม่มีถนนเชื่อมถึงกันโดยตรง (เช่น เกาะหรือพื้นที่ห่างไกล)' +
+            '\n- กรุณาตรวจสอบจุดหมาย หรือเลือกโหมดการเดินทางอื่น' +
+            (error?.message ? '\n\nรายละเอียด: ' + error.message : '')
+          );
           setRouteCoords([]);
           setIsRouteCalculated(false);
           // DEBUG: log error
@@ -504,8 +525,7 @@ const RoutePlanner = () => {
       <PageHeader>
         <PageTitle>Route Planner</PageTitle>
         <PageDescription>
-          Plan your journey with our interactive route planner. Find the best route, 
-          compare alternatives, and export your route for offline use.
+          วางแผนเส้นทางการเดินทางของคุณ ค้นหาเส้นทางที่ดีที่สุด เปรียบเทียบตัวเลือก และบันทึกเส้นทางไว้ใช้งานภายหลัง
         </PageDescription>
       </PageHeader>
 
@@ -513,7 +533,7 @@ const RoutePlanner = () => {
         <RouteFormContainer>
           <RouteForm onSubmit={handleCalculateRoute}>
             <FormGroup>
-              <label>Origin</label>
+              <label>Origin(จุดเริ่มต้น)</label>
               <div style={{ position: 'relative' }}>
                 <input
                   type="text"
@@ -569,7 +589,7 @@ const RoutePlanner = () => {
               </div>
             </FormGroup>
             <FormGroup>
-              <label>Destination</label>
+              <label>Destination(จุดปลายทาง)</label>
               <div style={{ position: 'relative' }}>
                 <input
                   type="text"
@@ -649,7 +669,9 @@ const RoutePlanner = () => {
             <Button type="submit" fullWidth>
               Calculate Route
             </Button>
-            {errorMsg && <div style={{ color: 'red', marginTop: 12 }}>{errorMsg}</div>}
+            {errorMsg && (
+              <div style={{ color: 'red', marginTop: 12, whiteSpace: 'pre-line' }}>{errorMsg}</div>
+            )}
           </RouteForm>
 
           {isRouteCalculated && (
@@ -668,6 +690,11 @@ const RoutePlanner = () => {
                 <div>
                   <strong>Mode:</strong> {TRANSPORT_MODES.find(m => m.key === mode)?.label}
                 </div>
+                {mode === 'car' && (
+                  <p style={{ color: '#eab308', fontSize: '0.875rem', marginTop: '1rem' }}>
+                    (หมายเหตุ: เวลาที่แสดงเป็นเพียงการประมาณการจากระยะทางและความเร็วเฉลี่ย อาจไม่ตรงกับสภาพจราจรจริง)
+                  </p>
+                )}
               </div>
             </div>
           )}

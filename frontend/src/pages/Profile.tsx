@@ -158,12 +158,15 @@ const ChangePasswordModal = ({ open, onClose, onSave }: { open: boolean, onClose
     e.preventDefault();
     let hasError = false;
     const newErrors: typeof errors = {};
-    if (!oldPassword) {
+    if (!oldPassword) { 
       newErrors.old = "กรุณากรอกรหัสผ่านเดิม";
-      hasError = true;
+      hasError = true;  
     }
-    if (!newPassword || newPassword.length < 7 || !/[a-zA-Z]/.test(newPassword)) {
-      newErrors.new = "รหัสผ่านใหม่ต้องมีอย่างน้อย 7 ตัวอักษรและมีตัวอักษร";
+    if (!newPassword || newPassword.length < 7) {
+      newErrors.new = "รหัสผ่านใหม่ต้องมีอย่างน้อย 7 ตัวอักษร";
+      hasError = true;
+    } else if (!/[a-zA-Z]/.test(newPassword)) {
+      newErrors.new = "รหัสผ่านใหม่ต้องมีตัวอักษรอย่างน้อย 1 ตัว";
       hasError = true;
     }
     if (newPassword !== confirmPassword) {
@@ -174,11 +177,19 @@ const ChangePasswordModal = ({ open, onClose, onSave }: { open: boolean, onClose
     if (hasError) return;
     setLoading(true);
     try {
-      await onSave({ oldPassword, newPassword, confirmPassword });
-      // ถ้า onSave สำเร็จ จะปิด modal และ toast.success ที่ parent
+      await onSave({ currentPassword: oldPassword, newPassword });
+      toast.success('Password changed successfully!');
+      onClose();
     } catch (err: any) {
-      // สมมติ err.message มี "current password is incorrect" หรือ error อื่น
-      if (err.message && err.message.toLowerCase().includes("current password")) {
+      console.log('DEBUG: ChangePasswordModal catch', err, err.message, err.response, errors);
+      if (
+        err.message && (
+          err.message.toLowerCase().includes("current password") ||
+          err.message.toLowerCase().includes("incorrect password") ||
+          err.message.toLowerCase().includes("รหัสผ่านเดิม") ||
+          err.message.toLowerCase().includes("password is incorrect")
+        )
+      ) {
         setErrors({ ...newErrors, old: "รหัสผ่านเดิมไม่ถูกต้อง" });
       } else if (err.message && err.message.toLowerCase().includes("password")) {
         setErrors({ ...newErrors, new: err.message });
@@ -368,13 +379,8 @@ const Profile = () => {
         }
       }} onAddressChange={setAddressPreview} />
       <ChangePasswordModal open={changePwOpen} onClose={() => setChangePwOpen(false)} onSave={async (data) => {
-        try {
-          await changePassword({ currentPassword: data.oldPassword, newPassword: data.newPassword });
-          toast.success('Password changed successfully!');
-          setChangePwOpen(false);
-        } catch (err: any) {
-          toast.error(err.message || 'Change password failed');
-        }
+        await changePassword({ currentPassword: data.currentPassword, newPassword: data.newPassword });
+        // success จะถูก handle ใน modal
       }} />
     </div>
   );

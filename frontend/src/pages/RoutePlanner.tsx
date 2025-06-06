@@ -412,7 +412,7 @@ const RoutePlanner = () => {
           let duration = result.duration;
           setDistance(dist);
           setDuration(duration);
-          setCost(mode === 'car' ? dist * 4 : calculateCost(mode, originCoord, destCoord));
+          setCost(mode === 'car' ? dist * 4 : calculateCost(mode, originCoord, destCoord)); // ระยะเส้นทางบนถนนจริง * 4 บาท/กม.
           setIsRouteCalculated(true);
         } catch (error: any) {
           setErrorMsg(

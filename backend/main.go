@@ -231,6 +231,12 @@ func initializeDatabase(ctx context.Context) error {
 		log.Println("Admin user created successfully")
 	}
 
+	// Initialize initial users
+	err = initializeUsers(ctx)
+	if err != nil {
+		return err
+	}
+
 	// --- เพิ่มข้อมูล Location ---
 	initialLocations := []models.Location{
 		{ID: "1", Name: "กรุงเทพมหานคร", Description: "กรุงเทพมหานคร เมืองหลวงและศูนย์กลางทางเศรษฐกิจ การเมือง และวัฒนธรรมของประเทศไทย เต็มไปด้วยวัดและพระบรมมหาราชวังสำคัญอย่างวัดพระแก้ว และแหล่งช็อปปิงทันสมัยเช่น สยามพารากอน พร้อมด้วยระบบขนส่งมวลชนทั้ง BTS, MRT และเรือคลอง"},
@@ -1058,6 +1064,188 @@ func initializeDatabase(ctx context.Context) error {
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
+		{
+			ID:          "33",
+			Name:        "โรงแรมเพนนินซูล่า กรุงเทพ",
+			LocationID:  "1",
+			Description: "โรงแรม 5 ดาว ริมแม่น้ำเจ้าพระยา ออกแบบในสไตล์คลาสสิก มีห้องพักกว้างขวาง บริการสปาและสระว่ายน้ำริมแม่น้ำ",
+			Category:    "Hotel & Resort",
+			CoverImage:  "CoverImage/The-Peninsula-Bangkok-1.jpeg",
+			HighlightImages: []string{
+				"HighlightImages/The-Peninsula-Bangkok-1.jpeg",
+				"HighlightImages/The-Peninsula-Bangkok-2.webp",
+				"HighlightImages/The-Peninsula-Bangkok-3.jpg",
+				"HighlightImages/The-Peninsula-Bangkok-4.jpg",
+				"HighlightImages/The-Peninsula-Bangkok-5.jpg",
+			},
+			Rating: 0.0,
+			Coordinates: struct {
+				Lat float64 `bson:"lat" json:"lat"`
+				Lng float64 `bson:"lng" json:"lng"`
+			}{Lat: 13.723020, Lng: 100.510910},
+			Address:   "333 ถนนเจริญนคร แขวงคลองสาน เขตคลองสาน กรุงเทพฯ 10600",
+			Phone:     "+66 2 020 2888",
+			Website:   "https://www.peninsula.com/en/bangkok/5-star-luxury-hotel-riverside",
+			Hours:     "Check-in 14:00, Check-out 12:00",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:          "34",
+			Name:        "โฟร์ซีซันส์ รีสอร์ท เชียงใหม่",
+			LocationID:  "2",
+			Description: "รีสอร์ทหรูระดับ 5 ดาว ตั้งอยู่ท่ามกลางทุ่งนาและขุนเขาในแม่ริม ให้บริการวิลล่าสุดหรู Villa พร้อมสระว่ายน้ำส่วนตัว สปา และกิจกรรมท่องเที่ยวเชิงอนุรักษ์",
+			Category:    "Hotel & Resort",
+			CoverImage:  "CoverImage/Four-Seasons-Chiang-Mai-1.jpg",
+			HighlightImages: []string{
+				"HighlightImages/Four-Seasons-Chiang-Mai-1.jpg",
+				"HighlightImages/Four-Seasons-Chiang-Mai-2.jpg",
+				"HighlightImages/Four-Seasons-Chiang-Mai-3.jpg",
+				"HighlightImages/Four-Seasons-Chiang-Mai-4.jpg",
+				"HighlightImages/Four-Seasons-Chiang-Mai-5.jpg",
+			},
+			Rating: 0.0,
+			Coordinates: struct {
+				Lat float64 `bson:"lat" json:"lat"`
+				Lng float64 `bson:"lng" json:"lng"`
+			}{Lat: 18.9163769, Lng: 98.9318816},
+			Address:   "502 หมู่ 1 ถนนแม่ริม-สะเมิงเก่า ตำบลแม่ริม อำเภอแม่ริม เชียงใหม่ 50180",
+			Phone:     "+66 53 298 181",
+			Website:   "https://www.fourseasons.com/chiangmai/",
+			Hours:     "Check-in 15:00, Check-out 11:00",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:          "35",
+			Name:        "เลอ เมอริเดียน เชียงราย รีสอร์ท",
+			LocationID:  "3",
+			Description: "รีสอร์ทระดับ 5 ดาว ริมแม่น้ำโขง ออกแบบบรรยากาศกลิ่นอายล้านนา มีห้องพักวิวแม่น้ำและสวน สปา และสิ่งอำนวยความสะดวกครบครัน",
+			Category:    "Hotel & Resort",
+			CoverImage:  "CoverImage/Le-Meridien-Chiang-Rai-1.jpg",
+			HighlightImages: []string{
+				"HighlightImages/Le-Meridien-Chiang-Rai-1.jpg",
+				"HighlightImages/Le-Meridien-Chiang-Rai-2.png",
+				"HighlightImages/Le-Meridien-Chiang-Rai-3.webp",
+				"HighlightImages/Le-Meridien-Chiang-Rai-4.jpg",
+				"HighlightImages/Le-Meridien-Chiang-Rai-5.jpg",
+			},
+			Rating: 0.0,
+			Coordinates: struct {
+				Lat float64 `bson:"lat" json:"lat"`
+				Lng float64 `bson:"lng" json:"lng"`
+			}{Lat: 19.9097, Lng: 99.8329},
+			Address:   "221/2 หมู่ 20 ถนนแก้วไพรี ตำบลรอบเวียง อำเภอเมืองเชียงราย เชียงราย 57000",
+			Phone:     "+66 53 603 333",
+			Website:   "https://www.marriott.com/en-us/hotels/ceimd-le-meridien-chiang-rai-resort-thailand/overview/",
+			Hours:     "Check-in 15:00, Check-out 12:00",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:          "36",
+			Name:        "คุ้มมีศรีสุข รีสอร์ท แอนด์ สปา",
+			LocationID:  "4",
+			Description: "รีสอร์ทสไตล์บูทีค อยู่ใกล้สนามช้างอารีน่า มีห้องพักหรูพร้อมสระว่ายน้ำกลางแจ้ง สปา และบริการรถรับ-ส่งสนามบิน",
+			Category:    "Hotel & Resort",
+			CoverImage:  "CoverImage/Khum-Meesrisuk-1.jpg",
+			HighlightImages: []string{
+				"HighlightImages/Khum-Meesrisuk-1.jpg",
+				"HighlightImages/Khum-Meesrisuk-2.jpg",
+				"HighlightImages/Khum-Meesrisuk-3.jpg",
+				"HighlightImages/Khum-Meesrisuk-4.jpg",
+				"HighlightImages/Khum-Meesrisuk-5.jpg",
+			},
+			Rating: 0.0,
+			Coordinates: struct {
+				Lat float64 `bson:"lat" json:"lat"`
+				Lng float64 `bson:"lng" json:"lng"`
+			}{Lat: 14.9951, Lng: 103.1116},
+			Address:   "111 หมู่ 5 ตำบลในเมือง อำเภอเมืองบุรีรัมย์ บุรีรัมย์ 31000",
+			Phone:     "+66 44 666 789",
+			Website:   "https://www.khumeesrisuk.com/",
+			Hours:     "Check-in 14:00, Check-out 12:00",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:          "37",
+			Name:        "โรงแรมแกรนด์ อุบลราชธานี",
+			LocationID:  "5",
+			Description: "โรงแรมหรู 4 ดาว ใจกลางเมืองอุบลราชธานี บริการห้องพักทันสมัย มีห้องอาหาร สระว่ายน้ำ และห้องจัดประชุมขนาดใหญ่",
+			Category:    "Hotel & Resort",
+			CoverImage:  "CoverImage/Ubon-Grand-Hotel-1.webp",
+			HighlightImages: []string{
+				"HighlightImages/Ubon-Grand-Hotel-1.webp",
+				"HighlightImages/Ubon-Grand-Hotel-2.jpg",
+				"HighlightImages/Ubon-Grand-Hotel-3.webp",
+				"HighlightImages/Ubon-Grand-Hotel-4.webp",
+				"HighlightImages/Ubon-Grand-Hotel-5.jpg",
+			},
+			Rating: 0.0,
+			Coordinates: struct {
+				Lat float64 `bson:"lat" json:"lat"`
+				Lng float64 `bson:"lng" json:"lng"`
+			}{Lat: 15.2448, Lng: 104.8473},
+			Address:   "149/12 ถนนอุบลรัตน์ ตำบลในเมือง อำเภอวารินชำราบ อุบลราชธานี 34000",
+			Phone:     "+66 45 245 123",
+			Website:   "http://www.ubongrandhotel.com/",
+			Hours:     "Check-in 14:00, Check-out 12:00",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:          "38",
+			Name:        "รีสอร์ทเสม็ด พาวิลเลียน",
+			LocationID:  "6",
+			Description: "รีสอร์ทระดับ 4 ดาว บนเกาะเสม็ด ติดชายหาดทรายแก้ว ให้บริการวิลล่าส่วนตัว ริมทะเล พร้อมสปาและกิจกรรมทางน้ำ",
+			Category:    "Hotel & Resort",
+			CoverImage:  "CoverImage/SamedPavilion-1.jpg",
+			HighlightImages: []string{
+				"HighlightImages/Samed-Pavilion-1.jpg",
+				"HighlightImages/Samed-Pavilion-2.jpg",
+				"HighlightImages/Samed-Pavilion-3.jpg",
+				"HighlightImages/Samed-Pavilion-4.jpg",
+				"HighlightImages/Samed-Pavilion-5.png",
+			},
+			Rating: 0.0,
+			Coordinates: struct {
+				Lat float64 `bson:"lat" json:"lat"`
+				Lng float64 `bson:"lng" json:"lng"`
+			}{Lat: 12.6515, Lng: 101.2106},
+			Address:   "369 หมู่ 4 เกาะเสม็ด อำเภอเมืองระยอง ระยอง 21160",
+			Phone:     "+66 38 602 111",
+			Website:   "https://www.samedpavilion.com/",
+			Hours:     "Check-in 14:00, Check-out 12:00",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:          "39",
+			Name:        "เซ็นทารา แกรนด์ มิราจ บีช รีสอร์ท พัทยา",
+			LocationID:  "7",
+			Description: "รีสอร์ทระดับ 5 ดาว ริมหาดดุสิตบีช พัทยา ออกแบบธีม Tropical Garden มีสวนน้ำในตัว ห้องพักวิวทะเล สปา และร้านอาหารหลากหลาย",
+			Category:    "Hotel & Resort",
+			CoverImage:  "CoverImage/CentaraMiragePattaya-1.jpg",
+			HighlightImages: []string{
+				"HighlightImages/Centara-Mirage-Pattaya-1.jpg",
+				"HighlightImages/Centara-Mirage-Pattaya-2.jpg",
+				"HighlightImages/Centara-Mirage-Pattaya-3.jpg",
+				"HighlightImages/Centara-Mirage-Pattaya-4.jpg",
+				"HighlightImages/Centara-Mirage-Pattaya-5.jpg",
+			},
+			Rating: 0.0,
+			Coordinates: struct {
+				Lat float64 `bson:"lat" json:"lat"`
+				Lng float64 `bson:"lng" json:"lng"`
+			}{Lat: 12.9225, Lng: 100.8850},
+			Address:   "277 ถนนทับไทร ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี 20150",
+			Phone:     "+66 38 301 234",
+			Website:   "https://www.centarahotelsresorts.com/centaragrand/cgmtp/",
+			Hours:     "Check-in 14:00, Check-out 12:00",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
 	}
 	for _, place := range initialPlaces {
 		var existing models.Place
@@ -1145,6 +1333,188 @@ func initializeDatabase(ctx context.Context) error {
 	log.Println("Initial routes created")
 
 	return nil
+}
+
+// initializeUsers creates initial users in the database
+func initializeUsers(ctx context.Context) error {
+	initialUsers := []models.User{
+		{
+			ID:       primitive.NewObjectID(),
+			Email:    "ekphop.jansuk@example.com",
+			Password: string(mustHashPassword("EkPh0p#2025")),
+			Name:     "เอกภพ จันทร์สุข",
+			Role:     "user",
+			Address: models.Address{
+				AddressLine: "12/34 หมู่บ้านสวนสวย ถนนสายไหม",
+				Province:    "กรุงเทพมหานคร",
+				City:        "เขตสายไหม",
+				Zipcode:     "10220",
+				Country:     "ประเทศไทย",
+			},
+			Status:    "active",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:       primitive.NewObjectID(),
+			Email:    "wararat.rungreung@example.com",
+			Password: string(mustHashPassword("War@2025Ra")),
+			Name:     "วรารัตน์ รุ่งเรือง",
+			Role:     "user",
+			Address: models.Address{
+				AddressLine: "56/7 หมู่ 9 ถนนเชียงใหม่-ลำพูน",
+				Province:    "เชียงใหม่",
+				City:        "อำเภอเมืองเชียงใหม่",
+				Zipcode:     "50200",
+				Country:     "ประเทศไทย",
+			},
+			Status:    "active",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:       primitive.NewObjectID(),
+			Email:    "witthaya.srisuwan@example.com",
+			Password: string(mustHashPassword("WiT#4598")),
+			Name:     "วิทยา ศรีสุวรรณ",
+			Role:     "user",
+			Address: models.Address{
+				AddressLine: "101/23 หมู่บ้านสีวลี ถนนพหลโยธิน",
+				Province:    "เชียงใหม่",
+				City:        "อำเภอเมืองเชียงใหม่",
+				Zipcode:     "50100",
+				Country:     "ประเทศไทย",
+			},
+			Status:    "active",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:       primitive.NewObjectID(),
+			Email:    "siriporn.thongtat@example.com",
+			Password: string(mustHashPassword("Sir!Porn88")),
+			Name:     "ศิริพร ทองทัต",
+			Role:     "user",
+			Address: models.Address{
+				AddressLine: "150/6 หมู่บ้านสราญใจ ถนนเจริญกรุง",
+				Province:    "กรุงเทพมหานคร",
+				City:        "เขตบางรัก",
+				Zipcode:     "10500",
+				Country:     "ประเทศไทย",
+			},
+			Status:    "active",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:       primitive.NewObjectID(),
+			Email:    "kraisorn.nammuang@example.com",
+			Password: string(mustHashPassword("K1r@s0rn")),
+			Name:     "ไกรสร นามเมือง",
+			Role:     "user",
+			Address: models.Address{
+				AddressLine: "9/9 หมู่บ้านจงเจริญ ถนนรามคำแหง",
+				Province:    "กรุงเทพมหานคร",
+				City:        "เขตสวนหลวง",
+				Zipcode:     "10250",
+				Country:     "ประเทศไทย",
+			},
+			Status:    "active",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:       primitive.NewObjectID(),
+			Email:    "uma.phuttharaksa@example.com",
+			Password: string(mustHashPassword("Um@5678")),
+			Name:     "อุมา พุทธรักษา",
+			Role:     "user",
+			Address: models.Address{
+				AddressLine: "200/12 หมู่ 3 ถนนสุราษฎร์ธานี-ตะกั่วป่า",
+				Province:    "พังงา",
+				City:        "อำเภอท้ายเหมือง",
+				Zipcode:     "82140",
+				Country:     "ประเทศไทย",
+			},
+			Status:    "active",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:       primitive.NewObjectID(),
+			Email:    "thanapol.jantara@example.com",
+			Password: string(mustHashPassword("ThaN@pol90")),
+			Name:     "ธนพล จันทรา",
+			Role:     "user",
+			Address: models.Address{
+				AddressLine: "44/1 หมู่บ้านศุภาลัย ถนนพระราม 9",
+				Province:    "กรุงเทพมหานคร",
+				City:        "เขตห้วยขวาง",
+				Zipcode:     "10310",
+				Country:     "ประเทศไทย",
+			},
+			Status:    "active",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:       primitive.NewObjectID(),
+			Email:    "yada.junpech@example.com",
+			Password: string(mustHashPassword("Y@da1234")),
+			Name:     "ญาดา จันทร์เพ็ชร",
+			Role:     "user",
+			Address: models.Address{
+				AddressLine: "61/22 หมู่ 7 ถนนรัตนาธิเบศร์",
+				Province:    "นนทบุรี",
+				City:        "อำเภอเมืองนนทบุรี",
+				Zipcode:     "11000",
+				Country:     "ประเทศไทย",
+			},
+			Status:    "active",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:       primitive.NewObjectID(),
+			Email:    "preecha.saransuk@example.com",
+			Password: string(mustHashPassword("Pr33ch@2025")),
+			Name:     "ปรีชา สำราญสุข",
+			Role:     "user",
+			Address: models.Address{
+				AddressLine: "12/8 หมู่บ้านภูเก็ตคลับ ถนนหลวงพ่อหลวง",
+				Province:    "ภูเก็ต",
+				City:        "อำเภอเมืองภูเก็ต",
+				Zipcode:     "83000",
+				Country:     "ประเทศไทย",
+			},
+			Status:    "active",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+	}
+
+	for _, user := range initialUsers {
+		var existingUser models.User
+		err := db.Collection("users").FindOne(ctx, bson.M{"email": user.Email}).Decode(&existingUser)
+		if err == mongo.ErrNoDocuments {
+			_, err = db.Collection("users").InsertOne(ctx, user)
+			if err != nil {
+				return err
+			}
+			log.Printf("Created user: %s\n", user.Email)
+		}
+	}
+
+	return nil
+}
+
+// mustHashPassword is a helper function to hash passwords
+func mustHashPassword(password string) []byte {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	return hashedPassword
 }
 
 func setupRoutes(router *gin.Engine) {
@@ -1245,62 +1615,64 @@ func setupRoutes(router *gin.Engine) {
 				admin.GET("/stats", handlers.GetStats)
 				admin.GET("/places", handlers.GetPlaces)
 				admin.POST("/places", handlers.CreatePlace)
-
 				admin.PUT("/places/:id", handlers.UpdatePlace)
 				admin.DELETE("/places/:id", handlers.DeletePlace)
 				admin.POST("/upload-image", handlers.UploadImage)
 				admin.GET("/review-reports", handlers.GetAllReviewReports)
 				admin.PATCH("/review-reports/:id/status", handlers.UpdateReviewReportStatus)
 			}
+		}
 
-			// New endpoint for getting all locations
-			api.GET("/locations", func(c *gin.Context) {
-				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-				defer cancel()
-				cursor, err := db.Collection("locations").Find(ctx, bson.M{})
-				if err != nil {
-					c.JSON(500, gin.H{"error": "Failed to fetch locations"})
-					return
-				}
-				defer cursor.Close(ctx)
+		// New endpoint for getting all locations
+		api.GET("/locations", func(c *gin.Context) {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			cursor, err := db.Collection("locations").Find(ctx, bson.M{})
+			if err != nil {
+				c.JSON(500, gin.H{"error": "Failed to fetch locations"})
+				return
+			}
+			defer cursor.Close(ctx)
 
-				var locations []models.Location
-				if err := cursor.All(ctx, &locations); err != nil {
-					c.JSON(500, gin.H{"error": "Failed to decode locations"})
-					return
-				}
-				c.JSON(200, gin.H{"locations": locations})
-			})
+			var locations []models.Location
+			if err := cursor.All(ctx, &locations); err != nil {
+				c.JSON(500, gin.H{"error": "Failed to decode locations"})
+				return
+			}
+			c.JSON(200, gin.H{"locations": locations})
+		})
 
-			// New endpoint for getting a place by place_id or _id
-			api.GET("/places/:id", func(c *gin.Context) {
-				id := c.Param("id")
-				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-				defer cancel()
-				log.Printf("[DEBUG] GET /api/places/:id called with id=%s", id)
+		// New endpoint for getting a place by place_id or _id
+		api.GET("/places/:id", func(c *gin.Context) {
+			id := c.Param("id")
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			log.Printf("[DEBUG] GET /api/places/:id called with id=%s", id)
 
-				var place models.Place
-				err := db.Collection("places").FindOne(ctx, bson.M{"place_id": id}).Decode(&place)
-				if err != nil {
-					log.Printf("[DEBUG] Not found by place_id: %v", err)
-					// Try ObjectId
-					objID, objErr := primitive.ObjectIDFromHex(id)
-					if objErr == nil {
-						err = db.Collection("places").FindOne(ctx, bson.M{"_id": objID}).Decode(&place)
-						if err != nil {
-							log.Printf("[DEBUG] Not found by _id: %v", err)
-							c.JSON(404, gin.H{"error": "Place not found"})
-							return
-						}
-					} else {
-						log.Printf("[DEBUG] id is not a valid ObjectId: %v", objErr)
+			var place models.Place
+			err := db.Collection("places").FindOne(ctx, bson.M{"place_id": id}).Decode(&place)
+			if err != nil {
+				log.Printf("[DEBUG] Not found by place_id: %v", err)
+				// Try ObjectId
+				objID, objErr := primitive.ObjectIDFromHex(id)
+				if objErr == nil {
+					err = db.Collection("places").FindOne(ctx, bson.M{"_id": objID}).Decode(&place)
+					if err != nil {
+						log.Printf("[DEBUG] Not found by _id: %v", err)
 						c.JSON(404, gin.H{"error": "Place not found"})
 						return
 					}
+				} else {
+					log.Printf("[DEBUG] id is not a valid ObjectId: %v", objErr)
+					c.JSON(404, gin.H{"error": "Place not found"})
+					return
 				}
-				log.Printf("[DEBUG] Place found: %+v", place)
-				c.JSON(200, gin.H{"place": place})
-			})
-		}
+			}
+			log.Printf("[DEBUG] Place found: %+v", place)
+			c.JSON(200, gin.H{"place": place})
+		})
 	}
 }
+
+// initializeReviews จะเพิ่มข้อมูลรีวิวเริ่มต้น
+// ... existing code ...

@@ -10,6 +10,9 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { reviewsAPI } from '../services/api';
 
+// เพิ่มตัวแปรสำหรับ URL รูปภาพ
+const HERO_BACKGROUND_IMAGE = 'https://www.ananda.co.th/blog/thegenc/wp-content/uploads/2024/03/%E0%B8%94%E0%B8%B5%E0%B9%84%E0%B8%8B%E0%B8%99%E0%B9%8C%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B8%B1%E0%B8%87%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%84%E0%B8%94%E0%B9%89%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD-2024-05-23T123322.980.png';
+
 const HeroSection = styled.section`
   position: relative;
   height: 85vh;
@@ -30,7 +33,7 @@ const HeroBg = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('https://images.pexels.com/photos/1051073/pexels-photo-1051073.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260');
+  background-image: url(${HERO_BACKGROUND_IMAGE});
   background-size: cover;
   background-position: center;
   
@@ -63,6 +66,7 @@ const HeroTitle = styled(motion.h1)`
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin-bottom: 1.5rem;
   max-width: 36rem;
+  color: white;
   
   @media (min-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 3.5rem;
@@ -472,7 +476,7 @@ const Home = () => {
             <div style={{ color: '#fff', fontSize: 18 }}>ยังไม่มีรีวิวจากผู้ใช้</div>
           ) : (
             <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
-              {latestReviews.map((review, idx) => (
+              {latestReviews.slice(0, 3).map((review, idx) => (
                 <div key={review.id || idx} style={{ background: 'white', color: '#222', borderRadius: 16, padding: 24, minWidth: 280, maxWidth: 340, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', textAlign: 'left' }}>
                   <div style={{ color: '#facc15', fontSize: 20, marginBottom: 8 }}>
                     {'★'.repeat(review.rating || 0)}

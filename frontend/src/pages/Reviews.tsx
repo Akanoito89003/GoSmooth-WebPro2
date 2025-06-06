@@ -545,6 +545,9 @@ const Reviews = () => {
   const [reportLoading, setReportLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [displayedReviews, setDisplayedReviews] = useState<Review[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const reviewsPerPage = 5;
 
   // Fetch reviews (pagination)
   useEffect(() => {
@@ -726,6 +729,15 @@ const Reviews = () => {
     }
   };
 
+  // Update displayed reviews when reviews array changes
+  useEffect(() => {
+    setDisplayedReviews(reviews.slice(0, currentPage * reviewsPerPage));
+  }, [reviews, currentPage]);
+
+  const loadMoreReviews = () => {
+    setCurrentPage(prev => prev + 1);
+  };
+
   return (
     <PageContainer>
       <PageHeader>
@@ -892,7 +904,7 @@ const Reviews = () => {
         </div>
         {/* Feed Reviews (แสดงกับทุกคน) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', margin: '0 auto', maxWidth: 600 }}>
-          {reviews.map((review, idx) => {
+          {displayedReviews.map((review, idx) => {
             const isLiked = user ? Array.isArray(review.liked_by) && review.liked_by.includes(user.id) : false;
             const isOwner = !!(user && review.user_id === user.id);
             // ฟังก์ชัน normalize id เพื่อเปรียบเทียบ id ที่อาจมีรูปแบบต่างกัน
@@ -974,15 +986,12 @@ const Reviews = () => {
           })}
           {loading && <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>Loading...</div>}
           {error && <div style={{ textAlign: 'center', color: 'red', margin: 24 }}>{error}</div>}
-          {hasMore && !loading && reviews.length > 0 && (
+          {reviews.length > displayedReviews.length && !loading && (
             <div style={{ textAlign: 'center', margin: 24 }}>
-              <Button variant="secondary" onClick={() => fetchReviews(page + 1)}>
-                อ่านรีวิวอื่นเพิ่มเติม
+              <Button variant="secondary" onClick={loadMoreReviews}>
+                ดูรีวิวอื่นเพิ่มเติม
               </Button>
             </div>
-          )}
-          {!hasMore && !loading && reviews.length > 0 && (
-            <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>ไม่มีโพสต์รีวิวแล้ว</div>
           )}
           {!loading && reviews.length === 0 && (
             <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>ยังไม่มีรีวิว</div>

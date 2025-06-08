@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -30,22 +33,64 @@ func GetPlaces(c *gin.Context) {
 		return
 	}
 
+	// --- เพิ่ม logic คำนวณ rating จาก reviews ---
+	for i, place := range places {
+		reviewCursor, err := db.Collection("reviews").Find(c, bson.M{"place_id": place.ID})
+		if err == nil {
+			var reviews []struct {
+				Rating int `bson:"rating"`
+			}
+			_ = reviewCursor.All(c, &reviews)
+			total := 0
+			for _, r := range reviews {
+				total += r.Rating
+			}
+			if len(reviews) > 0 {
+				places[i].Rating = float64(total) / float64(len(reviews))
+			} else {
+				places[i].Rating = 0.0
+			}
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{"places": places})
 }
 
 // CreatePlace handles creating a new place (admin only)
 func CreatePlace(c *gin.Context) {
-	var place models.Place
-	if err := c.ShouldBindJSON(&place); err != nil {
+	var input models.UpdatePlaceInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		fmt.Printf("[DEBUG] CreatePlace ShouldBindJSON error: %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	fmt.Printf("[DEBUG] CreatePlace input: %+v\n", input)
 
-	place.CreatedAt = time.Now()
-	place.UpdatedAt = time.Now()
+	place := models.Place{
+		ID:              primitive.NewObjectID().Hex(),
+		Name:            input.Name,
+		LocationID:      input.LocationID,
+		Description:     input.Description,
+		Category:        input.Category,
+		CoverImage:      input.CoverImage,
+		HighlightImages: input.Highlights,
+		Coordinates:     models.Place{}.Coordinates, // จะ map ด้านล่าง
+		Address:         input.Address,
+		Phone:           input.Phone,
+		Website:         input.Website,
+		Hours:           input.Hours,
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+	}
+	// map coordinates
+	place.Coordinates.Lat = input.Coordinates.Lat
+	place.Coordinates.Lng = input.Coordinates.Lng
+
+	fmt.Printf("[DEBUG] CreatePlace mapped place: %+v\n", place)
 
 	_, err := db.Collection("places").InsertOne(c, place)
 	if err != nil {
+		fmt.Printf("[DEBUG] CreatePlace InsertOne error: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create place"})
 		return
 	}
@@ -64,21 +109,32 @@ func UpdatePlace(c *gin.Context) {
 
 	var input models.UpdatePlaceInput
 	if err := c.ShouldBindJSON(&input); err != nil {
+		fmt.Printf("[DEBUG] UpdatePlace ShouldBindJSON error: %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	fmt.Printf("[DEBUG] UpdatePlace input: %+v\n", input)
 
 	update := bson.M{
 		"$set": bson.M{
-			"name":        input.Name,
-			"description": input.Description,
-			"location_id": input.LocationID,
-			"updated_at":  time.Now(),
+			"name":             input.Name,
+			"description":      input.Description,
+			"location_id":      input.LocationID,
+			"category":         input.Category,
+			"address":          input.Address,
+			"phone":            input.Phone,
+			"website":          input.Website,
+			"hours":            input.Hours,
+			"cover_image":      input.CoverImage,
+			"highlight_images": input.Highlights,
+			"coordinates":      input.Coordinates,
+			"updated_at":       time.Now(),
 		},
 	}
 
 	result, err := db.Collection("places").UpdateOne(c, bson.M{"_id": objectID}, update)
 	if err != nil {
+		fmt.Printf("[DEBUG] UpdatePlace UpdateOne error: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update place"})
 		return
 	}
@@ -239,23 +295,131 @@ func UploadImage(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No file is received"})
 		return
 	}
-	folderType := c.Query("type") // "places" หรือ "locations"
-	name := c.Query("name")       // ชื่อสถานที่
-	if folderType == "" || name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "type and name are required"})
-		return
+	imgType := c.Query("imgType") // "cover" หรือ "highlight"
+	if imgType == "" {
+		imgType = "cover"
 	}
-	// สร้าง path โฟลเดอร์
-	uploadPath := fmt.Sprintf("./uploads/%s/%s", folderType, name)
+	var uploadPath string
+	if imgType == "cover" {
+		uploadPath = "./uploads/CoverImage"
+	} else {
+		uploadPath = "./uploads/HighlightImages"
+	}
 	os.MkdirAll(uploadPath, os.ModePerm)
-	// เซฟไฟล์
-	filePath := fmt.Sprintf("%s/%s", uploadPath, file.Filename)
+
+	ext := filepath.Ext(file.Filename)
+	base := strings.TrimSuffix(file.Filename, ext)
+	uniqueName := fmt.Sprintf("%s-%d-%s%s", base, time.Now().Unix(), uuid.New().String(), ext)
+	filePath := fmt.Sprintf("%s/%s", uploadPath, uniqueName)
+
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
 		return
 	}
 	// ส่ง path กลับไป (frontend จะเอา path นี้ไปเก็บใน DB)
-	relativePath := strings.TrimPrefix(filePath, ".")
-	relativePath = strings.ReplaceAll(relativePath, "\\", "/") // สำหรับ Windows
+	var relativePath string
+	if imgType == "cover" {
+		relativePath = fmt.Sprintf("uploads/CoverImage/%s", uniqueName)
+	} else {
+		relativePath = fmt.Sprintf("uploads/HighlightImages/%s", uniqueName)
+	}
 	c.JSON(http.StatusOK, gin.H{"imageUrl": relativePath})
+}
+
+// BanUser handles banning a user (admin only)
+func BanUser(c *gin.Context) {
+	id := c.Param("id")
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID"})
+		return
+	}
+	var input struct {
+		Reason string `json:"reason"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	update := bson.M{
+		"$set": bson.M{
+			"status":     "banned",
+			"ban_reason": input.Reason,
+			"updated_at": time.Now(),
+		},
+	}
+	_, err = db.Collection("users").UpdateOne(context.Background(), bson.M{"_id": objectID}, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to ban user"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "user banned"})
+}
+
+// UnbanUser handles unbanning a user (admin only)
+func UnbanUser(c *gin.Context) {
+	id := c.Param("id")
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID"})
+		return
+	}
+	update := bson.M{
+		"$set": bson.M{
+			"status":     "active",
+			"ban_reason": "",
+			"updated_at": time.Now(),
+		},
+	}
+	_, err = db.Collection("users").UpdateOne(context.Background(), bson.M{"_id": objectID}, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to unban user"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "user unbanned"})
+}
+
+// GetAllReviewReports (admin only)
+func GetAllReviewReports(c *gin.Context) {
+	status := c.Query("status")
+	filter := bson.M{}
+	if status != "" {
+		filter["status"] = status
+	}
+	var reports []models.ReviewReport
+	cursor, err := db.Collection("review_reports").Find(context.Background(), filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get reports"})
+		return
+	}
+	defer cursor.Close(context.Background())
+	if err = cursor.All(context.Background(), &reports); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to decode reports"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"reports": reports})
+}
+
+// UpdateReviewReportStatus (admin only)
+func UpdateReviewReportStatus(c *gin.Context) {
+	reportID := c.Param("id")
+	objectID, err := primitive.ObjectIDFromHex(reportID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid report ID"})
+		return
+	}
+	var input struct {
+		Status string `json:"status" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil || input.Status == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "status is required"})
+		return
+	}
+	update := bson.M{"$set": bson.M{"status": input.Status, "resolved_at": time.Now()}}
+	_, err = db.Collection("review_reports").UpdateOne(context.Background(), bson.M{"_id": objectID}, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update report status"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "report status updated"})
 }

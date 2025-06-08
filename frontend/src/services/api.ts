@@ -107,7 +107,7 @@ export const reviewsAPI = {
       order,
       ...filters
     });
-    return axios.get(`/api/reviews?${params}`);
+    return api.get(`/api/reviews?${params}`);
   },
 
   // Create new review
@@ -138,6 +138,10 @@ export const reviewsAPI = {
   },
 
   likeReview: (reviewId: string) => api.post(`/api/reviews/${reviewId}/like`),
+
+  reportReview: (reviewId: string, data: { type: string; detail: string }) => {
+    return api.post(`/api/reviews/${reviewId}/report`, data);
+  },
 };
 
 // Admin API

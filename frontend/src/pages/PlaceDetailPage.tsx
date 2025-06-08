@@ -9,10 +9,13 @@ import { Place, Review } from '../types/place';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { api } from '../services/api';
-import { UserCircle, Heart, AlertTriangle } from 'lucide-react';
+import { UserCircle, Heart, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { reviewsAPI } from '../services/api';
 import { LuFlag, LuMapPin } from 'react-icons/lu';
 import { toast } from 'react-hot-toast';
+import ReviewOptionsMenu from '../components/ui/ReviewOptionsMenu';
+import ReportReviewModal from '../components/ui/ReportReviewModal';
+import styled from 'styled-components';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,6 +23,39 @@ interface UserReview {
   rating: number;
   comment: string;
 }
+
+const SuccessModal = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+`;
+
+const SuccessContent = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+`;
+
+const SuccessIcon = styled.div`
+  color: #22c55e;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+`;
+
+const SuccessMessage = styled.div`
+  font-size: 18px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 24px;
+`;
 
 const PlaceDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -44,6 +80,12 @@ const PlaceDetailPage: React.FC = () => {
     comment: string;
   } | null>(null);
   const [showRouteModal, setShowRouteModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReviewId, setReportReviewId] = useState<string | null>(null);
+  const [imgVersion, setImgVersion] = useState(Date.now());
+  const [reportLoading, setReportLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => { fetchPlaceDetails(); }, [id]);
@@ -58,13 +100,8 @@ const PlaceDetailPage: React.FC = () => {
   }, [place]);
 
   useEffect(() => {
-    try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      setUserId(user.id || user._id || '');
-    } catch {
-      setUserId('');
-    }
-  }, []);
+    setImgVersion(Date.now());
+  }, [place]);
 
   const fetchPlaceDetails = async () => {
     try {
@@ -72,22 +109,16 @@ const PlaceDetailPage: React.FC = () => {
       const response = await axios.get(`${API_URL}/api/places/${id}`);
       console.log('[DEBUG] API response:', response.data);
       const p = response.data.place || response.data;
-      const getPlaceId = (p: any) =>
-        (typeof p.place_id === 'string' && p.place_id) ||
-        (typeof p.PlaceID === 'string' && p.PlaceID) ||
-        (typeof p.id === 'string' && p.id) ||
-        (typeof p._id === 'string' && p._id) ||
-        (p._id && typeof p._id === 'object' && typeof p._id.$oid === 'string' && p._id.$oid) ||
-        '';
+      const getPlaceId = (p: any) => (typeof p.place_id === 'string' && p.place_id) || (typeof p.PlaceID === 'string' && p.PlaceID) || (typeof p.id === 'string' && p.id) || '';
       const placeData: Place = {
         id: getPlaceId(p),
         name: p.name || p.Name,
         location: p.location || p.Location || p.address || p.Address || '',
         description: p.description || p.Description || '',
         longDescription: p.longDescription || p.LongDescription || p.description || p.Description || '',
-        coverImage: p.CoverImage || '',
+        coverImage: p.coverImage || p.CoverImage || p.cover_image || '',
         imageUrl: Array.isArray(p.HighlightImages) ? p.HighlightImages : [],
-        gallery: Array.isArray(p.HighlightImages) ? p.HighlightImages.map((img: string) => `${API_URL}/uploads/${img}`) : [],
+        gallery: Array.isArray(p.HighlightImages) ? p.HighlightImages : [],
         rating: p.rating || p.Rating || 4.5,
         priceLevel: p.priceLevel || p.PriceLevel || 3,
         category: p.category || p.Category || 'attractions',
@@ -109,7 +140,7 @@ const PlaceDetailPage: React.FC = () => {
       };
       // Debug coverImage and url
       console.log('[DEBUG] coverImage:', placeData.coverImage);
-      console.log('[DEBUG] coverImage url:', `${API_URL}/uploads/${placeData.coverImage}`);
+      console.log('[DEBUG] coverImage url:', getImageUrl(placeData.coverImage));
       setPlace(placeData);
       setLoading(false);
     } catch (error) {
@@ -167,28 +198,29 @@ const PlaceDetailPage: React.FC = () => {
     setShowWarning(true);
   };
 
+  const showSuccess = (message: string) => {
+    setSuccessMessage(message);
+    setShowSuccessModal(true);
+    setTimeout(() => setShowSuccessModal(false), 2000); // ปิดอัตโนมัติหลัง 2 วินาที
+  };
+
   const handleConfirmReview = async () => {
-    if (!pendingReview || !place) return;
+    if (!pendingReview || !place || !user) return;
     try {
       setIsSubmittingReview(true);
-      // เรียก API เพื่อบันทึกรีวิวลง database
       const response = await reviewsAPI.createReview({
         placeId: place.id,
         placeName: place.name,
         rating: pendingReview.rating,
         comment: pendingReview.comment,
       });
-
       if (!response.data || !response.data.id) {
         throw new Error('ไม่สามารถสร้างรีวิวได้');
       }
-
-      // refresh reviews list
       await fetchReviews(place.id);
       setReviewRating(0);
       setReviewText('');
-      setReviewSuccess(true);
-      setTimeout(() => { setReviewSuccess(false); }, 3000);
+      showSuccess('โพสต์รีวิวสำเร็จ!');
     } catch (error: any) {
       console.error('Error posting review:', error);
       toast.error(error.response?.data?.error || error.message || 'เกิดข้อผิดพลาด');
@@ -213,6 +245,27 @@ const PlaceDetailPage: React.FC = () => {
     try {
       await reviewsAPI.toggleLike(reviewId);
     } catch {}
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    try {
+      await reviewsAPI.deleteReview(reviewId);
+      setReviews(prev => prev.filter(r => r.id !== reviewId));
+      showSuccess('ลบรีวิวสำเร็จ!');
+    } catch (e) {
+      console.error('Error deleting review:', e);
+      toast.error('เกิดข้อผิดพลาดในการลบรีวิว');
+    }
+  };
+
+  const getImageUrl = (img: string, version?: number) => {
+    if (!img) return '';
+    if (img.startsWith('http://') || img.startsWith('https://')) return img;
+    const cleanImg = img.startsWith('/') ? img.slice(1) : img;
+    const url = cleanImg.startsWith('uploads/') ? `${API_URL}/${cleanImg}` : `${API_URL}/uploads/${cleanImg}`;
+    const finalUrl = version ? `${url}?v=${version}` : url;
+    console.log('[DEBUG getImageUrl] img:', img, 'finalUrl:', finalUrl);
+    return finalUrl;
   };
 
   if (loading) {
@@ -247,10 +300,16 @@ const PlaceDetailPage: React.FC = () => {
       </div>
     );
   }
+  const heroBg = place.coverImage
+    ? getImageUrl(place.coverImage, imgVersion)
+    : (place.imageUrl && place.imageUrl.length > 0)
+      ? getImageUrl(place.imageUrl[0], imgVersion)
+      : '/default-cover.jpg';
+  console.log('[DEBUG Hero backgroundImage]', heroBg);
   return (
     <div className="page-container">
       {/* Hero Section */}
-      <div className="place-detail-hero" style={{ backgroundImage: `url(${place.coverImage ? `${API_URL}/uploads/${place.coverImage}` : place.imageUrl[0]})`, minHeight: '400px', height: '40vh', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
+      <div className="place-detail-hero" style={{ backgroundImage: `url(${heroBg})`, minHeight: '400px', height: '40vh', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
         <div className="place-detail-hero-overlay" style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 1 }}></div>
         <div className="container-custom px-6 pt-6" style={{ position: 'relative', zIndex: 2 }}>
           <div className="pb-8 md:pb-16 text-white max-w-3xl">
@@ -258,8 +317,8 @@ const PlaceDetailPage: React.FC = () => {
             <div className="flex items-center mb-4">
               <div className="flex items-center mr-4">
                 <FaStar className="star-icon mr-1 text-white" />
-                <span className="font-medium text-white">{place.rating.toFixed(1)}</span>
-                <span className="text-white text-opacity-80 ml-1">({place.reviews.length} reviews)</span>
+                <span className="font-medium text-white">{rating.toFixed(1)}</span>
+                <span className="text-white text-opacity-80 ml-1">({reviews.length} reviews)</span>
               </div>
               <div className="flex items-center mr-4">
                 <FaMapMarkerAlt className="location-icon mr-1 text-white text-opacity-80" />
@@ -328,7 +387,7 @@ const PlaceDetailPage: React.FC = () => {
                           {place.imageUrl.slice(0, 5).map((img, idx) => (
                             <img
                               key={idx}
-                              src={`${API_URL}/uploads/${img}`}
+                              src={getImageUrl(img, imgVersion)}
                               alt={`Highlight ${idx + 1}`}
                               className="w-20 h-20 object-cover rounded shadow border"
                             />
@@ -375,7 +434,7 @@ const PlaceDetailPage: React.FC = () => {
                       {(place.gallery ?? []).map((photo, index) => (
                         <div key={index} className="rounded-lg overflow-hidden h-64">
                           <img
-                            src={photo}
+                            src={getImageUrl(photo, imgVersion)}
                             alt={`${place.name} - Photo ${index + 1}`}
                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                           />
@@ -445,6 +504,12 @@ const PlaceDetailPage: React.FC = () => {
                           </div>
                         </div>
                       )}
+                      {!user && (
+                        <div className="bg-neutral-50 rounded-lg p-4 mb-6 text-center text-gray-500">
+                          <span>เข้าสู่ระบบเพื่อเขียนรีวิว</span>
+                          <button className="btn btn-primary ml-3" onClick={() => window.location.href = '/login'}>เข้าสู่ระบบ</button>
+                        </div>
+                      )}
                       {/* Warning Modal ภาษาไทย */}
                       {showWarning && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -502,43 +567,66 @@ const PlaceDetailPage: React.FC = () => {
                           </div>
                         </div>
                       )}
-                      {/* Review List */}
-                      <div className="space-y-6">
-                        {reviews.map((r) => {
-                          const review = r as any;
-                          const isLiked = Array.isArray(review.liked_by) && review.liked_by.includes(userId);
-                          return (
-                            <div key={review.id} className="border-b border-neutral-200 pb-6 last:border-b-0">
-                              <div className="flex justify-between items-start mb-2">
-                                <div className="flex items-center">
-                                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 22, color: '#6366f1', marginRight: 12 }}>
-                                    <UserCircle size={36} />
+                      {/* Feed Reviews (แสดงกับทุกคน) */}
+                      <div>
+                        {reviews.length === 0 ? (
+                          <div className="text-neutral-400">No reviews yet.</div>
+                        ) : (
+                          reviews.map((review) => {
+                            const likedBy = Array.isArray(review.liked_by) ? review.liked_by : [];
+                            const isLiked: boolean = !!(user && user.id && likedBy.includes(user.id));
+                            const isOwner: boolean = !!(user && review.user_id === user.id);
+                            const reviewDate = review.createdAt;
+                            return (
+                              <div key={review.id} className="border-b border-neutral-200 pb-6 last:border-b-0">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div className="flex items-center">
+                                    <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 22, color: '#6366f1', marginRight: 12 }}>
+                                      <UserCircle size={36} />
+                                    </div>
+                                    <div>
+                                      <div style={{ fontWeight: 600 }}>{review.username || 'Unknown'}</div>
+                                      <div style={{ fontSize: 13, color: '#6b7280' }}>
+                                        {reviewDate && !isNaN(new Date(reviewDate).getTime())
+                                          ? new Date(reviewDate).toLocaleString('th-TH')
+                                          : '-'}
+                                      </div>
+                                    </div>
                                   </div>
-                                  <div>
-                                    <div style={{ fontWeight: 600 }}>{review.username || 'Unknown'}</div>
-                                    <div style={{ fontSize: 13, color: '#6b7280' }}>@{review.username?.toLowerCase().replace(/\s/g, '_') || 'user'}</div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <FaStar
-                                      key={star}
-                                      className={star <= Math.floor(review.rating) ? "text-accent-400" : "text-neutral-300"}
-                                      size={14}
+                                  <div className="flex items-center gap-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <FaStar
+                                        key={star}
+                                        className={star <= Math.floor(review.rating) ? "text-accent-400" : "text-neutral-300"}
+                                        size={14}
+                                      />
+                                    ))}
+                                    <ReviewOptionsMenu
+                                      isOwner={isOwner}
+                                      onDelete={() => handleDeleteReview(review.id || '')}
+                                      onReport={user ? () => { setReportReviewId(review.id || ''); setShowReportModal(true); } : undefined}
                                     />
-                                  ))}
+                                  </div>
+                                </div>
+                                <p className="text-neutral-700">{review.comment}</p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 8 }}>
+                                  <span
+                                    style={{
+                                      display: 'flex', alignItems: 'center', gap: 4,
+                                      color: isLiked ? '#ef4444' : '#aaa',
+                                      cursor: user ? 'pointer' : 'not-allowed',
+                                      opacity: user ? 1 : 0.5
+                                    }}
+                                    onClick={user ? () => handleLikeReview(review.id || '') : undefined}
+                                    title={user ? '' : 'เข้าสู่ระบบเพื่อกดไลก์'}
+                                  >
+                                    <Heart size={18} fill={isLiked ? '#ef4444' : 'none'} color={isLiked ? '#ef4444' : '#aaa'} />{review.likes}
+                                  </span>
                                 </div>
                               </div>
-                              <p className="text-neutral-700">{review.comment}</p>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 8 }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: isLiked ? '#ef4444' : '#aaa', cursor: 'pointer' }} onClick={() => handleLikeReview(review.id)}>
-                                  <Heart size={18} fill={isLiked ? '#ef4444' : 'none'} />{(review as any).likes}
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        })}
-                        {reviews.length === 0 && <div className="text-neutral-400">No reviews yet.</div>}
+                            );
+                          })
+                        )}
                       </div>
                     </div>
                   </div>
@@ -620,7 +708,7 @@ const PlaceDetailPage: React.FC = () => {
                 onMouseOver={e => e.currentTarget.style.background='#bae6fd'} 
                 onMouseOut={e => e.currentTarget.style.background='#e0f2fe'}
               >
-                <LuFlag size={18} style={{ color: '#2563eb' }} /> Origin
+                <LuFlag size={18} style={{ color: '#2563eb' }} /> จุดเริ่มต้น
               </button>
               <button 
                 className="btn" 
@@ -632,21 +720,47 @@ const PlaceDetailPage: React.FC = () => {
                 onMouseOver={e => e.currentTarget.style.background='#bae6fd'} 
                 onMouseOut={e => e.currentTarget.style.background='#e0f2fe'}
               >
-                <LuMapPin size={18} style={{ color: '#0ea5e9' }} /> Destination
+                <LuMapPin size={18} style={{ color: '#0ea5e9' }} /> จุดปลายทาง 
               </button>
             </div>
-            <button 
-              className="btn btn-outline" 
-              style={{ color: '#2563eb', border: '1.5px solid #bae6fd', background: '#f0f9ff', borderRadius: 8, padding: '7px 22px', fontWeight: 400, fontSize: 15, marginTop: 2, transition: 'background 0.2s' }} 
-              onClick={() => setShowRouteModal(false)} 
-              onMouseOver={e => e.currentTarget.style.background='#e0f2fe'} 
-              onMouseOut={e => e.currentTarget.style.background='#f0f9ff'}
-            >
-              ยกเลิก
-            </button>
             <span style={{ position: 'absolute', top: 10, right: 16, cursor: 'pointer', color: '#60a5fa', fontSize: 20 }} onClick={() => setShowRouteModal(false)}>&times;</span>
           </div>
         </div>
+      )}
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <SuccessModal
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <SuccessContent>
+            <SuccessIcon>
+              <CheckCircle2 size={48} />
+            </SuccessIcon>
+            <SuccessMessage>{successMessage}</SuccessMessage>
+          </SuccessContent>
+        </SuccessModal>
+      )}
+      {/* Report Review Modal */}
+      {showReportModal && user && (
+        <ReportReviewModal
+          open={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          onSubmit={async (type, detail) => {
+            if (!reportReviewId) return;
+            setReportLoading(true);
+            try {
+              await reviewsAPI.reportReview(reportReviewId, { type, detail });
+              showSuccess('รายงานรีวิวสำเร็จ!');
+              setShowReportModal(false);
+            } catch (e: any) {
+              toast.error(e?.response?.data?.error || 'เกิดข้อผิดพลาด');
+            } finally {
+              setReportLoading(false);
+            }
+          }}
+        />
       )}
     </div>
   );

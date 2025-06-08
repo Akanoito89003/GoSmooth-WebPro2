@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"gosmooth/models"
@@ -98,7 +99,13 @@ func RequireAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID := c.GetString("userID")
 		var user models.User
-		err := db.Collection("users").FindOne(c, bson.M{"_id": userID}).Decode(&user)
+		objectID, err := primitive.ObjectIDFromHex(userID)
+		if err != nil {
+			c.JSON(http.StatusForbidden, gin.H{"error": "admin access required"})
+			c.Abort()
+			return
+		}
+		err = db.Collection("users").FindOne(c, bson.M{"_id": objectID}).Decode(&user)
 		if err != nil || user.Role != "admin" {
 			c.JSON(http.StatusForbidden, gin.H{"error": "admin access required"})
 			c.Abort()

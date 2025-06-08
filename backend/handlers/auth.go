@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -62,6 +63,7 @@ func Register(c *gin.Context) {
 		Address:   input.Address,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+		Status:    "active",
 	}
 
 	_, err = db.Collection("users").InsertOne(context.Background(), user)
@@ -84,6 +86,15 @@ func Login(c *gin.Context) {
 	err := db.Collection("users").FindOne(context.Background(), bson.M{"email": credentials.Email}).Decode(&user)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		return
+	}
+
+	// เช็คว่าถูกแบนหรือไม่
+	if user.Status == "banned" {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error":     "Your account has been banned",
+			"banReason": user.BanReason,
+		})
 		return
 	}
 
@@ -118,9 +129,11 @@ func ChangePassword(c *gin.Context) {
 		NewPassword     string `json:"newPassword" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
+		fmt.Println("DEBUG: ChangePassword input bind error:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	fmt.Printf("DEBUG: ChangePassword input: currentPassword=%s, newPassword=%s\n", input.CurrentPassword, input.NewPassword)
 
 	// ดึง user
 	var user models.User
@@ -132,6 +145,7 @@ func ChangePassword(c *gin.Context) {
 
 	// ตรวจสอบรหัสผ่านเดิม
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.CurrentPassword)); err != nil {
+		fmt.Println("DEBUG: ChangePassword password mismatch error:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "current password is incorrect"})
 		return
 	}
